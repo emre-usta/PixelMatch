@@ -2942,7 +2942,7 @@ MonoBehaviour:
   gridContainer: {fileID: 34886364}
   cardBackSprite: {fileID: 21300000, guid: e0c7d5a920e98fd47a926292adc0bec7, type: 3}
   cardSprites:
-  - {fileID: 21300000, guid: 50515b87527a140efb4a20420d8a7afe, type: 3}
+  - {fileID: 21300000, guid: 8a3a8592e3a8d2d42b13d9997baca81b, type: 3}
   - {fileID: 21300000, guid: b70944d5db9ae4c80b01034b6d3d91bf, type: 3}
   - {fileID: 21300000, guid: bfbf8b6c3b15547df885053bd2807cdd, type: 3}
   - {fileID: 21300000, guid: acac447b23cc54be1bfc375090e81d90, type: 3}
@@ -2987,7 +2987,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f90fb1ec7606f468d13c3331c2f24e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalTime: 10
+  totalTime: 120
   timerText: {fileID: 1730854359}
 --- !u!1 &1519298746
 GameObject:

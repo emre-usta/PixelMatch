@@ -177,6 +177,18 @@ public class GridManager : MonoBehaviour
 
     private void HandlePairMismatch(CardController a, CardController b)
     {
+        StartCoroutine(MismatchSequence(a, b));
+    }
+
+    private IEnumerator MismatchSequence(CardController a, CardController b)
+    {
+        // Önce shake
+        StartCoroutine(a.ShakeAnimation());
+        StartCoroutine(b.ShakeAnimation());
+
+        yield return new WaitForSeconds(0.3f);
+
+        // Sonra kapat
         a.Hide();
         b.Hide();
     }

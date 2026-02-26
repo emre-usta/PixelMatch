@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// PixelMatch — Ses Yöneticisi
@@ -47,13 +48,38 @@ public class AudioManager : MonoBehaviour
 
     private void OnEnable()
     {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SubscribeToEvents();
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        UnsubscribeFromEvents();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Her sahne yüklenince event'lere yeniden abone ol
+        UnsubscribeFromEvents();
+        SubscribeToEvents();
+
+        // Sahneye göre müzik çal
+        if (scene.name == "MainMenu")
+            PlayBGM(bgmMenu);
+        else if (scene.name == "Level1")
+            PlayBGM(bgmGame);
+    }
+
+    private void SubscribeToEvents()
+    {
         GameEvents.OnCardRevealed += HandleCardRevealed;
         GameEvents.OnPairMatched += HandlePairMatched;
         GameEvents.OnPairMismatch += HandlePairMismatch;
         GameEvents.OnGameStarted += HandleGameStarted;
     }
 
-    private void OnDisable()
+    private void UnsubscribeFromEvents()
     {
         GameEvents.OnCardRevealed -= HandleCardRevealed;
         GameEvents.OnPairMatched -= HandlePairMatched;

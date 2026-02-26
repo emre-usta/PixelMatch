@@ -4,23 +4,31 @@ using UnityEngine.UI;
 
 /// <summary>
 /// PixelMatch — Kart Kontrolcüsü
-/// Her kartın state'ini ve davranışını yönetir.
-/// GridManager tarafından üretilir ve yapılandırılır.
+/// Her kartın state'ini, davranışını ve animasyonlarını yönetir.
 /// </summary>
 public class CardController : MonoBehaviour
 {
     // ─── KART VERİSİ ──────────────────────────────────────────────
 
-    public int CardID { get; private set; }           // Eşleşme için kimlik (aynı ID = çift)
+    public int CardID { get; private set; }
     public CardState State { get; private set; } = CardState.Closed;
     public CardEffectType EffectType { get; private set; } = CardEffectType.None;
 
     // ─── GÖRSEL REFERANSLAR ───────────────────────────────────────
 
     [Header("Görsel")]
-    [SerializeField] private Image cardImage;         // Kartın UI Image componenti
-    [SerializeField] private Sprite cardBackSprite;   // Kapalı yüz (arka)
-    private Sprite cardFrontSprite;                   // Açık yüz (ön) — GridManager atar
+    [SerializeField] private Image cardImage;
+    [SerializeField] private Sprite cardBackSprite;
+    private Sprite cardFrontSprite;
+
+    // ─── ANİMASYON AYARLARI ───────────────────────────────────────
+
+    [Header("Animasyon")]
+    [SerializeField] private float flipDuration = 0.15f;
+    [SerializeField] private float shakeDuration = 0.3f;
+    [SerializeField] private float shakeStrength = 8f;
+
+    private Coroutine activeCoroutine;
 
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
@@ -30,12 +38,8 @@ public class CardController : MonoBehaviour
             cardImage = GetComponent<Image>();
     }
 
-    // ─── KURULUM (GridManager çağırır) ────────────────────────────
+    // ─── KURULUM ──────────────────────────────────────────────────
 
-    /// <summary>
-    /// GridManager bu kartı üretince çağırır.
-    /// ID, sprite ve efekt tipini dışarıdan alır.
-    /// </summary>
     public void Setup(int id, Sprite frontSprite, Sprite backSprite, CardEffectType effectType = CardEffectType.None)
     {
         CardID = id;
@@ -45,6 +49,7 @@ public class CardController : MonoBehaviour
 
         SetState(CardState.Closed);
         ShowBack();
+        transform.localScale = Vector3.one;
     }
 
     // ─── TIKLANMA ─────────────────────────────────────────────────
@@ -58,51 +63,116 @@ public class CardController : MonoBehaviour
 
     // ─── KART STATE İŞLEMLERİ ─────────────────────────────────────
 
-    /// <summary>Kartı açar ve event fırlatır.</summary>
     public void Reveal()
     {
         SetState(CardState.Open);
-        ShowFront();
+        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
+        activeCoroutine = StartCoroutine(FlipAnimation(cardBackSprite, cardFrontSprite));
         GameEvents.RaiseCardRevealed(this);
     }
 
-    /// <summary>Kartı kapatır (yanlış eşleşme sonrası).</summary>
     public void Hide()
     {
         SetState(CardState.Closed);
-        ShowBack();
+        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
+        activeCoroutine = StartCoroutine(FlipAnimation(cardFrontSprite, cardBackSprite));
     }
 
-    /// <summary>Kartı eşleşmiş olarak işaretler.</summary>
     public void SetMatched()
     {
         SetState(CardState.Matched);
-        cardImage.enabled = false;
-        GetComponent<Button>().enabled = false;
-        // İleride: eşleşme animasyonu buraya
+        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
+        activeCoroutine = StartCoroutine(MatchAnimation());
     }
 
-    /// <summary>Kartı kilitler (LockBreaker efekti).</summary>
     public void SetLocked()
     {
         SetState(CardState.Locked);
-        // İleride: kilit görseli buraya
     }
 
-    /// <summary>Kilitli kartı tekrar kapalıya döndürür.</summary>
     public void Unlock()
     {
         SetState(CardState.Closed);
         ShowBack();
     }
 
-    // ─── GÖRSEL YARDIMCILAR ───────────────────────────────────────
+    // ─── ANİMASYONLAR ─────────────────────────────────────────────
 
-    private void ShowFront()
+    private IEnumerator FlipAnimation(Sprite fromSprite, Sprite toSprite)
     {
-        if (cardImage != null && cardFrontSprite != null)
-            cardImage.sprite = cardFrontSprite;
+        float elapsed = 0f;
+        float half = flipDuration / 2f;
+
+        while (elapsed < half)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / half;
+            transform.localScale = new Vector3(1f - t, 1f, 1f);
+            yield return null;
+        }
+
+        if (cardImage != null && toSprite != null)
+            cardImage.sprite = toSprite;
+
+        elapsed = 0f;
+        while (elapsed < half)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / half;
+            transform.localScale = new Vector3(t, 1f, 1f);
+            yield return null;
+        }
+
+        transform.localScale = Vector3.one;
     }
+
+    private IEnumerator MatchAnimation()
+    {
+        float duration = 0.3f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            float scale = Mathf.Lerp(1f, 1.2f, t);
+            transform.localScale = new Vector3(scale, scale, 1f);
+            yield return null;
+        }
+
+        elapsed = 0f;
+        Color originalColor = cardImage.color;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            cardImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f - t);
+            yield return null;
+        }
+
+        cardImage.enabled = false;
+        GetComponent<Button>().enabled = false;
+        transform.localScale = Vector3.one;
+        cardImage.color = originalColor;
+    }
+
+    public IEnumerator ShakeAnimation()
+    {
+        Vector3 originalPos = transform.localPosition;
+        float elapsed = 0f;
+
+        while (elapsed < shakeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float x = originalPos.x + Mathf.Sin(elapsed * 40f) * shakeStrength;
+            transform.localPosition = new Vector3(x, originalPos.y, originalPos.z);
+            yield return null;
+        }
+
+        transform.localPosition = originalPos;
+    }
+
+    // ─── GÖRSEL YARDIMCILAR ───────────────────────────────────────
 
     private void ShowBack()
     {
@@ -115,9 +185,6 @@ public class CardController : MonoBehaviour
         State = newState;
     }
 
-    // ─── RAYCAST KONTROLÜ ─────────────────────────────────────────
-
-    /// <summary>Input engelleme — GridManager tüm kartlar için çağırır.</summary>
     public void SetInteractable(bool interactable)
     {
         if (cardImage != null)
@@ -125,12 +192,10 @@ public class CardController : MonoBehaviour
     }
 }
 
-// ─── CARD STATE ENUM ──────────────────────────────────────────────
-
 public enum CardState
 {
-    Closed,     // Kapalı — tıklanabilir
-    Open,       // Açık — eşleşme bekleniyor
-    Matched,    // Eşleşti — devre dışı
-    Locked      // Kilitli — LockBreaker tarafından kilitlendi
+    Closed,
+    Open,
+    Matched,
+    Locked
 }
