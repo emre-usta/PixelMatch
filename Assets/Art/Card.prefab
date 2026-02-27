@@ -90,7 +90,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardImage: {fileID: 6876912628267123317}
-  cardBackSprite: {fileID: 21300000, guid: e0c7d5a920e98fd47a926292adc0bec7, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: c82a6cf6552f1f24e8e168fcc9c06416, type: 3}
+  flipDuration: 0.15
+  shakeDuration: 0.3
+  shakeStrength: 8
 --- !u!114 &7298037497275457944
 MonoBehaviour:
   m_ObjectHideFlags: 0
