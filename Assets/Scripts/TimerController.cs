@@ -111,6 +111,16 @@ public class TimerController : MonoBehaviour
         }
     }
 
+    public void SetConfig(bool useTimer, float timeLimit)
+    {
+        if (!useTimer)
+        {
+            StopTimer();
+            return;
+        }
+        totalTime = timeLimit;
+    }
+
     /// <summary>
     /// Süreye delta ekler — pozitif = süre artar, negatif = azalır.
     /// Zaman Hırsızı kartı için: AddTime(-5)

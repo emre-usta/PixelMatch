@@ -25,6 +25,9 @@ public class GridManager : MonoBehaviour
     [Header("Kart Sprite'ları")]
     [SerializeField] private Sprite[] cardSprites;        // Ön yüz sprite'ları (min. 18 adet)
 
+    [Header("Level Konfigürasyonu")]
+    [SerializeField] private LevelConfig levelConfig;
+
     // ─── RUNTIME VERİSİ ───────────────────────────────────────────
 
     private List<CardController> allCards = new List<CardController>();
@@ -70,6 +73,15 @@ public class GridManager : MonoBehaviour
 
     private void GenerateGrid()
     {
+        if (levelConfig != null)
+        {
+            columns = levelConfig.columns;
+            rows = levelConfig.rows;
+            cardBackSprite = levelConfig.cardBackSprite;
+            if (levelConfig.cardSprites != null && levelConfig.cardSprites.Length > 0)
+                cardSprites = levelConfig.cardSprites;
+        }
+
         int totalCards = columns * rows;           // 36
         totalPairCount = totalCards / 2;           // 18 çift
 
@@ -92,6 +104,8 @@ public class GridManager : MonoBehaviour
         Shuffle(cardIDs);
 
         // Kartları üret ve yerleştir
+        AdjustGridLayout();
+
         for (int i = 0; i < totalCards; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab, gridContainer);
@@ -113,6 +127,33 @@ public class GridManager : MonoBehaviour
         GameStateManager.Instance.OnGridReady();
 
         Debug.Log($"[GridManager] Grid hazır: {columns}x{rows}, {totalPairCount} çift");
+    }
+
+    private void AdjustGridLayout()
+    {
+        GridLayoutGroup layout = gridContainer.GetComponent<GridLayoutGroup>();
+        if (layout == null) return;
+
+        // Grid container'ın boyutunu al
+        RectTransform containerRect = gridContainer.GetComponent<RectTransform>();
+        float containerWidth = containerRect.rect.width;
+        float containerHeight = containerRect.rect.height;
+
+        // Spacing sabit
+        float spacingX = 5f;
+        float spacingY = 5f;
+
+        // Her kart için uygun boyutu hesapla
+        float cellWidth = (containerWidth - (spacingX * (columns + 1))) / columns;
+        float cellHeight = (containerHeight - (spacingY * (rows + 1))) / rows;
+
+        // Kare kart — küçük olanı al
+        float cellSize = Mathf.Min(cellWidth, cellHeight);
+
+        layout.cellSize = new Vector2(cellSize, cellSize);
+        layout.spacing = new Vector2(spacingX, spacingY);
+        layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        layout.constraintCount = columns;
     }
 
     // ─── KART SEÇİMİ & EŞLEŞME KONTROLÜ ─────────────────────────

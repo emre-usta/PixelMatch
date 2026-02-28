@@ -49,6 +49,13 @@ public class MoveController : MonoBehaviour
         GameEvents.OnGameStarted -= HandleGameStarted;
     }
 
+    public void SetConfig(bool useMoveLimit, int moveLimit)
+    {
+        this.useMoveLimit = useMoveLimit;
+        this.moveLimit = moveLimit;
+    }
+
+
     // ─── EVENT HANDLERS ───────────────────────────────────────────
 
     private void HandleGameStarted()
