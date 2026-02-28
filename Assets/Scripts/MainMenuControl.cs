@@ -12,7 +12,7 @@ public class MainMenuControl : MonoBehaviour
 
     public void OnPlayClicked()
     {
-        SceneManager.LoadScene("Level1");
+        SceneManager.LoadScene("LevelSelect");
     }
 
     public void OnExitClicked()

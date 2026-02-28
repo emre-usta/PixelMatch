@@ -66,6 +66,9 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
+        if (LevelSelectManager.SelectedLevel != null)
+            levelConfig = LevelSelectManager.SelectedLevel;
+
         GenerateGrid();
     }
 
