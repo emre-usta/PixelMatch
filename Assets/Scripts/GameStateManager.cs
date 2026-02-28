@@ -82,6 +82,32 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
         if (panelWin != null) panelWin.SetActive(true);
+
+        // Bir sonraki leveli aç
+        UnlockNextLevel();
+    }
+
+    private void UnlockNextLevel()
+    {
+        if (LevelSelectManager.SelectedLevel == null) return;
+        if (LevelProgressManager.Instance == null) return;
+
+        int currentLevelID = LevelSelectManager.SelectedLevel.levelID;
+        int categoryID = LevelSelectManager.SelectedCategoryID;
+        int nextLevelID = currentLevelID + 1;
+
+        // Bir sonraki leveli aç
+        LevelProgressManager.Instance.UnlockLevel(categoryID, nextLevelID);
+        Debug.Log($"[GameStateManager] Level açıldı: Category {categoryID}, Level {nextLevelID}");
+
+        // Kategorinin son leveli mi?
+        bool isLastLevel = LevelSelectManager.IsLastLevelInCategory(currentLevelID);
+        if (isLastLevel)
+        {
+            // Bir sonraki kategoriyi aç
+            LevelProgressManager.Instance.UnlockCategory(categoryID + 1);
+            Debug.Log($"[GameStateManager] Yeni kategori açıldı: {categoryID + 1}");
+        }
     }
 
     public void LoseGame()
@@ -116,6 +142,12 @@ public class GameStateManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void NextOrRetryWin()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("LevelSelect");
     }
 }
 

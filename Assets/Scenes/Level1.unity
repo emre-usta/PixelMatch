@@ -3762,7 +3762,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1496422336}
         m_TargetAssemblyTypeName: GameStateManager, Assembly-CSharp
-        m_MethodName: RestartGame
+        m_MethodName: NextOrRetryWin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

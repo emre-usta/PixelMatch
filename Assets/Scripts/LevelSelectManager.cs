@@ -29,6 +29,7 @@ public class LevelSelectManager : MonoBehaviour
     // ─── SEÇİLEN LEVEL ────────────────────────────────────────────
 
     public static LevelConfig SelectedLevel { get; private set; }
+    public static int SelectedCategoryID { get; private set; }
 
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
@@ -78,6 +79,17 @@ public class LevelSelectManager : MonoBehaviour
         }
     }
 
+    public void OnCategoryClicked(int index)
+    {
+        if (LevelProgressManager.Instance != null &&
+            !LevelProgressManager.Instance.IsCategoryUnlocked(index))
+        {
+            Debug.Log($"[LevelSelectManager] Kategori kilitli: {index}");
+            return;
+        }
+        LoadCategory(index);
+    }
+
     // ─── LEVEL KARTI OLUŞTURMA ────────────────────────────────────
 
     private void CreateLevelCard(LevelConfig level, int levelIndex, bool isUnlocked)
@@ -112,15 +124,25 @@ public class LevelSelectManager : MonoBehaviour
         SceneManager.LoadScene("Level1");
     }
 
+    // ─── KATEGORİ SEÇİMİ ─────────────────────────────────────────────
+
+    public static bool IsLastLevelInCategory(int levelID)
+    {
+        if (Instance == null || Instance.categories == null) return false;
+
+        CategoryConfig category = null;
+        foreach (var cat in Instance.categories)
+            if (cat.categoryID == SelectedCategoryID)
+                category = cat;
+
+        if (category == null) return false;
+        return levelID >= category.levels.Length - 1;
+    }
+
     // ─── BUTON HANDLER'LARI ───────────────────────────────────────
 
     public void OnBackClicked()
     {
         SceneManager.LoadScene("MainMenu");
-    }
-
-    public void OnCategoryClicked(int index)
-    {
-        LoadCategory(index);
     }
 }

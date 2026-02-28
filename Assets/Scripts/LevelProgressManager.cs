@@ -38,6 +38,23 @@ public class LevelProgressManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    // ─── LEVEL KİLİT KONTROLÜ ─────────────────────────────────────
+
+    private const string KEY_UNLOCKED_CATEGORY = "unlocked_category_";
+
+    public bool IsCategoryUnlocked(int categoryID)
+    {
+        if (categoryID == 0) return true;
+        return PlayerPrefs.GetInt(KEY_UNLOCKED_CATEGORY + categoryID, 0) == 1;
+    }
+
+    public void UnlockCategory(int categoryID)
+    {
+        PlayerPrefs.SetInt(KEY_UNLOCKED_CATEGORY + categoryID, 1);
+        PlayerPrefs.Save();
+        Debug.Log($"[LevelProgressManager] Kategori açıldı: {categoryID}");
+    }
+
     // ─── SKOR KAYDETME ────────────────────────────────────────────
 
     public void SaveBestTime(int categoryID, int levelID, float time)
