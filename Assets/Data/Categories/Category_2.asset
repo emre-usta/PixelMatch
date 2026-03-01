@@ -17,4 +17,5 @@ MonoBehaviour:
   categoryDescription: 
   categoryIcon: {fileID: 0}
   categoryColor: {r: 1, g: 1, b: 1, a: 1}
-  levels: []
+  levels:
+  - {fileID: 11400000, guid: 69412c09362fecf4988c43b956eff350, type: 2}

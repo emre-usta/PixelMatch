@@ -30,6 +30,7 @@ public class LevelSelectManager : MonoBehaviour
 
     public static LevelConfig SelectedLevel { get; private set; }
     public static int SelectedCategoryID { get; private set; }
+    public static int SelectedCategoryLevelCount { get; private set; }
 
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
@@ -121,6 +122,8 @@ public class LevelSelectManager : MonoBehaviour
     {
         SelectedLevel = selectedCategory.levels[levelIndex];
         Debug.Log($"[LevelSelectManager] Level seçildi: {SelectedLevel.levelName}");
+        SelectedCategoryID = selectedCategory.categoryID;
+        SelectedCategoryLevelCount = selectedCategory.levels.Length;
         SceneManager.LoadScene("Level1");
     }
 
@@ -136,6 +139,8 @@ public class LevelSelectManager : MonoBehaviour
                 category = cat;
 
         if (category == null) return false;
+
+        Debug.Log($"[LevelSelectManager] levelID: {levelID}, category.levels.Length: {category.levels.Length}");
         return levelID >= category.levels.Length - 1;
     }
 

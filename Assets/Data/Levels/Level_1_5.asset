@@ -23,14 +23,8 @@ MonoBehaviour:
   moveLimit: 30
   cardSprites:
   - {fileID: 21300000, guid: b77e22f53247f3b408599cd84687f902, type: 3}
-  - {fileID: 21300000, guid: 24949f52b7b1ff44eb6218e4ad06f2dd, type: 3}
+  - {fileID: 21300000, guid: 07a4b77d490ab4544887b60cab5a349b, type: 3}
   - {fileID: 21300000, guid: 5bba549695f89444582f2ef1fe1f9c37, type: 3}
-  - {fileID: 21300000, guid: eea10caf1bb404543b1eaee2be1a4bbf, type: 3}
-  - {fileID: 21300000, guid: e6917dbd6a02641409de3f71a7240579, type: 3}
-  - {fileID: 21300000, guid: 62aeec98a3c56664bb29ef6f5721282b, type: 3}
-  - {fileID: 21300000, guid: 25afc1cc97f9e6a49b926e1028b521e4, type: 3}
-  - {fileID: 21300000, guid: 9bd4d367ec339c94c8728b1d9d05bbf5, type: 3}
-  - {fileID: 21300000, guid: a0916f387ff97de4ea8c7d556993c2d3, type: 3}
   - {fileID: 21300000, guid: 8adc84979f3c63846a2cd3d3636f9e07, type: 3}
   - {fileID: 21300000, guid: a0916f387ff97de4ea8c7d556993c2d3, type: 3}
   - {fileID: 21300000, guid: 9bd4d367ec339c94c8728b1d9d05bbf5, type: 3}
@@ -38,7 +32,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 62aeec98a3c56664bb29ef6f5721282b, type: 3}
   - {fileID: 21300000, guid: e6917dbd6a02641409de3f71a7240579, type: 3}
   - {fileID: 21300000, guid: eea10caf1bb404543b1eaee2be1a4bbf, type: 3}
-  - {fileID: 21300000, guid: eefb3928c103bce43bbbc54f457a7141, type: 3}
+  - {fileID: 21300000, guid: cfabcfeefcbec5946b3a950dec3fcfc0, type: 3}
+  - {fileID: 21300000, guid: 5b77c3f2add60c947b5a7fda9af8b607, type: 3}
+  - {fileID: 21300000, guid: cec7f6a176d5d154381166c3a1b3555e, type: 3}
   - {fileID: 21300000, guid: c3ef43765b2eaa34384399e26d912f4b, type: 3}
+  - {fileID: 21300000, guid: 646e3944dd2abbc488c91c985c454562, type: 3}
+  - {fileID: 21300000, guid: eefb3928c103bce43bbbc54f457a7141, type: 3}
+  - {fileID: 21300000, guid: f7fa3a72295f3724697400cb768f72af, type: 3}
+  - {fileID: 21300000, guid: 33912279b7479834a862091d79c13b32, type: 3}
   cardBackSprite: {fileID: 21300000, guid: c82a6cf6552f1f24e8e168fcc9c06416, type: 3}
   difficulty: 0

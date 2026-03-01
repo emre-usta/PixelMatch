@@ -94,19 +94,16 @@ public class GameStateManager : MonoBehaviour
 
         int currentLevelID = LevelSelectManager.SelectedLevel.levelID;
         int categoryID = LevelSelectManager.SelectedCategoryID;
+        int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
         int nextLevelID = currentLevelID + 1;
 
-        // Bir sonraki leveli aç
         LevelProgressManager.Instance.UnlockLevel(categoryID, nextLevelID);
-        Debug.Log($"[GameStateManager] Level açıldı: Category {categoryID}, Level {nextLevelID}");
+        Debug.Log($"[GameStateManager] Level açıldı: Category {categoryID}, Level {nextLevelID}, Total: {totalLevels}");
 
-        // Kategorinin son leveli mi?
-        bool isLastLevel = LevelSelectManager.IsLastLevelInCategory(currentLevelID);
-        if (isLastLevel)
+        if (currentLevelID >= totalLevels - 1)
         {
-            // Bir sonraki kategoriyi aç
             LevelProgressManager.Instance.UnlockCategory(categoryID + 1);
-            Debug.Log($"[GameStateManager] Yeni kategori açıldı: {categoryID + 1}");
+            Debug.Log($"[GameStateManager] Kategori açıldı: {categoryID + 1}");
         }
     }
 
