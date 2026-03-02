@@ -9,6 +9,13 @@ using TMPro;
 /// </summary>
 public class LevelSelectManager : MonoBehaviour
 {
+    public enum GameMode
+    {
+        Classic,
+        Move
+    }
+
+    public static GameMode SelectedMode { get; set; }
     public static LevelSelectManager Instance { get; private set; }
 
     // ─── INSPECTOR AYARLARI ───────────────────────────────────────
@@ -111,7 +118,8 @@ public class LevelSelectManager : MonoBehaviour
             if (isUnlocked)
             {
                 int capturedIndex = levelIndex;
-                btn.onClick.AddListener(() => OnLevelSelected(capturedIndex));
+                btn.onClick.AddListener(() =>
+                    LevelPopupManager.Instance.ShowPopup(level, capturedIndex));
             }
         }
     }
@@ -125,6 +133,13 @@ public class LevelSelectManager : MonoBehaviour
         SelectedCategoryID = selectedCategory.categoryID;
         SelectedCategoryLevelCount = selectedCategory.levels.Length;
         SceneManager.LoadScene("Level1");
+    }
+
+    public static void SetSelectedLevel(LevelConfig level, int levelIndex)
+    {
+        SelectedLevel = level;
+        SelectedCategoryID = Instance.selectedCategory.categoryID;
+        SelectedCategoryLevelCount = Instance.selectedCategory.levels.Length;
     }
 
     // ─── KATEGORİ SEÇİMİ ─────────────────────────────────────────────

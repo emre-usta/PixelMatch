@@ -30,6 +30,10 @@ public class LevelConfig : ScriptableObject
     [Header("Zorluk")]
     public DifficultyLevel difficulty = DifficultyLevel.Easy;
 
+    // LevelConfig.cs'e ekle
+    //[HideInInspector] public bool runtimeUseTimer;
+    //[HideInInspector] public bool runtimeUseMoveLimit;
+
     // ─── HESAPLANAN DEĞERLER ──────────────────────────────────────
 
     /// <summary>Toplam kart sayısı</summary>

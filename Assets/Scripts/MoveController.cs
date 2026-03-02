@@ -61,8 +61,7 @@ public class MoveController : MonoBehaviour
     private void HandleGameStarted()
     {
         moveCount = 0;
-        if (moveText != null)
-            moveText.text = "Moves: 0";
+        UpdateUI(); // "Moves: 0" yerine UpdateUI() çağır — moveLimit'i gösterir
     }
 
     private void HandlePairResult(CardController a, CardController b)
