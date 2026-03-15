@@ -69,24 +69,6 @@ public class GridManager : MonoBehaviour
         if (LevelSelectManager.SelectedLevel != null)
             levelConfig = LevelSelectManager.SelectedLevel;
 
-        // Mod kontrolü
-        if (LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move)
-        {
-            if (levelConfig != null)
-            {
-                levelConfig.useTimer = false;
-                levelConfig.useMoveLimit = true;
-            }
-        }
-        else
-        {
-            if (levelConfig != null)
-            {
-                levelConfig.useTimer = true;
-                levelConfig.useMoveLimit = false;
-            }
-        }
-
         GenerateGrid();
     }
 
@@ -101,17 +83,9 @@ public class GridManager : MonoBehaviour
             cardBackSprite = levelConfig.cardBackSprite;
             if (levelConfig.cardSprites != null && levelConfig.cardSprites.Length > 0)
                 cardSprites = levelConfig.cardSprites;
-        }
 
-        if (levelConfig != null)
-        {
-            columns = levelConfig.columns;
-            rows = levelConfig.rows;
-            cardBackSprite = levelConfig.cardBackSprite;
-            if (levelConfig.cardSprites != null && levelConfig.cardSprites.Length > 0)
-                cardSprites = levelConfig.cardSprites;
-
-            // Mod'a göre timer/hamle ayarla
+            // Mod'u levelConfig'ten değil, SelectedMode'dan oku
+            // levelConfig asset'ine hiç dokunma
             bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
             if (TimerController.Instance != null)
