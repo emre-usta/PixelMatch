@@ -33,4 +33,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 0f5339e545a77e4428cc1f76261bbd28, type: 3}
   - {fileID: 21300000, guid: fd00c87ddb96d0a40867601cb083a31c, type: 3}
   cardBackSprite: {fileID: 21300000, guid: c2c82a80e860b0543a267e2f18873915, type: 3}
-  difficulty: 0
+  difficulty: 1

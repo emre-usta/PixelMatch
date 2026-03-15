@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db900b700fd33a743bb035839a3a1e37, type: 3}
+  m_Name: Level_2_3
+  m_EditorClassIdentifier: 
+  levelID: 2
+  levelName: Foods 3
+  levelIcon: {fileID: 0}
+  columns: 4
+  rows: 5
+  useTimer: 1
+  timeLimit: 120
+  useMoveLimit: 0
+  moveLimit: 30
+  cardSprites:
+  - {fileID: 21300000, guid: 74f3154bc9cbb5146bd88abfe0b19b82, type: 3}
+  - {fileID: 21300000, guid: b75200ab946b81541901e2184849e600, type: 3}
+  - {fileID: 21300000, guid: c0a5b2dcb20464f4ba9517103b7fab17, type: 3}
+  - {fileID: 21300000, guid: f6bf8fbbff058744fb10e0ece996df67, type: 3}
+  - {fileID: 21300000, guid: cdbef69af9d5cf84785750ac949fa75a, type: 3}
+  - {fileID: 21300000, guid: 176fc6fe047fc444d8a44b52e0cb312e, type: 3}
+  - {fileID: 21300000, guid: 16ce500eba352a04194bc9a874d383a9, type: 3}
+  - {fileID: 21300000, guid: 49f3903b99d68f64eb97720ba2efc36a, type: 3}
+  - {fileID: 21300000, guid: 56534369e9efe6b49a57b4f6ecc372ca, type: 3}
+  - {fileID: 21300000, guid: c7a6b4f32a3452b47a031147ad561741, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: 5b7a79188101d6d41a59d22194a51405, type: 3}
+  difficulty: 1

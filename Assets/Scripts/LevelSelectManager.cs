@@ -124,7 +124,7 @@ public class LevelSelectManager : MonoBehaviour
         // Level adı
         TextMeshProUGUI nameText = card.GetComponentInChildren<TextMeshProUGUI>();
         if (nameText != null)
-            nameText.text = isUnlocked ? level.levelName : "🔒";
+            nameText.text = isUnlocked ? level.levelName : "Kilitli";
 
         // Buton
         Button btn = card.GetComponent<Button>();

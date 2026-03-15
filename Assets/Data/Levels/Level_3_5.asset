@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db900b700fd33a743bb035839a3a1e37, type: 3}
+  m_Name: Level_3_5
+  m_EditorClassIdentifier: 
+  levelID: 4
+  levelName: Natures 5
+  levelIcon: {fileID: 0}
+  columns: 6
+  rows: 6
+  useTimer: 1
+  timeLimit: 120
+  useMoveLimit: 0
+  moveLimit: 30
+  cardSprites:
+  - {fileID: 21300000, guid: feb5f1157e6eccf44b063df3d20a8fc8, type: 3}
+  - {fileID: 21300000, guid: 2de997cb354837347b3848cb3c1c0000, type: 3}
+  - {fileID: 21300000, guid: 128cbfec6a735b94fa70e5547c4b7e15, type: 3}
+  - {fileID: 21300000, guid: 47e00e3ab65d70547b177f9ba6d62021, type: 3}
+  - {fileID: 21300000, guid: 4a4319ff46c82254d86061eb01ea3d83, type: 3}
+  - {fileID: 21300000, guid: ee9ff2a0cc1c31742944b7bb6a88c591, type: 3}
+  - {fileID: 21300000, guid: afd1f9e0e545a7a498f6b4624e0212e5, type: 3}
+  - {fileID: 21300000, guid: 35a9d24f7cdd215479ef7d8fe684186c, type: 3}
+  - {fileID: 21300000, guid: 2e3b34101be96b2408785fea85fb856e, type: 3}
+  - {fileID: 21300000, guid: 828f913551a91b4418d520c45600c69f, type: 3}
+  - {fileID: 21300000, guid: ea4705a62028787488fe319c4b3fb321, type: 3}
+  - {fileID: 21300000, guid: faf480c70e452c045ae7b4c728e6fb34, type: 3}
+  - {fileID: 21300000, guid: 1ac47a8db35be5f4cba7aa3803f1d153, type: 3}
+  - {fileID: 21300000, guid: be8ed68a4d1b3944cbe5191261dcaa7b, type: 3}
+  - {fileID: 21300000, guid: 761c149be1dce094eb2957f366cf5aea, type: 3}
+  - {fileID: 21300000, guid: 5e86c9cb903d25c47ad8124cb4b1e70c, type: 3}
+  - {fileID: 21300000, guid: 5eb8a6b3a08ae7e4ca1014dca111c8b0, type: 3}
+  - {fileID: 21300000, guid: 9aebb424cb3a8714184644797624f556, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: 9ee3fc3fd3d95a0488ebc8beb5b9f562, type: 3}
+  difficulty: 2
