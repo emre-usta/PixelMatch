@@ -39,6 +39,11 @@ public class LevelSelectManager : MonoBehaviour
     public static int SelectedCategoryID { get; private set; }
     public static int SelectedCategoryLevelCount { get; private set; }
 
+    public static int TotalCategoryCount =>
+    Instance != null && Instance.categories != null
+    ? Instance.categories.Length
+    : 0;
+
 
     // ─── STATIC RESET ─────────────────────────────────────────────
 

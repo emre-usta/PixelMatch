@@ -102,8 +102,17 @@ public class GameStateManager : MonoBehaviour
 
         if (currentLevelID >= totalLevels - 1)
         {
-            LevelProgressManager.Instance.UnlockCategory(categoryID + 1);
-            Debug.Log($"[GameStateManager] Kategori açıldı: {categoryID + 1}");
+            int nextCategoryID = categoryID + 1;
+            if (LevelSelectManager.Instance != null &&
+                nextCategoryID < LevelSelectManager.TotalCategoryCount)
+            {
+                LevelProgressManager.Instance.UnlockCategory(nextCategoryID);
+                Debug.Log($"[GameStateManager] Kategori açıldı: {nextCategoryID}");
+            }
+            else
+            {
+                Debug.Log("[GameStateManager] Son kategori tamamlandı.");
+            }
         }
     }
 
