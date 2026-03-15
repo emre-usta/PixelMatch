@@ -82,6 +82,38 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
         if (panelWin != null) panelWin.SetActive(true);
+
+        // Bir sonraki leveli aç
+        UnlockNextLevel();
+    }
+
+    private void UnlockNextLevel()
+    {
+        if (LevelSelectManager.SelectedLevel == null) return;
+        if (LevelProgressManager.Instance == null) return;
+
+        int currentLevelID = LevelSelectManager.SelectedLevel.levelID;
+        int categoryID = LevelSelectManager.SelectedCategoryID;
+        int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
+        int nextLevelID = currentLevelID + 1;
+
+        LevelProgressManager.Instance.UnlockLevel(categoryID, nextLevelID);
+        Debug.Log($"[GameStateManager] Level açıldı: Category {categoryID}, Level {nextLevelID}, Total: {totalLevels}");
+
+        if (currentLevelID >= totalLevels - 1)
+        {
+            int nextCategoryID = categoryID + 1;
+            if (LevelSelectManager.Instance != null &&
+                nextCategoryID < LevelSelectManager.TotalCategoryCount)
+            {
+                LevelProgressManager.Instance.UnlockCategory(nextCategoryID);
+                Debug.Log($"[GameStateManager] Kategori açıldı: {nextCategoryID}");
+            }
+            else
+            {
+                Debug.Log("[GameStateManager] Son kategori tamamlandı.");
+            }
+        }
     }
 
     public void LoseGame()
@@ -116,6 +148,12 @@ public class GameStateManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void NextOrRetryWin()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("LevelSelect");
     }
 }
 

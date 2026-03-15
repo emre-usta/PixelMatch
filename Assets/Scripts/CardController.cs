@@ -47,6 +47,8 @@ public class CardController : MonoBehaviour
         cardBackSprite = backSprite;
         EffectType = effectType;
 
+        cardImage.preserveAspect = true;
+
         SetState(CardState.Closed);
         ShowBack();
         transform.localScale = Vector3.one;

@@ -2942,26 +2942,27 @@ MonoBehaviour:
   rows: 6
   cardPrefab: {fileID: 2182052643851207884, guid: f4150a7848990db4da576251c1ae2d20, type: 3}
   gridContainer: {fileID: 34886364}
-  cardBackSprite: {fileID: 21300000, guid: c82a6cf6552f1f24e8e168fcc9c06416, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: c2c82a80e860b0543a267e2f18873915, type: 3}
   cardSprites:
-  - {fileID: 21300000, guid: 5b77c3f2add60c947b5a7fda9af8b607, type: 3}
-  - {fileID: 21300000, guid: 24949f52b7b1ff44eb6218e4ad06f2dd, type: 3}
-  - {fileID: 21300000, guid: a0916f387ff97de4ea8c7d556993c2d3, type: 3}
-  - {fileID: 21300000, guid: eefb3928c103bce43bbbc54f457a7141, type: 3}
-  - {fileID: 21300000, guid: 62aeec98a3c56664bb29ef6f5721282b, type: 3}
-  - {fileID: 21300000, guid: b77e22f53247f3b408599cd84687f902, type: 3}
-  - {fileID: 21300000, guid: f7fa3a72295f3724697400cb768f72af, type: 3}
-  - {fileID: 21300000, guid: c3ef43765b2eaa34384399e26d912f4b, type: 3}
-  - {fileID: 21300000, guid: 25afc1cc97f9e6a49b926e1028b521e4, type: 3}
-  - {fileID: 21300000, guid: eea10caf1bb404543b1eaee2be1a4bbf, type: 3}
-  - {fileID: 21300000, guid: 5bba549695f89444582f2ef1fe1f9c37, type: 3}
-  - {fileID: 21300000, guid: cec7f6a176d5d154381166c3a1b3555e, type: 3}
-  - {fileID: 21300000, guid: cfabcfeefcbec5946b3a950dec3fcfc0, type: 3}
-  - {fileID: 21300000, guid: 33912279b7479834a862091d79c13b32, type: 3}
-  - {fileID: 21300000, guid: 9bd4d367ec339c94c8728b1d9d05bbf5, type: 3}
-  - {fileID: 21300000, guid: e6917dbd6a02641409de3f71a7240579, type: 3}
-  - {fileID: 21300000, guid: 8adc84979f3c63846a2cd3d3636f9e07, type: 3}
-  - {fileID: 21300000, guid: 646e3944dd2abbc488c91c985c454562, type: 3}
+  - {fileID: 21300000, guid: 906e9a74fe9b74649a1036816f5af9c1, type: 3}
+  - {fileID: 21300000, guid: 0bb03cdac0204ed46a7d1220cc573f9d, type: 3}
+  - {fileID: 21300000, guid: 75ad15b271ded16428aba45d7f55f9bd, type: 3}
+  - {fileID: 21300000, guid: 57ca3af5e9af97742af2b8224bf3032f, type: 3}
+  - {fileID: 21300000, guid: 0f5339e545a77e4428cc1f76261bbd28, type: 3}
+  - {fileID: 21300000, guid: fd00c87ddb96d0a40867601cb083a31c, type: 3}
+  - {fileID: 21300000, guid: 6a4ff1fcf6573f4468c8572aeeb60a5e, type: 3}
+  - {fileID: 21300000, guid: 7de77d31a1178c14cbb769e2b1dd241d, type: 3}
+  - {fileID: 21300000, guid: 404af7658a1eac647a1d623052c58f3e, type: 3}
+  - {fileID: 21300000, guid: 3a889b39d54543d4290559c3bd17dce1, type: 3}
+  - {fileID: 21300000, guid: 21a02b336e6c6474d85985f2eb1e2862, type: 3}
+  - {fileID: 21300000, guid: f4e64224ace995548affb5840b7b6461, type: 3}
+  - {fileID: 21300000, guid: 7f4754652d7d2fc499c223cdd7e8defd, type: 3}
+  - {fileID: 21300000, guid: 6d01f5f084f86524e8dc0e6aedaf9ae9, type: 3}
+  - {fileID: 21300000, guid: d482dc0f82d2d4348802b889230e58ca, type: 3}
+  - {fileID: 21300000, guid: 61ea7509140b2da4685f41f5d95bd17e, type: 3}
+  - {fileID: 21300000, guid: 73e04883e2c3f1a4580be7c0021fd7f3, type: 3}
+  - {fileID: 21300000, guid: aceb94b26159ca44c8aac39d9fe0a129, type: 3}
+  levelConfig: {fileID: 11400000, guid: 69412c09362fecf4988c43b956eff350, type: 2}
 --- !u!114 &1496422336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3761,7 +3762,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1496422336}
         m_TargetAssemblyTypeName: GameStateManager, Assembly-CSharp
-        m_MethodName: RestartGame
+        m_MethodName: NextOrRetryWin
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

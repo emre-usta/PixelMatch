@@ -24,6 +24,7 @@ public class TimerController : MonoBehaviour
     private float remainingTime;
     private bool isRunning = false;
     private Coroutine timerCoroutine;
+    private bool useTimer = true;
 
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
@@ -59,6 +60,7 @@ public class TimerController : MonoBehaviour
 
     private void HandleGameStarted()
     {
+        if (!useTimer) return;
         StartTimer();
     }
 
@@ -109,6 +111,18 @@ public class TimerController : MonoBehaviour
             StopCoroutine(timerCoroutine);
             timerCoroutine = null;
         }
+    }
+
+    public void SetConfig(bool useTimer, float timeLimit)
+    {
+        this.useTimer = useTimer;
+        if (!useTimer)
+        {
+            // Timer'ı gizle/disable et, başlatma
+            if (timerText != null) timerText.gameObject.SetActive(false);
+            return;
+        }
+        totalTime = timeLimit;
     }
 
     /// <summary>
