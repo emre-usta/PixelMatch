@@ -125,16 +125,6 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     // ─── LEVEL SEÇİMİ ─────────────────────────────────────────────
-
-    private void OnLevelSelected(int levelIndex)
-    {
-        SelectedLevel = selectedCategory.levels[levelIndex];
-        Debug.Log($"[LevelSelectManager] Level seçildi: {SelectedLevel.levelName}");
-        SelectedCategoryID = selectedCategory.categoryID;
-        SelectedCategoryLevelCount = selectedCategory.levels.Length;
-        SceneManager.LoadScene("Level1");
-    }
-
     public static void SetSelectedLevel(LevelConfig level, int levelIndex)
     {
         SelectedLevel = level;
