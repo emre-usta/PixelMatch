@@ -22,13 +22,13 @@ MonoBehaviour:
   useMoveLimit: 0
   moveLimit: 30
   cardSprites:
-  - {fileID: 21300000, guid: b6192fbbe8a8c90428b141c3e8ae71e8, type: 3}
-  - {fileID: 21300000, guid: 555d5229b0501b1429d65ad2572ffcfc, type: 3}
-  - {fileID: 21300000, guid: 552520348f39d4348aa608265c40017a, type: 3}
-  - {fileID: 21300000, guid: 5025b14f9c57ed548845f9e05fa15fe7, type: 3}
-  - {fileID: 21300000, guid: 83f30fbc18dbfce4d8a331fec5636665, type: 3}
-  - {fileID: 21300000, guid: 9760cab0378580649927200d28674dde, type: 3}
-  - {fileID: 21300000, guid: a075ad188bb14a4449f4ed128b34ef1c, type: 3}
-  - {fileID: 21300000, guid: cbb3c87ea75fe5e49b319328c4fcfacc, type: 3}
+  - {fileID: 21300000, guid: 6a4ff1fcf6573f4468c8572aeeb60a5e, type: 3}
+  - {fileID: 21300000, guid: 7de77d31a1178c14cbb769e2b1dd241d, type: 3}
+  - {fileID: 21300000, guid: 404af7658a1eac647a1d623052c58f3e, type: 3}
+  - {fileID: 21300000, guid: 3a889b39d54543d4290559c3bd17dce1, type: 3}
+  - {fileID: 21300000, guid: 21a02b336e6c6474d85985f2eb1e2862, type: 3}
+  - {fileID: 21300000, guid: f4e64224ace995548affb5840b7b6461, type: 3}
+  - {fileID: 21300000, guid: 7f4754652d7d2fc499c223cdd7e8defd, type: 3}
+  - {fileID: 21300000, guid: 6d01f5f084f86524e8dc0e6aedaf9ae9, type: 3}
   cardBackSprite: {fileID: 21300000, guid: c2c82a80e860b0543a267e2f18873915, type: 3}
   difficulty: 0
