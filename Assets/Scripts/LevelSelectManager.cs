@@ -39,6 +39,18 @@ public class LevelSelectManager : MonoBehaviour
     public static int SelectedCategoryID { get; private set; }
     public static int SelectedCategoryLevelCount { get; private set; }
 
+
+    // ─── STATIC RESET ─────────────────────────────────────────────
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void ResetStaticState()
+    {
+        SelectedLevel = null;
+        SelectedCategoryID = 0;
+        SelectedCategoryLevelCount = 0;
+        SelectedMode = GameMode.Classic;
+    }
+
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
     private void Awake()
