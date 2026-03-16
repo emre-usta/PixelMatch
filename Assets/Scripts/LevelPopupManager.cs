@@ -21,6 +21,8 @@ public class LevelPopupManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelNameText;
     [SerializeField] private TextMeshProUGUI classicModeText;
     [SerializeField] private TextMeshProUGUI moveModeText;
+    [SerializeField] private TextMeshProUGUI classicDetailText;
+    [SerializeField] private TextMeshProUGUI moveDetailText;
 
     // ─── RUNTIME VERİSİ ───────────────────────────────────────────
 
@@ -58,15 +60,25 @@ public class LevelPopupManager : MonoBehaviour
         {
             int minutes = Mathf.FloorToInt(level.timeLimit / 60);
             int seconds = Mathf.FloorToInt(level.timeLimit % 60);
-            classicModeText.text = $"KLASİK MOD\nSüre: {minutes:00}:{seconds:00}";
+            classicModeText.text = $"CLASSIC MODE";
         }
 
         // Hamle mod bilgisini güncelle
         if (moveModeText != null)
-            moveModeText.text = $"HAMLE MODU\n{level.moveLimit} Hamle";
+            moveModeText.text = $"MOVEMENT MODE";
 
         if (popupPanel != null)
             popupPanel.SetActive(true);
+
+        if (classicDetailText != null)
+        {
+            int minutes = Mathf.FloorToInt(level.timeLimit / 60);
+            int seconds = Mathf.FloorToInt(level.timeLimit % 60);
+            classicDetailText.text = $"Time: {minutes:00}:{seconds:00}  ·  {level.columns}×{level.rows}";
+        }
+
+        if (moveDetailText != null)
+            moveDetailText.text = $"{level.moveLimit} Movement  ·  {level.columns}×{level.rows}";
     }
 
     // ─── BUTON HANDLER'LARI ───────────────────────────────────────

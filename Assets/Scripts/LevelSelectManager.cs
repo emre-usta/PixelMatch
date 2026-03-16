@@ -121,17 +121,38 @@ public class LevelSelectManager : MonoBehaviour
     {
         GameObject card = Instantiate(levelCardPrefab, levelContainer);
 
-        // Level adı
-        TextMeshProUGUI nameText = card.GetComponentInChildren<TextMeshProUGUI>();
-        if (nameText != null)
-            nameText.text = isUnlocked ? level.levelName : "Kilitli";
+        // Level adı / kilitli
+        TextMeshProUGUI[] texts = card.GetComponentsInChildren<TextMeshProUGUI>();
+        foreach (var t in texts)
+        {
+            if (t.gameObject.name == "Text_LevelName")
+                t.text = isUnlocked ? level.levelName : "Kilitli";
 
-        // Buton
+            if (t.gameObject.name == "Text_Difficulty")
+            {
+                t.text = isUnlocked ? level.difficulty.ToString().ToUpper() : "";
+                t.color = level.difficulty switch
+                {
+                    DifficultyLevel.Easy => new Color(0.59f, 0.77f, 0.35f), // #97C459
+                    DifficultyLevel.Medium => new Color(0.98f, 0.78f, 0.46f), // #FAC775
+                    DifficultyLevel.Hard => new Color(0.89f, 0.29f, 0.29f), // #E24B4A
+                    _ => Color.gray
+                };
+            }
+        }
+
+        // Kilitli kart görünümü
+        if (!isUnlocked)
+        {
+            Image cardImage = card.GetComponent<Image>();
+            if (cardImage != null)
+                cardImage.color = new Color(0.05f, 0.04f, 0.03f); // daha koyu
+        }
+
         Button btn = card.GetComponent<Button>();
         if (btn != null)
         {
             btn.interactable = isUnlocked;
-
             if (isUnlocked)
             {
                 int capturedIndex = levelIndex;

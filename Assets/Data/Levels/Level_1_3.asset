@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level_1_3
   m_EditorClassIdentifier: 
   levelID: 2
-  levelName: Orman 3
+  levelName: Animal 3
   levelIcon: {fileID: 0}
   columns: 4
   rows: 5
