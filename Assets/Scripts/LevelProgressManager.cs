@@ -11,6 +11,7 @@ public class LevelProgressManager : MonoBehaviour
     private const string KEY_UNLOCKED = "unlocked_level_";
     private const string KEY_BEST_TIME = "best_time_";
     private const string KEY_BEST_MOVES = "best_moves_";
+    private const string KEY_BEST_STARS = "best_stars_";
 
     private void Awake()
     {
@@ -87,6 +88,23 @@ public class LevelProgressManager : MonoBehaviour
     public int GetBestMoves(int categoryID, int levelID)
     {
         return PlayerPrefs.GetInt(KEY_BEST_MOVES + categoryID + "_" + levelID, 0);
+    }
+
+    public void SaveBestStars(int categoryID, int levelID, int stars)
+    {
+        string key = KEY_BEST_STARS + categoryID + "_" + levelID;
+        int current = PlayerPrefs.GetInt(key, 0);
+        if (stars > current)
+        {
+            PlayerPrefs.SetInt(key, stars);
+            PlayerPrefs.Save();
+            Debug.Log($"[LevelProgressManager] Yıldız kaydedildi: Cat{categoryID} Lv{levelID} → {stars}");
+        }
+    }
+
+    public int GetBestStars(int categoryID, int levelID)
+    {
+        return PlayerPrefs.GetInt(KEY_BEST_STARS + categoryID + "_" + levelID, 0);
     }
 
     // ─── İLERLEME SIFIRLAMA ───────────────────────────────────────

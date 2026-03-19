@@ -20,7 +20,7 @@ MonoBehaviour:
   useTimer: 1
   timeLimit: 120
   useMoveLimit: 0
-  moveLimit: 30
+  moveLimit: 28
   cardSprites:
   - {fileID: 21300000, guid: 6a4ff1fcf6573f4468c8572aeeb60a5e, type: 3}
   - {fileID: 21300000, guid: 7de77d31a1178c14cbb769e2b1dd241d, type: 3}
@@ -32,3 +32,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6d01f5f084f86524e8dc0e6aedaf9ae9, type: 3}
   cardBackSprite: {fileID: 21300000, guid: c2c82a80e860b0543a267e2f18873915, type: 3}
   difficulty: 0
+  threeStarTime: 66
+  twoStarTime: 36
+  threeStarMoves: 14
+  twoStarMoves: 21
