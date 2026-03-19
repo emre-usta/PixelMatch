@@ -73,6 +73,15 @@ public class CardController : MonoBehaviour
         GameEvents.RaiseCardRevealed(this);
     }
 
+    // Mevcut Reveal() metodunu koru, yanına yeni metod ekle
+    public void RevealSilent()
+    {
+        SetState(CardState.Open);
+        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
+        activeCoroutine = StartCoroutine(FlipAnimation(cardBackSprite, cardFrontSprite));
+        // GameEvents tetiklenmez — sadece görsel
+    }
+
     public void Hide()
     {
         SetState(CardState.Closed);

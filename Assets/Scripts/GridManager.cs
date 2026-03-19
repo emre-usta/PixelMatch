@@ -135,8 +135,8 @@ public class GridManager : MonoBehaviour
             allCards.Add(card);
         }
 
-        // Grid hazır — GameStateManager'a bildir
-        GameStateManager.Instance.OnGridReady();
+        // Grid hazır — önce peek, sonra oyunu başlat
+        StartCoroutine(PeekAndStart());
 
         Debug.Log($"[GridManager] Grid hazır: {columns}x{rows}, {totalPairCount} çift");
     }
@@ -273,4 +273,20 @@ public class GridManager : MonoBehaviour
     public int MatchedPairCount => matchedPairCount;
     public int TotalPairCount => totalPairCount;
     public List<CardController> AllCards => allCards;
+
+    private IEnumerator PeekAndStart()
+    {
+        // Event tetiklemeden sessizce aç
+        foreach (var card in allCards)
+            card.RevealSilent();
+
+        yield return new WaitForSeconds(1.5f);
+
+        foreach (var card in allCards)
+            card.Hide();
+
+        yield return new WaitForSeconds(0.3f);
+
+        GameStateManager.Instance.OnGridReady();
+    }
 }
