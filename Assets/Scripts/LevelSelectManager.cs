@@ -141,6 +141,24 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Yıldızları güncelle
+        int bestStars = LevelProgressManager.Instance != null
+            ? LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, levelIndex)
+            : 0;
+
+        Transform starsPanel = card.transform.Find("Panel_Stars");
+        if (starsPanel != null)
+        {
+            for (int s = 0; s < starsPanel.childCount; s++)
+            {
+                Image starImg = starsPanel.GetChild(s).GetComponent<Image>();
+                if (starImg != null)
+                    starImg.color = (s < bestStars)
+                        ? new Color(0.98f, 0.78f, 0.46f)   // #FAC775 — aktif
+                        : new Color(0.16f, 0.13f, 0.06f);  // #2A2010 — pasif
+            }
+        }
+
         // Kilitli kart görünümü
         if (!isUnlocked)
         {

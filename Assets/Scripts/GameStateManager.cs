@@ -81,10 +81,49 @@ public class GameStateManager : MonoBehaviour
         SetState(GameState.Win);
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
-        if (panelWin != null) panelWin.SetActive(true);
 
-        // Bir sonraki leveli aç
+        int stars = CalculateStars();
+        SaveStars(stars);
         UnlockNextLevel();
+
+        if (panelWin != null)
+        {
+            panelWin.SetActive(true);
+            WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
+            if (winPanel != null)
+                winPanel.ShowResult(stars);
+        }
+    }
+
+    private int CalculateStars()
+    {
+        if (LevelSelectManager.SelectedLevel == null) return 1;
+        LevelConfig config = LevelSelectManager.SelectedLevel;
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
+        if (isMoveMode)
+        {
+            int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 99;
+            if (usedMoves <= config.threeStarMoves) return 3;
+            if (usedMoves <= config.twoStarMoves) return 2;
+            return 1;
+        }
+        else
+        {
+            float remaining = TimerController.Instance != null ? TimerController.Instance.RemainingTime : 0f;
+            if (remaining >= config.threeStarTime) return 3;
+            if (remaining >= config.twoStarTime) return 2;
+            return 1;
+        }
+    }
+
+    private void SaveStars(int stars)
+    {
+        if (LevelProgressManager.Instance == null) return;
+        int categoryID = LevelSelectManager.SelectedCategoryID;
+        int levelID = LevelSelectManager.SelectedLevel.levelID;
+        LevelProgressManager.Instance.SaveBestStars(categoryID, levelID, stars);
+        Debug.Log($"[GameStateManager] {stars} yıldız kazanıldı ve kaydedildi.");
     }
 
     private void UnlockNextLevel()
