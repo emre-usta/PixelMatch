@@ -118,6 +118,20 @@ public class GridManager : MonoBehaviour
         // Kartları üret ve yerleştir
         AdjustGridLayout();
 
+        int timeThiefIndex1 = -1;
+        int timeThiefIndex2 = -1;
+        if (levelConfig != null && levelConfig.difficulty == DifficultyLevel.Hard)
+        {
+            // İki farklı rastgele pozisyon seç
+            timeThiefIndex1 = Random.Range(4, totalCards);
+            do
+            {
+                timeThiefIndex2 = Random.Range(4, totalCards);
+            } while (timeThiefIndex2 == timeThiefIndex1);
+
+            Debug.Log($"[GridManager] Zaman Hırsızı indeksleri: {timeThiefIndex1}, {timeThiefIndex2}");
+        }
+
         for (int i = 0; i < totalCards; i++)
         {
             GameObject cardObj = Instantiate(cardPrefab, gridContainer);
@@ -129,8 +143,22 @@ public class GridManager : MonoBehaviour
                 continue;
             }
 
+            // Zaman Hırsızı ID'si — totalPairCount'un dışında özel bir ID
+            int timeThiefID = totalPairCount + 99;
+
             int id = cardIDs[i];
-            card.Setup(id, cardSprites[id], cardBackSprite);
+            CardEffectType effectType = CardEffectType.None;
+            Sprite frontSprite = cardSprites[id];
+
+            if (i == timeThiefIndex1 || i == timeThiefIndex2)
+            {
+                effectType = CardEffectType.TimeThief;
+                id = timeThiefID; // Her iki kart da aynı ID — eşleşirler
+                if (levelConfig.timeThiefSprite != null)
+                    frontSprite = levelConfig.timeThiefSprite;
+            }
+
+            card.Setup(id, frontSprite, cardBackSprite, effectType);
             card.SetInteractable(true);
             allCards.Add(card);
         }
