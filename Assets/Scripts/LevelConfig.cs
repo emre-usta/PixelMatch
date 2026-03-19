@@ -38,6 +38,9 @@ public class LevelConfig : ScriptableObject
     public int threeStarMoves = 12;     // Bu kadar veya az hamlede 3 yıldız
     public int twoStarMoves = 18;       // 2 yıldız eşiği
 
+    [Header("Özel Kart Görselleri")]
+    public Sprite timeThiefSprite;
+
     // LevelConfig.cs'e ekle
     //[HideInInspector] public bool runtimeUseTimer;
     //[HideInInspector] public bool runtimeUseMoveLimit;
