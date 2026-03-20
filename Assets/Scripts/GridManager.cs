@@ -232,6 +232,13 @@ public class GridManager : MonoBehaviour
         {
             // ❌ Eşleşmedi
             GameEvents.RaisePairMismatch(firstSelectedCard, secondSelectedCard);
+
+            // Zaman Hırsızı kartı yanlış eşleştirildi → ceza
+            if (firstSelectedCard.EffectType == CardEffectType.TimeThief ||
+                secondSelectedCard.EffectType == CardEffectType.TimeThief)
+            {
+                GameEvents.RaiseEffectTriggered(CardEffectType.TimeThief);
+            }
         }
 
         firstSelectedCard = null;
