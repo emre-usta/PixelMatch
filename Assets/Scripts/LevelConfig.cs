@@ -30,13 +30,13 @@ public class LevelConfig : ScriptableObject
     [Header("Zorluk")]
     public DifficultyLevel difficulty = DifficultyLevel.Easy;
 
-    [Header("Yıldız Kriterleri — Klasik Mod")]
+    /*[Header("Yıldız Kriterleri — Klasik Mod")]
     public float threeStarTime = 90f;   // Bu süreden fazla kalırsa 3 yıldız
     public float twoStarTime = 60f;     // 2 yıldız eşiği
 
     [Header("Yıldız Kriterleri — Hamle Modu")]
     public int threeStarMoves = 12;     // Bu kadar veya az hamlede 3 yıldız
-    public int twoStarMoves = 18;       // 2 yıldız eşiği
+    public int twoStarMoves = 18;       // 2 yıldız eşiği*/
 
     [Header("Özel Kart Görselleri")]
     public Sprite timeThiefSprite;

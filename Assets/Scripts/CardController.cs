@@ -71,10 +71,6 @@ public class CardController : MonoBehaviour
         if (activeCoroutine != null) StopCoroutine(activeCoroutine);
         activeCoroutine = StartCoroutine(FlipAnimation(cardBackSprite, cardFrontSprite));
         GameEvents.RaiseCardRevealed(this);
-
-        // Özel kart efekti tetikle
-        if (EffectType == CardEffectType.TimeThief)
-            GameEvents.RaiseEffectTriggered(CardEffectType.TimeThief);
     }
 
     // Mevcut Reveal() metodunu koru, yanına yeni metod ekle

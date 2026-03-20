@@ -8,9 +8,11 @@ public class WinPanelController : MonoBehaviour
     [SerializeField] private Image star1;
     [SerializeField] private Image star2;
     [SerializeField] private Image star3;
-
     [SerializeField] private Color starActiveColor = new Color(0.98f, 0.78f, 0.46f);
     [SerializeField] private Color starInactiveColor = new Color(0.16f, 0.13f, 0.06f);
+
+    [Header("0 Yýldýz Uyarýsý")]
+    [SerializeField] private GameObject noStarWarningPanel;
 
     public void ShowResult(int stars)
     {
@@ -20,10 +22,21 @@ public class WinPanelController : MonoBehaviour
         StartCoroutine(AnimateStars(stars));
     }
 
+    public void ShowNoStarWarning()
+    {
+        // Yýldýzlarý kapat
+        if (star1) star1.color = starInactiveColor;
+        if (star2) star2.color = starInactiveColor;
+        if (star3) star3.color = starInactiveColor;
+
+        // Uyarý panelini aç
+        if (noStarWarningPanel != null)
+            noStarWarningPanel.SetActive(true);
+    }
+
     private IEnumerator AnimateStars(int stars)
     {
         yield return new WaitForSecondsRealtime(0.4f);
-
         if (stars >= 1 && star1)
         {
             star1.color = starActiveColor;
