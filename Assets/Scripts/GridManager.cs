@@ -225,19 +225,24 @@ public class GridManager : MonoBehaviour
 
         if (firstSelectedCard.CardID == secondSelectedCard.CardID)
         {
-            // ✅ Eşleşti
             GameEvents.RaisePairMatched(firstSelectedCard, secondSelectedCard);
         }
         else
         {
-            // ❌ Eşleşmedi
-            GameEvents.RaisePairMismatch(firstSelectedCard, secondSelectedCard);
+            bool hasTimeThief = firstSelectedCard.EffectType == CardEffectType.TimeThief ||
+                                secondSelectedCard.EffectType == CardEffectType.TimeThief;
 
-            // Zaman Hırsızı kartı yanlış eşleştirildi → ceza
-            if (firstSelectedCard.EffectType == CardEffectType.TimeThief ||
-                secondSelectedCard.EffectType == CardEffectType.TimeThief)
+            if (hasTimeThief)
             {
+                // Zaman Hırsızı varsa normal -1 hamle yerine sadece -3 ceza
                 GameEvents.RaiseEffectTriggered(CardEffectType.TimeThief);
+                // Mismatch event'i tetikleme — animasyon için ayrıca çağır
+                StartCoroutine(MismatchSequence(firstSelectedCard, secondSelectedCard));
+            }
+            else
+            {
+                // Normal yanlış eşleşme — -1 hamle
+                GameEvents.RaisePairMismatch(firstSelectedCard, secondSelectedCard);
             }
         }
 

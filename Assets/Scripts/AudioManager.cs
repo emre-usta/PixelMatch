@@ -34,16 +34,14 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        // Singleton + DontDestroyOnLoad
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         SetupAudioSources();
+
+        // Kayıtlı ses ayarlarını yükle
+        bgmVolume = PlayerPrefs.GetFloat("settings_bgm", 0.5f);
+        sfxVolume = PlayerPrefs.GetFloat("settings_sfx", 1f);
     }
 
     private void OnEnable()
