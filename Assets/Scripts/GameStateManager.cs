@@ -175,17 +175,17 @@ public class GameStateManager : MonoBehaviour
         // ─── 2 YILDIZ — Açık Bak kazanılır ──────────────────────
         if (stars == 2)
         {
-            // Faz 8'de PowerUpManager.Instance.AddPowerUp(PowerUpType.XRay) olacak
-            Debug.Log("[GameStateManager] 2 yıldız — Açık Bak kazanıldı! (Faz 8'de bağlanacak)");
+            PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
+            Debug.Log("[GameStateManager] 2 yıldız — Açık Bak kazanıldı!");
         }
 
-        // ─── 3 YILDIZ — İpucu veya Süre Dondur kazanılır ────────
         if (stars == 3)
         {
-            // Rastgele İpucu veya Süre Dondur
-            PowerUpType reward = Random.value > 0.5f ? PowerUpType.MindFreeze : PowerUpType.TimeFreeze;
-            // Faz 8'de PowerUpManager.Instance.AddPowerUp(reward) olacak
-            Debug.Log($"[GameStateManager] 3 yıldız — {reward} kazanıldı! (Faz 8'de bağlanacak)");
+            PowerUpType reward = Random.value > 0.5f
+                ? PowerUpType.MindFreeze
+                : PowerUpType.TimeFreeze;
+            PowerUpManager.Instance?.AddPowerUp(reward);
+            Debug.Log($"[GameStateManager] 3 yıldız — {reward} kazanıldı!");
         }
     }
 

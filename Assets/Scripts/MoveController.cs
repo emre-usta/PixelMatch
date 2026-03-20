@@ -23,6 +23,9 @@ public class MoveController : MonoBehaviour
 
     private int moveCount = 0;
 
+    // ─── FREEZE ───────────────────────────────────────────────────
+    private int frozenMoves = 0; // Kaç hamle daha ücretsiz
+
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
     private void Awake()
@@ -64,17 +67,28 @@ public class MoveController : MonoBehaviour
         UpdateUI(); // "Moves: 0" yerine UpdateUI() çağır — moveLimit'i gösterir
     }
 
+    public void ActivateFreezeForMoves(int freeMovesCount)
+    {
+        frozenMoves = freeMovesCount;
+        Debug.Log($"[MoveController] {freeMovesCount} hamle ücretsiz!");
+    }
+
     private void HandlePairResult(CardController a, CardController b)
     {
+        if (frozenMoves > 0)
+        {
+            frozenMoves--;
+            Debug.Log($"[MoveController] Ücretsiz hamle kullanıldı. Kalan: {frozenMoves}");
+            UpdateUI();
+            return; // Hamle sayılmaz
+        }
+
         moveCount++;
         UpdateUI();
         GameEvents.RaiseMoveUsed(useMoveLimit ? moveLimit - moveCount : moveCount);
 
-        // Hamle limiti doldu mu?
         if (useMoveLimit && moveCount >= moveLimit)
-        {
             GameStateManager.Instance.LoseGame();
-        }
     }
 
     // ─── UI GÜNCELLEME ────────────────────────────────────────────
