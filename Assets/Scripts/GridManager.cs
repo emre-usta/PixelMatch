@@ -28,6 +28,9 @@ public class GridManager : MonoBehaviour
     [Header("Level Konfigürasyonu")]
     [SerializeField] private LevelConfig levelConfig;
 
+    [Header("Serbest Mod")]
+    [SerializeField] private FreeModeLimitConfig freeModeLimitConfig;
+
     // ─── RUNTIME VERİSİ ───────────────────────────────────────────
 
     private List<CardController> allCards = new List<CardController>();
@@ -66,10 +69,46 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
-        if (LevelSelectManager.SelectedLevel != null)
+        if (FreeModeManager.IsFreeModeActive)
+            SetupFreeModeConfig();
+        else if (LevelSelectManager.SelectedLevel != null)
             levelConfig = LevelSelectManager.SelectedLevel;
 
         GenerateGrid();
+    }
+
+
+
+    private void SetupFreeModeConfig()
+    {
+        columns = FreeModeManager.SelectedColumns;
+        rows = FreeModeManager.SelectedRows;
+
+        // Kategori sprite'larını al
+        CategoryConfig cat = FreeModeManager.SelectedCategory;
+        if (cat != null && cat.levels.Length > 0)
+        {
+            // En büyük levelin sprite'larını kullan (en fazla sprite içeriyor)
+            LevelConfig biggestLevel = cat.levels[cat.levels.Length - 1];
+            cardSprites = biggestLevel.cardSprites;
+            cardBackSprite = biggestLevel.cardBackSprite;
+        }
+
+        // Limit config'den süre/hamle al
+        bool isMoveMode = FreeModeManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        if (freeModeLimitConfig != null)
+        {
+            var limit = freeModeLimitConfig.GetLimit(
+                columns, rows, FreeModeManager.SelectedDifficulty);
+
+            if (TimerController.Instance != null)
+                TimerController.Instance.SetConfig(!isMoveMode, limit.timeLimit);
+            if (MoveController.Instance != null)
+                MoveController.Instance.SetConfig(isMoveMode, limit.moveLimit);
+        }
+
+        // LevelConfig null bırak — GenerateGrid() içinde levelConfig kontrolü var
+        levelConfig = null;
     }
 
     // ─── GRİD ÜRETİMİ ─────────────────────────────────────────────

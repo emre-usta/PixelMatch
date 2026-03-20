@@ -15,6 +15,11 @@ public class MainMenuControl : MonoBehaviour
         SceneManager.LoadScene("LevelSelect");
     }
 
+    public void OnFreeModeClicked()
+    {
+        SceneManager.LoadScene("FreeMode");
+    }
+
     public void OnExitClicked()
     {
         if (quitPanel != null) quitPanel.SetActive(true);

@@ -8181,6 +8181,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 73e04883e2c3f1a4580be7c0021fd7f3, type: 3}
   - {fileID: 21300000, guid: aceb94b26159ca44c8aac39d9fe0a129, type: 3}
   levelConfig: {fileID: 11400000, guid: 69412c09362fecf4988c43b956eff350, type: 2}
+  freeModeLimitConfig: {fileID: 11400000, guid: 9b416457dd6997843bd2de659e607aab, type: 2}
 --- !u!114 &1496422336
 MonoBehaviour:
   m_ObjectHideFlags: 0
