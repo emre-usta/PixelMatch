@@ -103,6 +103,18 @@ public class MoveController : MonoBehaviour
             moveText.text = $"Moves: {moveCount}";
     }
 
+    //--------------------------------------------------------------
+    public void StealMoves(int amount)
+    {
+        moveCount += amount;
+        UpdateUI();
+        GameEvents.RaiseMoveUsed(useMoveLimit ? moveLimit - moveCount : moveCount);
+        Debug.Log($"[MoveController] Hamle Hırsızı: +{amount} hamle eklendi. Toplam: {moveCount}");
+
+        if (useMoveLimit && moveCount >= moveLimit)
+            GameStateManager.Instance.LoseGame();
+    }
+
     // ─── PUBLIC ERİŞİM ────────────────────────────────────────────
 
     public int MoveCount => moveCount;

@@ -34,9 +34,22 @@ public class EffectManager : MonoBehaviour
         switch (effectType)
         {
             case CardEffectType.TimeThief:
-                TimerController.Instance?.AddTime(-5f);
-                StartCoroutine(ShowFeedback("-5 SANİYE!", new Color(0.89f, 0.29f, 0.29f)));
-                StartCoroutine(ShowBanner("ZAMAN HIRSIZI!", new Color(0.89f, 0.29f, 0.29f)));
+                bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
+                if (isMoveMode)
+                {
+                    // Hamle modunda -3 hamle
+                    MoveController.Instance?.StealMoves(3);
+                    StartCoroutine(ShowFeedback("-3 HAMLE!", new Color(0.89f, 0.29f, 0.29f)));
+                    StartCoroutine(ShowBanner("HAMLE HIRSIZI!", new Color(0.89f, 0.29f, 0.29f)));
+                }
+                else
+                {
+                    // Klasik modda -5 saniye
+                    TimerController.Instance?.AddTime(-5f);
+                    StartCoroutine(ShowFeedback("-5 SANİYE!", new Color(0.89f, 0.29f, 0.29f)));
+                    StartCoroutine(ShowBanner("ZAMAN HIRSIZI!", new Color(0.89f, 0.29f, 0.29f)));
+                }
 
                 if (PlayerPrefs.GetInt("seen_timethief", 0) == 0)
                 {
@@ -44,8 +57,6 @@ public class EffectManager : MonoBehaviour
                     PlayerPrefs.Save();
                     StartCoroutine(ShowTutorialPopup());
                 }
-
-                Debug.Log("[EffectManager] Zaman Hırsızı: -5 saniye!");
                 break;
         }
     }
@@ -110,10 +121,30 @@ public class EffectManager : MonoBehaviour
 
         if (timeThiefTutorialPopup != null)
         {
+            // Moda göre metni güncelle
+            bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
+            TextMeshProUGUI descText = timeThiefTutorialPopup
+                .GetComponentInChildren<TextMeshProUGUI>();
+
+            // Text_Desc'i bul
+            Transform descTransform = timeThiefTutorialPopup.transform.Find("Panel/Text_Desc");
+            if (descTransform != null)
+            {
+                TextMeshProUGUI desc = descTransform.GetComponent<TextMeshProUGUI>();
+                if (desc != null)
+                {
+                    desc.text = isMoveMode
+                        ? "Bu kart yanlış eşleştirildiğinde\n3 hamle hakkını çalar.\nDikkatli ol!"
+                        : "Bu kart yanlış eşleştirildiğinde\n5 saniyeni çalar.\nDikkatli ol!";
+                }
+            }
+
             Time.timeScale = 0f;
             timeThiefTutorialPopup.SetActive(true);
         }
     }
+
 
     public void OnTutorialPopupClosed()
     {

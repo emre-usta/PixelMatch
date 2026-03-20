@@ -42,8 +42,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b75200ab946b81541901e2184849e600, type: 3}
   cardBackSprite: {fileID: 21300000, guid: 5b7a79188101d6d41a59d22194a51405, type: 3}
   difficulty: 2
-  threeStarTime: 99
-  twoStarTime: 54
-  threeStarMoves: 22
-  twoStarMoves: 33
-  timeThiefSprite: {fileID: 21300000, guid: cb48ad0965646114080af8f779edf2eb, type: 3}
+  timeThiefSprite: {fileID: 21300000, guid: cb1339b4ea5283c45bb706f4c5f75258, type: 3}
