@@ -135,6 +135,16 @@ public class GameStateManager : MonoBehaviour
         // ─── 0 YILDIZ — hiçbir şey açılmaz ───────────────────────
         if (stars == 0)
         {
+            int previousBestStars = LevelProgressManager.Instance.GetBestStars(categoryID, currentLevelID);
+
+            if (previousBestStars > 0)
+            {
+                // Daha önce geçmiş — uyarı gösterme, sessizce bitir
+                Debug.Log("[GameStateManager] 0 yıldız ama daha önce geçilmiş — uyarı yok.");
+                return;
+            }
+
+            // İlk kez 0 yıldız — uyarı göster
             Debug.Log("[GameStateManager] 0 yıldız — level açılmadı.");
             WinPanelController winPanel = panelWin?.GetComponentInChildren<WinPanelController>();
             winPanel?.ShowNoStarWarning();
