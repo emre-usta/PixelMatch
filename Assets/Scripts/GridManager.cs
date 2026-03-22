@@ -69,7 +69,9 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
-        if (FreeModeManager.IsFreeModeActive)
+        if (DailyChallengeManager.IsDailyChallengeActive)
+            SetupDailyChallengeConfig();
+        else if (FreeModeManager.IsFreeModeActive)
             SetupFreeModeConfig();
         else if (LevelSelectManager.SelectedLevel != null)
             levelConfig = LevelSelectManager.SelectedLevel;
@@ -77,7 +79,30 @@ public class GridManager : MonoBehaviour
         GenerateGrid();
     }
 
+    private void SetupDailyChallengeConfig()
+    {
+        columns = DailyChallengeManager.DCColumns;
+        rows = DailyChallengeManager.DCRows;
 
+        CategoryConfig cat = DailyChallengeManager.DCCategory;
+        if (cat != null && cat.levels.Length > 0)
+        {
+            LevelConfig biggestLevel = cat.levels[cat.levels.Length - 1];
+            cardSprites = biggestLevel.cardSprites;
+            cardBackSprite = biggestLevel.cardBackSprite;
+        }
+
+        if (freeModeLimitConfig != null)
+        {
+            var limit = freeModeLimitConfig.GetLimit(
+                columns, rows, DailyChallengeManager.DCDifficulty);
+
+            TimerController.Instance?.SetConfig(true, limit.timeLimit);
+            MoveController.Instance?.SetConfig(false, limit.moveLimit);
+        }
+
+        levelConfig = null;
+    }
 
     private void SetupFreeModeConfig()
     {
