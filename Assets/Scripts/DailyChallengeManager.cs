@@ -23,6 +23,7 @@ public class DailyChallengeManager : MonoBehaviour
     // ─── PLAYERPREFS ANAHTARLARI ──────────────────────────────────
     private const string KEY_LAST_PLAYED = "dc_last_played";
     private const string KEY_LAST_STARS = "dc_last_stars";
+    private const string KEY_ATTEMPTS = "dc_attempts";
 
     // ─── INSPECTOR ────────────────────────────────────────────────
     [Header("Kategoriler")]
@@ -120,6 +121,52 @@ public class DailyChallengeManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    public bool CanRetry()
+    {
+        if (!IsPlayedToday()) return true; // Henüz tamamlanmamış
+        return false; // Tamamlandıysa retry yok
+    }
+
+    public int GetTodayAttempts()
+    {
+        string today = DateTime.Now.ToString("yyyy-MM-dd");
+        return PlayerPrefs.GetInt(KEY_ATTEMPTS + "_" + today, 0);
+    }
+
+    public void AddAttempt()
+    {
+        string today = DateTime.Now.ToString("yyyy-MM-dd");
+        int current = GetTodayAttempts();
+        PlayerPrefs.SetInt(KEY_ATTEMPTS + "_" + today, current + 1);
+        PlayerPrefs.Save();
+        Debug.Log($"[DC] Deneme: {current + 1}/2");
+    }
+
+    public bool HasAttemptsLeft()
+    {
+        return GetTodayAttempts() < 2;
+    }
+
+    public static void SetInactive()
+    {
+        IsDailyChallengeActive = false;
+
+        // Sadece eğer bugün henüz tamamlanmamışsa kapat
+        string today = DateTime.Now.ToString("yyyy-MM-dd");
+        string lastPlayed = PlayerPrefs.GetString("dc_last_played", "");
+
+        if (lastPlayed != today)
+        {
+            // Başarısız — bugün oynadı ama tamamlayamadı
+            PlayerPrefs.SetString("dc_last_played", today);
+            PlayerPrefs.SetInt("dc_last_stars", 0);
+            PlayerPrefs.Save();
+        }
+        // Başarılı tamamlamada MarkPlayedToday zaten doğru değeri yazmış
+
+        Debug.Log("[DC] SetInactive — bugün DC kapandı.");
+    }
+
     // ─── OYUN BAŞLATMA ────────────────────────────────────────────
 
     public void StartDailyChallenge()
@@ -158,18 +205,18 @@ public class DailyChallengeManager : MonoBehaviour
         }
 
         // Durum metni
-        if (txtStatus != null)
+        if (playedToday)
         {
-            if (playedToday)
+            int stars = GetTodayStars();
+            if (stars > 0)
             {
-                int stars = GetTodayStars();
-                txtStatus.text = $"Tamamlandı  {stars} yıldız";
+                txtStatus.text = "Tamamlandi!";
                 txtStatus.color = new Color(0.59f, 0.77f, 0.35f);
             }
             else
             {
-                txtStatus.text = "Oynamak için tıkla!";
-                txtStatus.color = new Color(0.98f, 0.78f, 0.46f);
+                txtStatus.text = "Bugun basarisiz oldun. Yarin tekrar dene!";
+                txtStatus.color = new Color(0.89f, 0.29f, 0.29f);
             }
         }
 
@@ -189,12 +236,13 @@ public class DailyChallengeManager : MonoBehaviour
         txtTimer.text = $"{remaining.Hours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}";
     }
 
-    // Test için — build'e almadan önce sil
     [ContextMenu("DC'yi Sıfırla")]
     public void ResetDailyChallenge()
     {
-        PlayerPrefs.DeleteKey("dc_last_played");
-        PlayerPrefs.DeleteKey("dc_last_stars");
+        string today = DateTime.Now.ToString("yyyy-MM-dd");
+        PlayerPrefs.DeleteKey(KEY_LAST_PLAYED);
+        PlayerPrefs.DeleteKey(KEY_LAST_STARS);
+        PlayerPrefs.DeleteKey(KEY_ATTEMPTS + "_" + today);
         PlayerPrefs.Save();
         Debug.Log("[DC] Sıfırlandı!");
     }

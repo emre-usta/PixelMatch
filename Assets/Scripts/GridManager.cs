@@ -180,20 +180,29 @@ public class GridManager : MonoBehaviour
         Shuffle(cardIDs);
 
         // Kartları üret ve yerleştir
+        // Kartları üret ve yerleştir
         AdjustGridLayout();
 
         int timeThiefIndex1 = -1;
         int timeThiefIndex2 = -1;
         if (levelConfig != null && levelConfig.difficulty == DifficultyLevel.Hard)
         {
-            // İki farklı rastgele pozisyon seç
-            timeThiefIndex1 = Random.Range(4, totalCards);
-            do
-            {
-                timeThiefIndex2 = Random.Range(4, totalCards);
-            } while (timeThiefIndex2 == timeThiefIndex1);
+            // Aynı çiftten 2 kart seç
+            int timeThiefPairID = Random.Range(2, totalPairCount); // ilk 2 çifti atla
 
-            Debug.Log($"[GridManager] Zaman Hırsızı indeksleri: {timeThiefIndex1}, {timeThiefIndex2}");
+            List<int> pairIndices = new List<int>();
+            for (int i = 0; i < cardIDs.Count; i++)
+            {
+                if (cardIDs[i] == timeThiefPairID)
+                    pairIndices.Add(i);
+            }
+
+            if (pairIndices.Count == 2)
+            {
+                timeThiefIndex1 = pairIndices[0];
+                timeThiefIndex2 = pairIndices[1];
+                Debug.Log($"[GridManager] Zaman Hırsızı: PairID={timeThiefPairID}, index={timeThiefIndex1},{timeThiefIndex2}");
+            }
         }
 
         for (int i = 0; i < totalCards; i++)
@@ -207,9 +216,7 @@ public class GridManager : MonoBehaviour
                 continue;
             }
 
-            // Zaman Hırsızı ID'si — totalPairCount'un dışında özel bir ID
             int timeThiefID = totalPairCount + 99;
-
             int id = cardIDs[i];
             CardEffectType effectType = CardEffectType.None;
             Sprite frontSprite = cardSprites[id];
@@ -217,7 +224,7 @@ public class GridManager : MonoBehaviour
             if (i == timeThiefIndex1 || i == timeThiefIndex2)
             {
                 effectType = CardEffectType.TimeThief;
-                id = timeThiefID; // Her iki kart da aynı ID — eşleşirler
+                id = timeThiefID;
                 if (levelConfig.timeThiefSprite != null)
                     frontSprite = levelConfig.timeThiefSprite;
             }
