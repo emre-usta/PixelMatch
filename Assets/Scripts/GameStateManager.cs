@@ -68,47 +68,103 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
 
-        int stars = CalculateStars();
-        SaveStars(stars);
-        UnlockNextLevel(stars);
+        // Serbest mod
+        if (FreeModeManager.IsFreeModeActive)
+        {
+            if (panelWin != null) panelWin.SetActive(true);
+            return;
+        }
+
+        // Daily Challenge
+        if (DailyChallengeManager.IsDailyChallengeActive)
+        {
+            // DC'de her zaman 3 yıldız
+            int stars = 3;
+            DailyChallengeManager.Instance.MarkPlayedToday(stars);
+            DailyChallengeManager.SetInactive();
+            GiveDailyChallengeReward(stars);
+
+            if (panelWin != null)
+            {
+                panelWin.SetActive(true);
+
+                var buttons = panelWin.GetComponentsInChildren<UnityEngine.UI.Button>(true);
+                foreach (var btn in buttons)
+                    if (btn.gameObject.name == "Btn_Retry")
+                        btn.gameObject.SetActive(false);
+
+                WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
+                winPanel?.ShowResult(stars);
+            }
+            return;
+        }
+
+        // Normal hikaye modu
+        int starsNormal = CalculateStars();
+        SaveStars(starsNormal);
+        UnlockNextLevel(starsNormal);
 
         if (panelWin != null)
         {
             panelWin.SetActive(true);
             WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
-            if (winPanel != null)
-                winPanel.ShowResult(stars);
+            winPanel?.ShowResult(starsNormal);
         }
+    }
+
+    private void GiveDailyChallengeReward(int stars)
+    {
+        if (PowerUpManager.Instance == null) return;
+
+        // DC tamamlandı — her zaman 1 İpucu + 1 Süre Dondur
+        PowerUpManager.Instance.AddPowerUp(PowerUpType.MindFreeze);
+        PowerUpManager.Instance.AddPowerUp(PowerUpType.TimeFreeze);
+        Debug.Log("[DC] Ödül: 1 İpucu + 1 Süre Dondur kazanıldı!");
     }
 
     private int CalculateStars()
     {
-        if (LevelSelectManager.SelectedLevel == null) return 0;
-        LevelConfig config = LevelSelectManager.SelectedLevel;
+        bool isFree = FreeModeManager.IsFreeModeActive;
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
-        if (isMoveMode)
-        {
-            if (config.moveLimit <= 0) return 0;
-            int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 99;
-            float usageRatio = (float)usedMoves / config.moveLimit;
+        float timeLimit = 0f;
+        int moveLimit = 0;
 
-            if (usageRatio <= 0.45f) return 3;   // %45'inden azını kullandı
-            if (usageRatio <= 0.70f) return 2;   // %45–70 arası
-            if (usageRatio <= 0.90f) return 1;   // %70–90 arası
-            return 0;                             // %90'dan fazla
+        if (isFree)
+        {
+            timeLimit = TimerController.Instance != null
+                ? TimerController.Instance.TotalTime : 120f;
+            moveLimit = MoveController.Instance != null
+                ? MoveController.Instance.MoveLimit : 30;
         }
         else
         {
-            if (config.timeLimit <= 0) return 0;
-            float usedTime = config.timeLimit - (TimerController.Instance != null
-                ? TimerController.Instance.RemainingTime : 0f);
-            float usageRatio = usedTime / config.timeLimit;
+            if (LevelSelectManager.SelectedLevel == null) return 0;
+            LevelConfig config = LevelSelectManager.SelectedLevel;
+            timeLimit = config.timeLimit;
+            moveLimit = config.moveLimit;
+        }
 
-            if (usageRatio <= 0.45f) return 3;   // %45'inden azını kullandı
-            if (usageRatio <= 0.70f) return 2;   // %45–70 arası
-            if (usageRatio <= 0.90f) return 1;   // %70–90 arası
-            return 0;                             // %90'dan fazla
+        if (isMoveMode)
+        {
+            if (moveLimit <= 0) return 0;
+            int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 99;
+            float usageRatio = (float)usedMoves / moveLimit;
+            if (usageRatio <= 0.45f) return 3;
+            if (usageRatio <= 0.70f) return 2;
+            if (usageRatio <= 0.90f) return 1;
+            return 0;
+        }
+        else
+        {
+            if (timeLimit <= 0) return 0;
+            float usedTime = timeLimit - (TimerController.Instance != null
+                ? TimerController.Instance.RemainingTime : 0f);
+            float usageRatio = usedTime / timeLimit;
+            if (usageRatio <= 0.45f) return 3;
+            if (usageRatio <= 0.70f) return 2;
+            if (usageRatio <= 0.90f) return 1;
+            return 0;
         }
     }
 
@@ -195,6 +251,32 @@ public class GameStateManager : MonoBehaviour
         SetState(GameState.Lose);
         Time.timeScale = 0f;
         GameEvents.RaiseGameLost();
+
+        if (DailyChallengeManager.IsDailyChallengeActive)
+        {
+            DailyChallengeManager.Instance?.AddAttempt();
+            bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
+
+            // Hakkı doldu — hemen pasif yap
+            if (!hasAttempts)
+                DailyChallengeManager.SetInactive();
+
+            if (panelGameOver != null) panelGameOver.SetActive(true);
+
+            var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>();
+            foreach (var btn in buttons)
+            {
+                if (btn.gameObject.name == "Btn_Retry")
+                {
+                    btn.interactable = hasAttempts;
+                    TMPro.TextMeshProUGUI txt = btn.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                    if (txt != null)
+                        txt.text = hasAttempts ? "TEKRAR" : "HAKKIN DOLDU";
+                }
+            }
+            return;
+        }
+
         if (panelGameOver != null) panelGameOver.SetActive(true);
     }
 
@@ -212,12 +294,30 @@ public class GameStateManager : MonoBehaviour
 
     public void LoadMainMenu()
     {
+        // DC aktifse pasif yap
+        if (DailyChallengeManager.IsDailyChallengeActive)
+            DailyChallengeManager.SetInactive();
+
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
 
     public void RestartGame()
     {
+        // DC'de deneme hakkı kontrolü
+        if (DailyChallengeManager.IsDailyChallengeActive)
+        {
+            if (!DailyChallengeManager.Instance.HasAttemptsLeft())
+            {
+                // Deneme hakkı doldu — ana menüye dön
+                DailyChallengeManager.SetInactive();
+                Time.timeScale = 1f;
+                SceneManager.LoadScene("MainMenu");
+                Debug.Log("[DC] Deneme hakkı doldu, ana menüye dönüldü.");
+                return;
+            }
+        }
+
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

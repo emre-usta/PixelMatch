@@ -26,6 +26,8 @@ public class TimerController : MonoBehaviour
     private Coroutine timerCoroutine;
     private bool useTimer = true;
 
+    public float TotalTime => totalTime;
+
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
     private void Awake()

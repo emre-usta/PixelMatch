@@ -19,6 +19,8 @@ public class MoveController : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI moveText;    // Opsiyonel — HUD'a eklenirse
 
+    public int MoveLimit => moveLimit;
+
     // ─── RUNTIME VERİSİ ───────────────────────────────────────────
 
     private int moveCount = 0;
