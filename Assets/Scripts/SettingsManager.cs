@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class SettingsManager : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private GameObject settingsPanel;
 
+    [Header("Value Texts")]
+    [SerializeField] private TextMeshProUGUI bgmValueText;
+    [SerializeField] private TextMeshProUGUI sfxValueText;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -21,7 +26,6 @@ public class SettingsManager : MonoBehaviour
 
     private void Start()
     {
-        // Kayıtlı değerleri yükle
         float bgm = PlayerPrefs.GetFloat(KEY_BGM, 0.5f);
         float sfx = PlayerPrefs.GetFloat(KEY_SFX, 1f);
 
@@ -37,11 +41,13 @@ public class SettingsManager : MonoBehaviour
             sfxSlider.onValueChanged.AddListener(OnSFXChanged);
         }
 
-        // AudioManager'a uygula
         AudioManager.Instance?.SetBGMVolume(bgm);
         AudioManager.Instance?.SetSFXVolume(sfx);
 
-        // Panel başlangıçta kapalı
+        // Başlangıç değerlerini göster
+        UpdateBGMText(bgm);
+        UpdateSFXText(sfx);
+
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
     }
@@ -53,6 +59,7 @@ public class SettingsManager : MonoBehaviour
         AudioManager.Instance?.SetBGMVolume(value);
         PlayerPrefs.SetFloat(KEY_BGM, value);
         PlayerPrefs.Save();
+        UpdateBGMText(value);
     }
 
     private void OnSFXChanged(float value)
@@ -60,6 +67,21 @@ public class SettingsManager : MonoBehaviour
         AudioManager.Instance?.SetSFXVolume(value);
         PlayerPrefs.SetFloat(KEY_SFX, value);
         PlayerPrefs.Save();
+        UpdateSFXText(value);
+    }
+
+    // ─── VALUE TEXTS ──────────────────────────────────────────────
+
+    private void UpdateBGMText(float value)
+    {
+        if (bgmValueText != null)
+            bgmValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
+    }
+
+    private void UpdateSFXText(float value)
+    {
+        if (sfxValueText != null)
+            sfxValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
     }
 
     // ─── PANEL AÇMA/KAPAMA ────────────────────────────────────────

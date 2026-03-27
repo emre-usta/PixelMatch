@@ -10,6 +10,13 @@ public class MainMenuControl : MonoBehaviour
     [Header("UI")]
     [SerializeField] private GameObject quitPanel;
 
+    private void Start()
+    {
+        // Panel baþlangýçta kapalý
+        if (quitPanel != null)
+            quitPanel.SetActive(false);
+    }
+
     public void OnPlayClicked()
     {
         SceneManager.LoadScene("LevelSelect");
@@ -20,11 +27,14 @@ public class MainMenuControl : MonoBehaviour
         SceneManager.LoadScene("FreeMode");
     }
 
+    // Çýkýþ butonuna basýnca popup aç
     public void OnExitClicked()
     {
-        if (quitPanel != null) quitPanel.SetActive(true);
+        if (quitPanel != null)
+            quitPanel.SetActive(true);
     }
 
+    // Popup'ta EVET'e basýnca
     public void OnQuitConfirmed()
     {
         Application.Quit();
@@ -33,8 +43,10 @@ public class MainMenuControl : MonoBehaviour
 #endif
     }
 
+    // Popup'ta HAYIR'a basýnca
     public void OnQuitCancelled()
     {
-        if (quitPanel != null) quitPanel.SetActive(false);
+        if (quitPanel != null)
+            quitPanel.SetActive(false);
     }
 }
