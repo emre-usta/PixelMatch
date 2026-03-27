@@ -196,12 +196,12 @@ public class DailyChallengeManager : MonoBehaviour
         {
             string diffText = DCDifficulty switch
             {
-                DifficultyLevel.Easy => "KOLAY",
-                DifficultyLevel.Medium => "ORTA",
-                DifficultyLevel.Hard => "ZOR",
+                DifficultyLevel.Easy => "EASY",
+                DifficultyLevel.Medium => "MEDIUM",
+                DifficultyLevel.Hard => "HARD",
                 _ => ""
             };
-            txtDifficulty.text = $"GÜNLÜK GÖREV  ·  {diffText}  ·  {DCColumns}×{DCRows}";
+            txtDifficulty.text = $"{diffText} · {DCColumns}×{DCRows}";
         }
 
         // Durum metni
