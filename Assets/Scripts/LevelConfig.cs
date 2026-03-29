@@ -41,6 +41,9 @@ public class LevelConfig : ScriptableObject
     [Header("Özel Kart Görselleri")]
     public Sprite timeThiefSprite;
 
+    [Header("Level Önizleme")]
+    public Sprite previewSprite; // Level Select'te gösterilecek görsel
+
     // LevelConfig.cs'e ekle
     //[HideInInspector] public bool runtimeUseTimer;
     //[HideInInspector] public bool runtimeUseMoveLimit;

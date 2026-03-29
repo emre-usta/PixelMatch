@@ -1,15 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// PixelMatch — Oyun State Machine
-/// Oyunun her anında hangi state'te olduğunu bilen tek otorite.
-/// Sahneye tek bir GameManager objesi olarak eklenir.
-/// </summary>
 public class GameStateManager : MonoBehaviour
 {
     public static GameStateManager Instance { get; private set; }
-
     public GameState CurrentState { get; private set; } = GameState.Initializing;
 
     [Header("UI Panelleri")]
@@ -17,15 +11,9 @@ public class GameStateManager : MonoBehaviour
     [SerializeField] private GameObject panelWin;
     [SerializeField] private GameObject panelGameOver;
 
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
-
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         SetState(GameState.Initializing);
     }
@@ -34,8 +22,6 @@ public class GameStateManager : MonoBehaviour
     {
         GameEvents.ClearAllEvents();
     }
-
-    // ─── STATE GEÇİŞLERİ ──────────────────────────────────────────
 
     public void OnGridReady()
     {
@@ -78,7 +64,6 @@ public class GameStateManager : MonoBehaviour
         // Daily Challenge
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
-            // DC'de her zaman 3 yıldız
             int stars = 3;
             DailyChallengeManager.Instance.MarkPlayedToday(stars);
             DailyChallengeManager.SetInactive();
@@ -87,12 +72,10 @@ public class GameStateManager : MonoBehaviour
             if (panelWin != null)
             {
                 panelWin.SetActive(true);
-
                 var buttons = panelWin.GetComponentsInChildren<UnityEngine.UI.Button>(true);
                 foreach (var btn in buttons)
                     if (btn.gameObject.name == "Btn_Retry")
                         btn.gameObject.SetActive(false);
-
                 WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
                 winPanel?.ShowResult(stars);
             }
@@ -102,6 +85,7 @@ public class GameStateManager : MonoBehaviour
         // Normal hikaye modu
         int starsNormal = CalculateStars();
         SaveStars(starsNormal);
+        SaveRecord(starsNormal); // ← YENİ
         UnlockNextLevel(starsNormal);
 
         if (panelWin != null)
@@ -115,8 +99,6 @@ public class GameStateManager : MonoBehaviour
     private void GiveDailyChallengeReward(int stars)
     {
         if (PowerUpManager.Instance == null) return;
-
-        // DC tamamlandı — her zaman 1 İpucu + 1 Süre Dondur
         PowerUpManager.Instance.AddPowerUp(PowerUpType.MindFreeze);
         PowerUpManager.Instance.AddPowerUp(PowerUpType.TimeFreeze);
         Debug.Log("[DC] Ödül: 1 İpucu + 1 Süre Dondur kazanıldı!");
@@ -132,10 +114,8 @@ public class GameStateManager : MonoBehaviour
 
         if (isFree)
         {
-            timeLimit = TimerController.Instance != null
-                ? TimerController.Instance.TotalTime : 120f;
-            moveLimit = MoveController.Instance != null
-                ? MoveController.Instance.MoveLimit : 30;
+            timeLimit = TimerController.Instance != null ? TimerController.Instance.TotalTime : 120f;
+            moveLimit = MoveController.Instance != null ? MoveController.Instance.MoveLimit : 30;
         }
         else
         {
@@ -174,7 +154,47 @@ public class GameStateManager : MonoBehaviour
         int categoryID = LevelSelectManager.SelectedCategoryID;
         int levelID = LevelSelectManager.SelectedLevel.levelID;
         LevelProgressManager.Instance.SaveBestStars(categoryID, levelID, stars);
-        Debug.Log($"[GameStateManager] {stars} yıldız kazanıldı ve kaydedildi.");
+        Debug.Log($"[GameStateManager] {stars} yıldız kaydedildi.");
+    }
+
+    // ─── REKOR KAYDETME ───────────────────────────────────────────
+    private void SaveRecord(int stars)
+    {
+        if (stars == 0) return;
+        if (LevelSelectManager.SelectedLevel == null) return;
+
+        int categoryID = LevelSelectManager.SelectedCategoryID;
+        int levelID = LevelSelectManager.SelectedLevel.levelID;
+        int mode = (int)LevelSelectManager.SelectedMode;
+        string recordKey = $"record_{categoryID}_{levelID}_{mode}";
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
+        Debug.Log($"[SaveRecord] categoryID:{categoryID}, levelID:{levelID}, mode:{mode}, key:{recordKey}");
+
+
+        if (isMoveMode)
+        {
+            int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 0;
+            int existing = PlayerPrefs.GetInt(recordKey + "_moves", 9999);
+            if (usedMoves < existing)
+            {
+                PlayerPrefs.SetInt(recordKey + "_moves", usedMoves);
+                PlayerPrefs.Save();
+                Debug.Log($"[GameStateManager] Hamle rekoru kaydedildi: {usedMoves}");
+            }
+        }
+        else
+        {
+            float usedTime = LevelSelectManager.SelectedLevel.timeLimit -
+                (TimerController.Instance != null ? TimerController.Instance.RemainingTime : 0f);
+            float existing = PlayerPrefs.GetFloat(recordKey, 9999f);
+            if (usedTime < existing)
+            {
+                PlayerPrefs.SetFloat(recordKey, usedTime);
+                PlayerPrefs.Save();
+                Debug.Log($"[GameStateManager] Süre rekoru kaydedildi: {usedTime:F1}s");
+            }
+        }
     }
 
     private void UnlockNextLevel(int stars)
@@ -188,26 +208,20 @@ public class GameStateManager : MonoBehaviour
         int nextLevelID = currentLevelID + 1;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
-        // ─── 0 YILDIZ — hiçbir şey açılmaz ───────────────────────
         if (stars == 0)
         {
             int previousBestStars = LevelProgressManager.Instance.GetBestStars(categoryID, currentLevelID);
-
             if (previousBestStars > 0)
             {
-                // Daha önce geçmiş — uyarı gösterme, sessizce bitir
                 Debug.Log("[GameStateManager] 0 yıldız ama daha önce geçilmiş — uyarı yok.");
                 return;
             }
-
-            // İlk kez 0 yıldız — uyarı göster
             Debug.Log("[GameStateManager] 0 yıldız — level açılmadı.");
             WinPanelController winPanel = panelWin?.GetComponentInChildren<WinPanelController>();
             winPanel?.ShowNoStarWarning();
             return;
         }
 
-        // ─── 1+ YILDIZ — sonraki level açılır ────────────────────
         if (!isLastLevel)
         {
             LevelProgressManager.Instance.UnlockLevel(categoryID, nextLevelID);
@@ -228,7 +242,6 @@ public class GameStateManager : MonoBehaviour
             }
         }
 
-        // ─── 2 YILDIZ — Açık Bak kazanılır ──────────────────────
         if (stars == 2)
         {
             PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
@@ -237,9 +250,7 @@ public class GameStateManager : MonoBehaviour
 
         if (stars == 3)
         {
-            PowerUpType reward = Random.value > 0.5f
-                ? PowerUpType.MindFreeze
-                : PowerUpType.TimeFreeze;
+            PowerUpType reward = Random.value > 0.5f ? PowerUpType.MindFreeze : PowerUpType.TimeFreeze;
             PowerUpManager.Instance?.AddPowerUp(reward);
             Debug.Log($"[GameStateManager] 3 yıldız — {reward} kazanıldı!");
         }
@@ -257,9 +268,7 @@ public class GameStateManager : MonoBehaviour
             DailyChallengeManager.Instance?.AddAttempt();
             bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
 
-            // Hakkı doldu — hemen pasif yap
-            if (!hasAttempts)
-                DailyChallengeManager.SetInactive();
+            if (!hasAttempts) DailyChallengeManager.SetInactive();
 
             if (panelGameOver != null) panelGameOver.SetActive(true);
 
@@ -280,8 +289,6 @@ public class GameStateManager : MonoBehaviour
         if (panelGameOver != null) panelGameOver.SetActive(true);
     }
 
-    // ─── YARDIMCI METOTLAR ────────────────────────────────────────
-
     public bool IsPlaying => CurrentState == GameState.Playing;
 
     private void SetState(GameState newState)
@@ -290,26 +297,20 @@ public class GameStateManager : MonoBehaviour
         Debug.Log($"[GameStateManager] State: {newState}");
     }
 
-    // ─── SAHNE YÖNETİMİ ───────────────────────────────────────────
-
     public void LoadMainMenu()
     {
-        // DC aktifse pasif yap
         if (DailyChallengeManager.IsDailyChallengeActive)
             DailyChallengeManager.SetInactive();
-
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
 
     public void RestartGame()
     {
-        // DC'de deneme hakkı kontrolü
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
             if (!DailyChallengeManager.Instance.HasAttemptsLeft())
             {
-                // Deneme hakkı doldu — ana menüye dön
                 DailyChallengeManager.SetInactive();
                 Time.timeScale = 1f;
                 SceneManager.LoadScene("MainMenu");
@@ -317,7 +318,6 @@ public class GameStateManager : MonoBehaviour
                 return;
             }
         }
-
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
