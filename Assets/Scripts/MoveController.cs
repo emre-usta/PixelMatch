@@ -100,9 +100,9 @@ public class MoveController : MonoBehaviour
         if (moveText == null) return;
 
         if (useMoveLimit)
-            moveText.text = $"Moves: {moveLimit - moveCount}";
+            moveText.text = $"{moveLimit - moveCount}";
         else
-            moveText.text = $"Moves: {moveCount}";
+            moveText.text = $"{moveCount}";
     }
 
     //--------------------------------------------------------------
