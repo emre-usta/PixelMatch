@@ -54,14 +54,12 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
 
-        // Serbest mod
         if (FreeModeManager.IsFreeModeActive)
         {
             if (panelWin != null) panelWin.SetActive(true);
             return;
         }
 
-        // Daily Challenge
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
             int stars = 3;
@@ -82,10 +80,9 @@ public class GameStateManager : MonoBehaviour
             return;
         }
 
-        // Normal hikaye modu
         int starsNormal = CalculateStars();
         SaveStars(starsNormal);
-        SaveRecord(starsNormal); // ← YENİ
+        SaveRecord(starsNormal);
         UnlockNextLevel(starsNormal);
 
         if (panelWin != null)
@@ -108,7 +105,6 @@ public class GameStateManager : MonoBehaviour
     {
         bool isFree = FreeModeManager.IsFreeModeActive;
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
-
         float timeLimit = 0f;
         int moveLimit = 0;
 
@@ -157,7 +153,6 @@ public class GameStateManager : MonoBehaviour
         Debug.Log($"[GameStateManager] {stars} yıldız kaydedildi.");
     }
 
-    // ─── REKOR KAYDETME ───────────────────────────────────────────
     private void SaveRecord(int stars)
     {
         if (stars == 0) return;
@@ -170,7 +165,6 @@ public class GameStateManager : MonoBehaviour
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
         Debug.Log($"[SaveRecord] categoryID:{categoryID}, levelID:{levelID}, mode:{mode}, key:{recordKey}");
-
 
         if (isMoveMode)
         {
@@ -267,7 +261,6 @@ public class GameStateManager : MonoBehaviour
         {
             DailyChallengeManager.Instance?.AddAttempt();
             bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
-
             if (!hasAttempts) DailyChallengeManager.SetInactive();
 
             if (panelGameOver != null) panelGameOver.SetActive(true);
