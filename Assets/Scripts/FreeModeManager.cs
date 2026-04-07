@@ -51,7 +51,24 @@ public class FreeModeManager : MonoBehaviour
 
     [Header("Başlat")]
     [SerializeField] private Button btnStart;
-    [SerializeField] private TextMeshProUGUI txtLimitInfo;
+
+    [Header("Limit Bilgisi")]
+    [SerializeField] private TextMeshProUGUI txtTimeValue;
+    [SerializeField] private TextMeshProUGUI txtMoveValue;
+
+    // ─── RENK PALETİ ──────────────────────────────────────────────
+    // Kategori & Grid & Mod için amber
+    private readonly Color colorActiveBg = new Color(0.10f, 0.07f, 0.00f); // #1A1200
+    private readonly Color colorInactiveBg = new Color(0.04f, 0.04f, 0.08f); // #0A0A14
+    private readonly Color colorActiveText = new Color(0.96f, 0.65f, 0.14f); // #F5A623
+    private readonly Color colorInactiveText = new Color(0.32f, 0.26f, 0.20f); // #524534
+    private readonly Color colorActiveBorder = new Color(0.96f, 0.65f, 0.14f); // #F5A623
+    private readonly Color colorInactiveBorder = new Color(0.16f, 0.16f, 0.31f); // #2A2A50
+
+    // Zorluk için yeşil
+    private readonly Color colorEasyBg = new Color(0.04f, 0.12f, 0.06f); // #0A1F10
+    private readonly Color colorEasyText = new Color(0.32f, 0.93f, 0.51f); // #51ED82
+    private readonly Color colorEasyBorder = new Color(0.32f, 0.93f, 0.51f); // #51ED82
 
     // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
@@ -75,15 +92,15 @@ public class FreeModeManager : MonoBehaviour
 
         // Default vurgulamalar
         Button[] gridBtns = { btn4x4, btn4x5, btn5x4, btn6x6 };
-        HighlightButton(gridBtns, 0);
+        HighlightButton(gridBtns, 0, false);
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
-        HighlightButton(diffBtns, 0);
+        HighlightButton(gridBtns, 0, false);
 
         Button[] modeBtns = { btnClassic, btnMove };
-        HighlightButton(modeBtns, 0);
+        HighlightButton(modeBtns, 0, false);
 
-        HighlightButton(categoryButtons, 0);
+        HighlightButton(categoryButtons, 0, false);
     }
 
     private void SetupButtons()
@@ -118,7 +135,7 @@ public class FreeModeManager : MonoBehaviour
     private void SelectCategory(CategoryConfig category)
     {
         SelectedCategory = category;
-        HighlightButton(categoryButtons, System.Array.IndexOf(categories, category));
+        HighlightButton(categoryButtons, System.Array.IndexOf(categories, category), false);
         Debug.Log($"[FreeModeManager] Kategori: {category.categoryName}");
     }
 
@@ -132,7 +149,7 @@ public class FreeModeManager : MonoBehaviour
         int index = (cols == 4 && rows == 4) ? 0 :
                     (cols == 4 && rows == 5) ? 1 :
                     (cols == 5 && rows == 4) ? 2 : 3;
-        HighlightButton(gridBtns, index);
+        HighlightButton(gridBtns, index, false);
         Debug.Log($"[FreeModeManager] Grid: {cols}x{rows}");
     }
 
@@ -142,7 +159,8 @@ public class FreeModeManager : MonoBehaviour
         UpdateLimitInfo();
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
-        HighlightButton(diffBtns, (int)difficulty);
+        HighlightButton(diffBtns, (int)difficulty, false);
+
         Debug.Log($"[FreeModeManager] Zorluk: {difficulty}");
     }
 
@@ -152,32 +170,58 @@ public class FreeModeManager : MonoBehaviour
         LevelSelectManager.SelectedMode = mode;
 
         Button[] modeBtns = { btnClassic, btnMove };
-        HighlightButton(modeBtns, mode == LevelSelectManager.GameMode.Classic ? 0 : 1);
+        HighlightButton(modeBtns, mode == LevelSelectManager.GameMode.Classic ? 0 : 1, false);
         Debug.Log($"[FreeModeManager] Mod: {mode}");
     }
 
-    private void HighlightButton(Button[] buttons, int selectedIndex)
+    // ─── BUTON VURGULAMA ──────────────────────────────────────────
+
+    // Kategori, Grid, Mod için — amber renk
+    private void HighlightButton(Button[] buttons, int selectedIndex, bool isDifficulty)
     {
         for (int i = 0; i < buttons.Length; i++)
         {
             if (buttons[i] == null) continue;
-            Image img = buttons[i].GetComponent<Image>();
-            if (img == null) continue;
 
-            img.color = (i == selectedIndex)
-                ? new Color(0.55f, 0.41f, 0.08f)   // #8B6914 — aktif
-                : new Color(0.10f, 0.08f, 0.03f);  // #1A1408 — pasif
+            bool isActive = (i == selectedIndex);
+
+            // Buton arka plan
+            Image bg = buttons[i].GetComponent<Image>();
+            if (bg != null)
+                bg.color = isActive ? colorActiveBg : colorInactiveBg;
+
+            // Metin rengi
+            TextMeshProUGUI txt = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+                txt.color = isActive ? colorActiveText : colorInactiveText;
+
+            // Border_Bottom rengi
+            Transform borderBottom = buttons[i].transform.Find("Border_Bottom");
+            if (borderBottom != null)
+            {
+                Image borderImg = borderBottom.GetComponent<Image>();
+                if (borderImg != null)
+                    borderImg.color = isActive ? colorActiveBorder : colorInactiveBorder;
+            }
         }
     }
 
+    // ─── LİMİT BİLGİSİ ───────────────────────────────────────────
+
     private void UpdateLimitInfo()
     {
-        if (limitConfig == null || txtLimitInfo == null) return;
+        if (limitConfig == null) return;
         var limit = limitConfig.GetLimit(SelectedColumns, SelectedRows, SelectedDifficulty);
 
-        int minutes = Mathf.FloorToInt(limit.timeLimit / 60);
-        int seconds = Mathf.FloorToInt(limit.timeLimit % 60);
-        txtLimitInfo.text = $"Süre: {minutes:00}:{seconds:00}  ·  Hamle: {limit.moveLimit}";
+        if (txtTimeValue != null)
+        {
+            int minutes = Mathf.FloorToInt(limit.timeLimit / 60);
+            int seconds = Mathf.FloorToInt(limit.timeLimit % 60);
+            txtTimeValue.text = $"{minutes:00}:{seconds:00}";
+        }
+
+        if (txtMoveValue != null)
+            txtMoveValue.text = $"{limit.moveLimit}";
     }
 
     // ─── OYUN BAŞLATMA ────────────────────────────────────────────
