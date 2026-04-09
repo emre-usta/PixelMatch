@@ -128,7 +128,7 @@ public class EffectManager : MonoBehaviour
                 .GetComponentInChildren<TextMeshProUGUI>();
 
             // Text_Desc'i bul
-            Transform descTransform = timeThiefTutorialPopup.transform.Find("Panel/Text_Desc");
+            Transform descTransform = timeThiefTutorialPopup.transform.Find("Panel_Content/Text_Desc");
             if (descTransform != null)
             {
                 TextMeshProUGUI desc = descTransform.GetComponent<TextMeshProUGUI>();
