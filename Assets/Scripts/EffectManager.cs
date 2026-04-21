@@ -121,22 +121,29 @@ public class EffectManager : MonoBehaviour
 
         if (timeThiefTutorialPopup != null)
         {
-            // Moda göre metni güncelle
             bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
-            TextMeshProUGUI descText = timeThiefTutorialPopup
-                .GetComponentInChildren<TextMeshProUGUI>();
+            // Başlık güncelle
+            Transform titleTransform = timeThiefTutorialPopup.transform
+                .Find("Panel_Content/Panel_Title/Text_PauseTitle");
+            if (titleTransform != null)
+            {
+                TextMeshProUGUI title = titleTransform.GetComponent<TextMeshProUGUI>();
+                if (title != null)
+                    title.text = isMoveMode ? "MOVE THIEF" : "TIME THIEF";
+            }
 
-            // Text_Desc'i bul
-            Transform descTransform = timeThiefTutorialPopup.transform.Find("Panel_Content/Text_Desc");
+            // Açıklama güncelle
+            Transform descTransform = timeThiefTutorialPopup.transform
+                .Find("Panel_Content/Text_Desc");
             if (descTransform != null)
             {
                 TextMeshProUGUI desc = descTransform.GetComponent<TextMeshProUGUI>();
                 if (desc != null)
                 {
                     desc.text = isMoveMode
-                        ? "Bu kart yanlış eşleştirildiğinde\n3 hamle hakkını çalar.\nDikkatli ol!"
-                        : "Bu kart yanlış eşleştirildiğinde\n5 saniyeni çalar.\nDikkatli ol!";
+                        ? "If this card is matched incorrectly, you will receive a penalty of <color=#FFB4AB>-3 MOVES</color>!"
+                        : "If this card is matched incorrectly, you will receive a penalty of <color=#FFB4AB>-5 SECONDS</color>!";
                 }
             }
 

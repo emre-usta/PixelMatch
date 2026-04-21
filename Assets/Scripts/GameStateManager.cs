@@ -265,6 +265,8 @@ public class GameStateManager : MonoBehaviour
 
             if (panelGameOver != null) panelGameOver.SetActive(true);
 
+            UpdateGameOverReason();
+
             var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>();
             foreach (var btn in buttons)
             {
@@ -280,6 +282,21 @@ public class GameStateManager : MonoBehaviour
         }
 
         if (panelGameOver != null) panelGameOver.SetActive(true);
+        UpdateGameOverReason();
+    }
+
+    private void UpdateGameOverReason()
+    {
+        if (panelGameOver == null) return;
+
+        Transform reasonT = panelGameOver.transform.Find("Panel_LoseContent/Text_Reason");
+        if (reasonT == null) return;
+
+        TMPro.TextMeshProUGUI reason = reasonT.GetComponent<TMPro.TextMeshProUGUI>();
+        if (reason == null) return;
+
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        reason.text = isMoveMode ? "OUT OF MOVES" : "OUT OF TIME";
     }
 
     public bool IsPlaying => CurrentState == GameState.Playing;
