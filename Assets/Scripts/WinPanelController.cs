@@ -34,6 +34,10 @@ public class WinPanelController : MonoBehaviour
     [Header("Toplam Yıldız")]
     [SerializeField] private TextMeshProUGUI txtTotalStars;
 
+    [Header("Stat Card Labels")]
+    [SerializeField] private TextMeshProUGUI txtTimeBonusLabel;
+    [SerializeField] private TextMeshProUGUI txtScoreLabel;
+
     // Kazanılan power-up'ları dışarıdan set etmek için
     private List<(PowerUpType type, int amount)> pendingRewards = new();
 
@@ -142,32 +146,71 @@ public class WinPanelController : MonoBehaviour
 
     private void UpdateScore()
     {
-        if (LevelSelectManager.SelectedLevel == null) return;
-
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isFree = FreeModeManager.IsFreeModeActive;
+
+        // Label güncelle
+        if (txtTimeBonusLabel != null)
+            txtTimeBonusLabel.text = isMoveMode ? "KULLANILAN HAMLE" : "KALAN SÜRE";
+        if (txtScoreLabel != null)
+            txtScoreLabel.text = "PERFORMANS";
 
         if (isMoveMode)
         {
+            int moveLimit = 0;
             int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 0;
-            int moveLimit = LevelSelectManager.SelectedLevel.moveLimit;
+
+            if (!isFree && LevelSelectManager.SelectedLevel != null)
+                moveLimit = LevelSelectManager.SelectedLevel.moveLimit;
+            else if (isFree)
+                moveLimit = MoveController.Instance != null ? MoveController.Instance.MoveLimit : 30;
+
             int remaining = Mathf.Max(0, moveLimit - usedMoves);
+            float ratio = moveLimit > 0 ? (float)remaining / moveLimit : 0f;
+            string perf = GetPerformanceLabel(ratio);
 
             if (txtTimeBonusValue != null)
-                txtTimeBonusValue.text = $"+{remaining * 100}";
+                txtTimeBonusValue.text = $"{usedMoves} / {moveLimit}";
             if (txtScoreValue != null)
-                txtScoreValue.text = $"{remaining * 100:N0}".Replace(",", ".");
+                txtScoreValue.text = perf;
         }
         else
         {
+            float timeLimit = 0f;
             float remainingTime = TimerController.Instance != null
                 ? TimerController.Instance.RemainingTime : 0f;
-            int timeBonus = Mathf.RoundToInt(remainingTime) * 10;
+
+            if (!isFree && LevelSelectManager.SelectedLevel != null)
+                timeLimit = LevelSelectManager.SelectedLevel.timeLimit;
+            else if (isFree)
+                timeLimit = TimerController.Instance != null
+                    ? TimerController.Instance.TotalTime : 120f;
+
+            float ratio = timeLimit > 0 ? remainingTime / timeLimit : 0f;
+            string perf = GetPerformanceLabel(ratio);
+
+            int minutes = Mathf.FloorToInt(remainingTime / 60);
+            int seconds = Mathf.FloorToInt(remainingTime % 60);
 
             if (txtTimeBonusValue != null)
-                txtTimeBonusValue.text = $"+{timeBonus:N0}".Replace(",", ".");
+                txtTimeBonusValue.text = $"{minutes:00}:{seconds:00}";
             if (txtScoreValue != null)
-                txtScoreValue.text = $"{timeBonus:N0}".Replace(",", ".");
+                txtScoreValue.text = perf;
         }
+
+        // Toplam yıldız güncelle
+        if (txtTotalStars != null)
+        {
+            int total = PlayerPrefs.GetInt("total_stars", 0);
+            txtTotalStars.text = $"TOTAL: {total}";
+        }
+    }
+
+    private string GetPerformanceLabel(float ratio)
+    {
+        if (ratio >= 0.60f) return "PERFECT!";
+        if (ratio >= 0.30f) return "GOOD!";
+        return "COMPLETED";
     }
 
     // ─── NEW RECORD ───────────────────────────────────────────────

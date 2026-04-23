@@ -7313,7 +7313,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: FINAL SCORE
+  m_text: PERFORMANCE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3548033e9b5431f4995895eec2e0a852, type: 2}
   m_sharedMaterial: {fileID: 3653284798536397567, guid: 3548033e9b5431f4995895eec2e0a852, type: 2}
@@ -13222,6 +13222,8 @@ MonoBehaviour:
   panelNewRecordRect: {fileID: 1396911755}
   noStarWarningPanel: {fileID: 1035917373}
   txtTotalStars: {fileID: 1391802195}
+  txtTimeBonusLabel: {fileID: 1854952785}
+  txtScoreLabel: {fileID: 486176658}
 --- !u!1 &773979787
 GameObject:
   m_ObjectHideFlags: 0

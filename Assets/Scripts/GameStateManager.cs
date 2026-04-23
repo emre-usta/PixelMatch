@@ -118,6 +118,7 @@ public class GameStateManager : MonoBehaviour
     {
         bool isFree = FreeModeManager.IsFreeModeActive;
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
         float timeLimit = 0f;
         int moveLimit = 0;
 
@@ -138,25 +139,31 @@ public class GameStateManager : MonoBehaviour
         {
             if (moveLimit <= 0) return 0;
             int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 99;
-            float usageRatio = (float)usedMoves / moveLimit;
-            if (usageRatio <= 0.45f) return 3;
-            if (usageRatio <= 0.70f) return 2;
-            if (usageRatio <= 0.90f) return 1;
-            return 0;
+            int remainingMoves = moveLimit - usedMoves;
+            float remainingRatio = (float)remainingMoves / moveLimit;
+
+            // %50+ kalan → 3 yıldız
+            // %20-50 kalan → 2 yıldız
+            // %0-20 kalan → 1 yıldız
+            if (remainingRatio >= 0.50f) return 3;
+            if (remainingRatio >= 0.20f) return 2;
+            return 1;
         }
         else
         {
             if (timeLimit <= 0) return 0;
-            float usedTime = timeLimit - (TimerController.Instance != null
-                ? TimerController.Instance.RemainingTime : 0f);
-            float usageRatio = usedTime / timeLimit;
-            if (usageRatio <= 0.45f) return 3;
-            if (usageRatio <= 0.70f) return 2;
-            if (usageRatio <= 0.90f) return 1;
-            return 0;
+            float remainingTime = TimerController.Instance != null
+                ? TimerController.Instance.RemainingTime : 0f;
+            float remainingRatio = remainingTime / timeLimit;
+
+            // %60+ kalan → 3 yıldız
+            // %30-60 kalan → 2 yıldız
+            // %0-30 kalan → 1 yıldız
+            if (remainingRatio >= 0.60f) return 3;
+            if (remainingRatio >= 0.30f) return 2;
+            return 1;
         }
     }
-
     private void SaveStars(int stars)
     {
         if (LevelProgressManager.Instance == null)

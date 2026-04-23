@@ -45,19 +45,19 @@ public class BadgeManager : MonoBehaviour
 
     private string GetTitle(int stars)
     {
-        if (stars >= 100) return "LEGEND";
-        if (stars >= 60) return "MASTER";
-        if (stars >= 30) return "EXPLORER";
-        if (stars >= 6) return "NOVICE";
+        if (stars >= 120) return "LEGEND";
+        if (stars >= 80) return "MASTER";
+        if (stars >= 45) return "EXPLORER";
+        if (stars >= 15) return "NOVICE";
         return "ROOKIE";
     }
 
     private Color GetTitleColor(int stars)
     {
-        if (stars >= 100) return new Color(0.32f, 0.93f, 0.51f); // #51ED82 yeşil
-        if (stars >= 60) return new Color(0.96f, 0.65f, 0.14f); // #F5A623 amber
-        if (stars >= 30) return new Color(0.27f, 0.67f, 1.00f); // #44AAFF mavi
-        if (stars >= 10) return new Color(0.98f, 0.78f, 0.46f); // #FAC775 sarı
+        if (stars >= 120) return new Color(0.32f, 0.93f, 0.51f); // #51ED82 yeşil
+        if (stars >= 80) return new Color(0.96f, 0.65f, 0.14f); // #F5A623 amber
+        if (stars >= 45) return new Color(0.27f, 0.67f, 1.00f); // #44AAFF mavi
+        if (stars >= 15) return new Color(0.98f, 0.78f, 0.46f); // #FAC775 sarı
         return new Color(0.67f, 0.67f, 0.67f);                   // #AAAAAA gri
     }
 }
