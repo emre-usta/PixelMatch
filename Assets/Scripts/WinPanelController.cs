@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -17,6 +18,12 @@ public class WinPanelController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtTimeBonusValue;
     [SerializeField] private GameObject panelNewRecord;
 
+    [Header("Power-up Ödül")]
+    [SerializeField] private GameObject panelPowerUpReward;
+    [SerializeField] private GameObject[] rewardIcons; // RewardIcon_1, 2, 3
+    [SerializeField] private TextMeshProUGUI[] rewardIconTexts; // icon emoji
+    [SerializeField] private TextMeshProUGUI[] rewardCountTexts; // "x1" vb.
+
     [Header("Animasyon")]
     [SerializeField] private RectTransform txtYouWin;
     [SerializeField] private RectTransform panelNewRecordRect;
@@ -24,7 +31,23 @@ public class WinPanelController : MonoBehaviour
     [Header("0 Yıldız Uyarısı")]
     [SerializeField] private GameObject noStarWarningPanel;
 
+    [Header("Toplam Yıldız")]
+    [SerializeField] private TextMeshProUGUI txtTotalStars;
+
+    // Kazanılan power-up'ları dışarıdan set etmek için
+    private List<(PowerUpType type, int amount)> pendingRewards = new();
+
     // ─── PUBLIC ───────────────────────────────────────────────────
+
+    public void AddPendingReward(PowerUpType type, int amount = 1)
+    {
+        pendingRewards.Add((type, amount));
+    }
+
+    public void ClearPendingRewards()
+    {
+        pendingRewards.Clear();
+    }
 
     public void ShowResult(int stars)
     {
@@ -36,13 +59,21 @@ public class WinPanelController : MonoBehaviour
         CheckNewRecord();
         StartCoroutine(AnimateStars(stars));
 
-        // YOU WIN pulse animasyonu
         if (txtYouWin != null)
             StartCoroutine(PulseAnimation(txtYouWin));
 
-        // NEW RECORD bounce animasyonu
         if (panelNewRecord != null && panelNewRecord.activeSelf && panelNewRecordRect != null)
             StartCoroutine(BounceAnimation(panelNewRecordRect));
+
+        // Toplam yıldız güncelle
+        if (txtTotalStars != null)
+        {
+            int total = PlayerPrefs.GetInt("total_stars", 0);
+            txtTotalStars.text = $"TOTAL: {total} STARS";
+        }
+
+        // Power-up ödüllerini göster
+        StartCoroutine(ShowPowerUpRewards());
     }
 
     public void ShowNoStarWarning()
@@ -53,6 +84,58 @@ public class WinPanelController : MonoBehaviour
 
         if (noStarWarningPanel != null)
             noStarWarningPanel.SetActive(true);
+    }
+
+    // ─── POWER-UP ÖDÜL GÖSTERİMİ ─────────────────────────────────
+
+    private IEnumerator ShowPowerUpRewards()
+    {
+        if (panelPowerUpReward == null || pendingRewards.Count == 0) yield break;
+
+        // Yıldız animasyonu bitmeden bekleme
+        yield return new WaitForSecondsRealtime(1.6f);
+
+        // Tüm ikonları gizle
+        foreach (var icon in rewardIcons)
+            if (icon != null) icon.SetActive(false);
+
+        // Ödülleri doldur
+        for (int i = 0; i < pendingRewards.Count && i < rewardIcons.Length; i++)
+        {
+            var (type, amount) = pendingRewards[i];
+
+            if (rewardIconTexts != null && i < rewardIconTexts.Length && rewardIconTexts[i] != null)
+                rewardIconTexts[i].text = GetPowerUpIcon(type);
+
+            if (rewardCountTexts != null && i < rewardCountTexts.Length && rewardCountTexts[i] != null)
+                rewardCountTexts[i].text = $"x{amount}";
+        }
+
+        panelPowerUpReward.SetActive(true);
+
+        // Her ikonu sırayla pop animasyonuyla göster
+        for (int i = 0; i < pendingRewards.Count && i < rewardIcons.Length; i++)
+        {
+            if (rewardIcons[i] != null)
+            {
+                rewardIcons[i].SetActive(true);
+                StartCoroutine(ScalePop(rewardIcons[i].transform));
+                yield return new WaitForSecondsRealtime(0.3f);
+            }
+        }
+
+        pendingRewards.Clear();
+    }
+
+    private string GetPowerUpIcon(PowerUpType type)
+    {
+        return type switch
+        {
+            PowerUpType.XRay => "X",
+            PowerUpType.MindFreeze => "M",
+            PowerUpType.TimeFreeze => "F",
+            _ => "?"
+        };
     }
 
     // ─── SKOR ─────────────────────────────────────────────────────
@@ -222,5 +305,22 @@ public class WinPanelController : MonoBehaviour
 
             yield return new WaitForSecondsRealtime(0.3f);
         }
+    }
+
+    public void ShowFreeModeResult(int stars)
+    {
+        if (star1) star1.color = starInactiveColor;
+        if (star2) star2.color = starInactiveColor;
+        if (star3) star3.color = starInactiveColor;
+
+        // Skoru sıfır göster
+        if (txtTimeBonusValue != null) txtTimeBonusValue.text = "+0";
+        if (txtScoreValue != null) txtScoreValue.text = "0";
+        if (panelNewRecord != null) panelNewRecord.SetActive(false);
+
+        StartCoroutine(AnimateStars(stars));
+
+        if (txtYouWin != null)
+            StartCoroutine(PulseAnimation(txtYouWin));
     }
 }

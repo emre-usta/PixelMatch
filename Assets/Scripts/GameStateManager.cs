@@ -56,7 +56,13 @@ public class GameStateManager : MonoBehaviour
 
         if (FreeModeManager.IsFreeModeActive)
         {
-            if (panelWin != null) panelWin.SetActive(true);
+            if (panelWin != null)
+            {
+                panelWin.SetActive(true);
+                int stars = CalculateStars();
+                WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
+                winPanel?.ShowFreeModeResult(stars);
+            }
             return;
         }
 
@@ -91,6 +97,13 @@ public class GameStateManager : MonoBehaviour
             WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
             winPanel?.ShowResult(starsNormal);
         }
+    }
+
+    private void NotifyWinPanel(PowerUpType type)
+    {
+        if (panelWin == null) return;
+        WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
+        winPanel?.AddPendingReward(type, 1);
     }
 
     private void GiveDailyChallengeReward(int stars)
@@ -146,11 +159,33 @@ public class GameStateManager : MonoBehaviour
 
     private void SaveStars(int stars)
     {
-        if (LevelProgressManager.Instance == null) return;
+        if (LevelProgressManager.Instance == null)
+        {
+            Debug.LogError("[SaveStars] LevelProgressManager null!");
+            return;
+        }
+
         int categoryID = LevelSelectManager.SelectedCategoryID;
         int levelID = LevelSelectManager.SelectedLevel.levelID;
+
+        int previousStars = LevelProgressManager.Instance.GetBestStars(categoryID, levelID);
+        Debug.Log($"[SaveStars] Önceki:{previousStars}, Yeni:{stars}");
+
+        if (stars > previousStars)
+        {
+            int diff = stars - previousStars;
+            int totalStars = PlayerPrefs.GetInt("total_stars", 0);
+            int newTotal = totalStars + diff;
+            PlayerPrefs.SetInt("total_stars", newTotal);
+            PlayerPrefs.Save();
+            Debug.Log($"[SaveStars] Toplam yıldız güncellendi: {totalStars} → {newTotal}");
+        }
+        else
+        {
+            Debug.Log($"[SaveStars] Yıldız artmadı: yeni({stars}) <= önceki({previousStars})");
+        }
+
         LevelProgressManager.Instance.SaveBestStars(categoryID, levelID, stars);
-        Debug.Log($"[GameStateManager] {stars} yıldız kaydedildi.");
     }
 
     private void SaveRecord(int stars)
@@ -236,16 +271,20 @@ public class GameStateManager : MonoBehaviour
             }
         }
 
+        // 2 yıldız
         if (stars == 2)
         {
             PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
+            NotifyWinPanel(PowerUpType.XRay);
             Debug.Log("[GameStateManager] 2 yıldız — Açık Bak kazanıldı!");
         }
 
+        // 3 yıldız
         if (stars == 3)
         {
             PowerUpType reward = Random.value > 0.5f ? PowerUpType.MindFreeze : PowerUpType.TimeFreeze;
             PowerUpManager.Instance?.AddPowerUp(reward);
+            NotifyWinPanel(reward);
             Debug.Log($"[GameStateManager] 3 yıldız — {reward} kazanıldı!");
         }
     }
