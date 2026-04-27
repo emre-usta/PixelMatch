@@ -15670,9 +15670,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c756326a91c446d4d8b17da429667d9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sfxMatch: {fileID: 8300000, guid: f89622d4536b54fc38caa0cdea1577bd, type: 3}
-  sfxMismatch: {fileID: 8300000, guid: 0b0224914a7f24e5dbf38e2f376b259a, type: 3}
-  sfxCardFlip: {fileID: 0}
+  sfxCardFlipVariants: []
+  sfxMatchVariants:
+  - {fileID: 8300000, guid: f89622d4536b54fc38caa0cdea1577bd, type: 3}
+  sfxCombo: {fileID: 0}
+  sfxMismatchVariants:
+  - {fileID: 8300000, guid: 0b0224914a7f24e5dbf38e2f376b259a, type: 3}
+  sfxLevelComplete: {fileID: 0}
+  sfxTimeThief: {fileID: 0}
+  sfxFreeze: {fileID: 0}
+  sfxPowerUp: {fileID: 0}
   bgmGame: {fileID: 8300000, guid: d8bbe9489eee742bdaf0146c7068b6b1, type: 3}
   bgmMenu: {fileID: 8300000, guid: d8bbe9489eee742bdaf0146c7068b6b1, type: 3}
   sfxVolume: 1

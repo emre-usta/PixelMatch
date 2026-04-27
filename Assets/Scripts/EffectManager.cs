@@ -7,8 +7,8 @@ public class EffectManager : MonoBehaviour
     public static EffectManager Instance { get; private set; }
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI effectFeedbackText;  // "-10 SANİYE!" yukarı kayar
-    [SerializeField] private TextMeshProUGUI bannerText;          // "ZAMAN HIRSIZI!" ortada büyük
+    [SerializeField] private TextMeshProUGUI effectFeedbackText;
+    [SerializeField] private TextMeshProUGUI bannerText;
 
     [Header("Tutorial")]
     [SerializeField] private GameObject timeThiefTutorialPopup;
@@ -36,19 +36,28 @@ public class EffectManager : MonoBehaviour
             case CardEffectType.TimeThief:
                 bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
+                // Kırmızı flash efekti
+                ComboEffectManager.Instance?.TriggerTimeThiefFlash();
+
                 if (isMoveMode)
                 {
-                    // Hamle modunda -3 hamle
                     MoveController.Instance?.StealMoves(3);
-                    StartCoroutine(ShowFeedback("-3 HAMLE!", new Color(0.89f, 0.29f, 0.29f)));
-                    StartCoroutine(ShowBanner("HAMLE HIRSIZI!", new Color(0.89f, 0.29f, 0.29f)));
+                    StartCoroutine(ShowFeedback(
+                        LocalizationManager.Get("banner_move_thief"),
+                        new Color(0.89f, 0.29f, 0.29f)));
+                    StartCoroutine(ShowBanner(
+                        LocalizationManager.Get("banner_move_thief"),
+                        new Color(0.89f, 0.29f, 0.29f)));
                 }
                 else
                 {
-                    // Klasik modda -5 saniye
                     TimerController.Instance?.AddTime(-5f);
-                    StartCoroutine(ShowFeedback("-5 SANİYE!", new Color(0.89f, 0.29f, 0.29f)));
-                    StartCoroutine(ShowBanner("ZAMAN HIRSIZI!", new Color(0.89f, 0.29f, 0.29f)));
+                    StartCoroutine(ShowFeedback(
+                        LocalizationManager.Get("banner_time_thief"),
+                        new Color(0.89f, 0.29f, 0.29f)));
+                    StartCoroutine(ShowBanner(
+                        LocalizationManager.Get("banner_time_thief"),
+                        new Color(0.89f, 0.29f, 0.29f)));
                 }
 
                 if (PlayerPrefs.GetInt("seen_timethief", 0) == 0)
@@ -61,7 +70,7 @@ public class EffectManager : MonoBehaviour
         }
     }
 
-    // ─── FEEDBACK (yukarı kayarak kaybolur) ───────────────────────
+    // ─── FEEDBACK ─────────────────────────────────────────────────
 
     private IEnumerator ShowFeedback(string text, Color color)
     {
@@ -88,7 +97,7 @@ public class EffectManager : MonoBehaviour
         effectFeedbackText.transform.localPosition = startPos;
     }
 
-    // ─── BANNER (ortada büyük, fade out) ──────────────────────────
+    // ─── BANNER ───────────────────────────────────────────────────
 
     private IEnumerator ShowBanner(string text, Color color)
     {
@@ -123,35 +132,32 @@ public class EffectManager : MonoBehaviour
         {
             bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
-            // Başlık güncelle
             Transform titleTransform = timeThiefTutorialPopup.transform
                 .Find("Panel_Content/Panel_Title/Text_PauseTitle");
             if (titleTransform != null)
             {
                 TextMeshProUGUI title = titleTransform.GetComponent<TextMeshProUGUI>();
                 if (title != null)
-                    title.text = isMoveMode ? "MOVE THIEF" : "TIME THIEF";
+                    title.text = isMoveMode
+                        ? LocalizationManager.Get("move_thief_title")
+                        : LocalizationManager.Get("time_thief_title");
             }
 
-            // Açıklama güncelle
             Transform descTransform = timeThiefTutorialPopup.transform
                 .Find("Panel_Content/Text_Desc");
             if (descTransform != null)
             {
                 TextMeshProUGUI desc = descTransform.GetComponent<TextMeshProUGUI>();
                 if (desc != null)
-                {
                     desc.text = isMoveMode
-                        ? "If this card is matched incorrectly, you will receive a penalty of <color=#FFB4AB>-3 MOVES</color>!"
-                        : "If this card is matched incorrectly, you will receive a penalty of <color=#FFB4AB>-5 SECONDS</color>!";
-                }
+                        ? LocalizationManager.Get("move_thief_desc")
+                        : LocalizationManager.Get("time_thief_desc");
             }
 
             Time.timeScale = 0f;
             timeThiefTutorialPopup.SetActive(true);
         }
     }
-
 
     public void OnTutorialPopupClosed()
     {

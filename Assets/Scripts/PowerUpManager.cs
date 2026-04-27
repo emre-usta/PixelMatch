@@ -172,6 +172,8 @@ public class PowerUpManager : MonoBehaviour
             // Hamle modunda: sonraki 3 hamle ücretsiz
             MoveController.Instance?.ActivateFreezeForMoves(3);
             PowerUpUI.Instance?.ShowFreezeFeedback();
+            ComboEffectManager.Instance?.TriggerFreezeFlash(); // ← ekle
+            AudioManager.Instance?.PlayFreezeSFX();
             Debug.Log("[PowerUpManager] Süre Dondur: sonraki 3 hamle ücretsiz!");
             yield break;
         }
@@ -179,6 +181,8 @@ public class PowerUpManager : MonoBehaviour
         // Klasik modda: timer 5sn durur
         TimerController.Instance?.PauseTimer();
         PowerUpUI.Instance?.ShowFreezeFeedback();
+        ComboEffectManager.Instance?.TriggerFreezeFlash(); // ← ekle
+        AudioManager.Instance?.PlayFreezeSFX();
         Debug.Log("[PowerUpManager] Süre Dondur: 5sn durakladı.");
 
         yield return new WaitForSecondsRealtime(5f);

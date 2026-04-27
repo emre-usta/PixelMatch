@@ -1,36 +1,41 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// PixelMatch — Ses Yöneticisi
-/// Tüm ses efektlerini ve müziği yönetir.
-/// DontDestroyOnLoad ile sahneler arası yaşar.
-/// </summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
-    // ─── INSPECTOR AYARLARI ───────────────────────────────────────
+    [Header("Kart Sesleri")]
+    [SerializeField] private AudioClip[] sfxCardFlipVariants;
 
-    [Header("Ses Efektleri")]
-    [SerializeField] private AudioClip sfxMatch;        // sfx_match
-    [SerializeField] private AudioClip sfxMismatch;     // sfx_mismatch
-    [SerializeField] private AudioClip sfxCardFlip;     // sfx_cardflip
+    [Header("Eşleşme Sesleri")]
+    [SerializeField] private AudioClip[] sfxMatchVariants;
+    [SerializeField] private AudioClip sfxCombo;
+
+    [Header("Yanlış Eşleşme Sesleri")]
+    [SerializeField] private AudioClip[] sfxMismatchVariants;
+
+    [Header("Özel Sesler")]
+    [SerializeField] private AudioClip sfxLevelComplete;
+    [SerializeField] private AudioClip sfxTimeThief;
+    [SerializeField] private AudioClip sfxFreeze;
+    [SerializeField] private AudioClip sfxPowerUp;
 
     [Header("Arka Plan Müziği")]
-    [SerializeField] private AudioClip bgmGame;         // Oyun sahnesi müziği
-    [SerializeField] private AudioClip bgmMenu;         // Ana menü müziği
+    [SerializeField] private AudioClip bgmGame;
+    [SerializeField] private AudioClip bgmMenu;
 
     [Header("Ses Seviyeleri")]
     [Range(0f, 1f)][SerializeField] private float sfxVolume = 1f;
     [Range(0f, 1f)][SerializeField] private float bgmVolume = 0.5f;
 
-    // ─── AUDIO SOURCES ────────────────────────────────────────────
+    private AudioSource sfxSource;
+    private AudioSource bgmSource;
 
-    private AudioSource sfxSource;   // Efekt sesleri için
-    private AudioSource bgmSource;   // Müzik için (loop)
-
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
+    // ─── COMBO SAYACI ─────────────────────────────────────────────
+    private int comboCount = 0;
+    private float comboResetTime = 3f;
+    private float lastMatchTime = 0f;
 
     private void Awake()
     {
@@ -39,9 +44,14 @@ public class AudioManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         SetupAudioSources();
 
-        // Kayıtlı ses ayarlarını yükle
         bgmVolume = PlayerPrefs.GetFloat("settings_bgm", 0.5f);
         sfxVolume = PlayerPrefs.GetFloat("settings_sfx", 1f);
+    }
+
+    private void Update()
+    {
+        if (comboCount > 0 && Time.time - lastMatchTime > comboResetTime)
+            comboCount = 0;
     }
 
     private void OnEnable()
@@ -58,11 +68,10 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // Her sahne yüklenince event'lere yeniden abone ol
         UnsubscribeFromEvents();
         SubscribeToEvents();
+        comboCount = 0;
 
-        // Sahneye göre müzik çal
         if (scene.name == "MainMenu")
             PlayBGM(bgmMenu);
         else if (scene.name == "Level1")
@@ -75,6 +84,8 @@ public class AudioManager : MonoBehaviour
         GameEvents.OnPairMatched += HandlePairMatched;
         GameEvents.OnPairMismatch += HandlePairMismatch;
         GameEvents.OnGameStarted += HandleGameStarted;
+        GameEvents.OnGameWon += HandleGameWon;
+        GameEvents.OnEffectTriggered += HandleEffectTriggered;
     }
 
     private void UnsubscribeFromEvents()
@@ -83,19 +94,17 @@ public class AudioManager : MonoBehaviour
         GameEvents.OnPairMatched -= HandlePairMatched;
         GameEvents.OnPairMismatch -= HandlePairMismatch;
         GameEvents.OnGameStarted -= HandleGameStarted;
+        GameEvents.OnGameWon -= HandleGameWon;
+        GameEvents.OnEffectTriggered -= HandleEffectTriggered;
     }
-
-    // ─── KURULUM ──────────────────────────────────────────────────
 
     private void SetupAudioSources()
     {
-        // SFX source — kısa efekt sesleri
         sfxSource = gameObject.AddComponent<AudioSource>();
         sfxSource.playOnAwake = false;
         sfxSource.loop = false;
         sfxSource.volume = sfxVolume;
 
-        // BGM source — arka plan müziği
         bgmSource = gameObject.AddComponent<AudioSource>();
         bgmSource.playOnAwake = false;
         bgmSource.loop = true;
@@ -106,22 +115,57 @@ public class AudioManager : MonoBehaviour
 
     private void HandleCardRevealed(CardController card)
     {
-        PlaySFX(sfxCardFlip);
+        if (sfxCardFlipVariants != null && sfxCardFlipVariants.Length > 0)
+            PlaySFX(sfxCardFlipVariants[Random.Range(0, sfxCardFlipVariants.Length)]);
     }
 
     private void HandlePairMatched(CardController a, CardController b)
     {
-        PlaySFX(sfxMatch);
+        lastMatchTime = Time.time;
+        comboCount++;
+
+        if (comboCount >= 3)
+        {
+            PlaySFX(sfxCombo);
+
+            if (comboCount == 3)
+                ComboEffectManager.Instance?.TriggerComboFlash(comboCount);
+            else
+                ComboEffectManager.Instance?.TriggerComboText(comboCount);
+        }
+        else
+        {
+            if (sfxMatchVariants != null && sfxMatchVariants.Length > 0)
+                PlaySFX(sfxMatchVariants[Random.Range(0, sfxMatchVariants.Length)]);
+        }
     }
 
     private void HandlePairMismatch(CardController a, CardController b)
     {
-        PlaySFX(sfxMismatch);
+        comboCount = 0;
+
+        if (sfxMismatchVariants != null && sfxMismatchVariants.Length > 0)
+            PlaySFX(sfxMismatchVariants[Random.Range(0, sfxMismatchVariants.Length)]);
     }
 
     private void HandleGameStarted()
     {
         PlayBGM(bgmGame);
+    }
+
+    private void HandleGameWon()
+    {
+        PlaySFX(sfxLevelComplete);
+    }
+
+    private void HandleEffectTriggered(CardEffectType effectType)
+    {
+        switch (effectType)
+        {
+            case CardEffectType.TimeThief:
+                PlaySFX(sfxTimeThief);
+                break;
+        }
     }
 
     // ─── PUBLIC METOTLAR ──────────────────────────────────────────
@@ -133,20 +177,19 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(clip);
     }
 
+    public void PlayFreezeSFX() => PlaySFX(sfxFreeze);
+    public void PlayPowerUpSFX() => PlaySFX(sfxPowerUp);
+
     public void PlayBGM(AudioClip clip)
     {
         if (clip == null) return;
         if (bgmSource.clip == clip && bgmSource.isPlaying) return;
-
         bgmSource.clip = clip;
         bgmSource.volume = bgmVolume;
         bgmSource.Play();
     }
 
-    public void StopBGM()
-    {
-        bgmSource.Stop();
-    }
+    public void StopBGM() => bgmSource.Stop();
 
     public void SetSFXVolume(float volume)
     {
@@ -160,13 +203,6 @@ public class AudioManager : MonoBehaviour
         bgmSource.volume = bgmVolume;
     }
 
-    public void PlayMenuMusic()
-    {
-        PlayBGM(bgmMenu);
-    }
-
-    public void PlayGameMusic()
-    {
-        PlayBGM(bgmGame);
-    }
+    public void PlayMenuMusic() => PlayBGM(bgmMenu);
+    public void PlayGameMusic() => PlayBGM(bgmGame);
 }
