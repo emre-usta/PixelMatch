@@ -309,26 +309,55 @@ public class GameStateManager : MonoBehaviour
             bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
             if (!hasAttempts) DailyChallengeManager.SetInactive();
 
-            if (panelGameOver != null) panelGameOver.SetActive(true);
-
-            UpdateGameOverReason();
-
-            var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>();
-            foreach (var btn in buttons)
+            if (panelGameOver != null)
             {
-                if (btn.gameObject.name == "Btn_Retry")
+                panelGameOver.SetActive(true);
+                UpdateGameOverReason();
+                UpdateTilesRemaining();
+
+                var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>();
+                foreach (var btn in buttons)
                 {
-                    btn.interactable = hasAttempts;
-                    TMPro.TextMeshProUGUI txt = btn.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                    if (txt != null)
-                        txt.text = hasAttempts ? "TEKRAR" : "HAKKIN DOLDU";
+                    if (btn.gameObject.name == "Btn_Retry")
+                    {
+                        btn.interactable = hasAttempts;
+                        TMPro.TextMeshProUGUI txt = btn.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                        if (txt != null)
+                            txt.text = hasAttempts
+                                ? LocalizationManager.Get("btn_retry")
+                                : LocalizationManager.Get("dc_no_attempts");
+                    }
                 }
             }
             return;
         }
 
-        if (panelGameOver != null) panelGameOver.SetActive(true);
-        UpdateGameOverReason();
+        if (panelGameOver != null)
+        {
+            panelGameOver.SetActive(true);
+            UpdateGameOverReason();
+            UpdateTilesRemaining();
+        }
+    }
+
+    private void UpdateTilesRemaining()
+    {
+        if (panelGameOver == null) return;
+
+        Transform tilesT = panelGameOver.transform
+            .Find("Panel_LoseContent/Panel_LoseStatCard/Panel_TilesRemaining/Text_TilesValue");
+
+        if (tilesT != null)
+        {
+            TMPro.TextMeshProUGUI tilesTxt = tilesT.GetComponent<TMPro.TextMeshProUGUI>();
+            if (tilesTxt != null)
+            {
+                int remaining = GridManager.Instance != null
+                    ? GridManager.Instance.RemainingPairs * 2
+                    : 0;
+                tilesTxt.text = remaining.ToString("D2");
+            }
+        }
     }
 
     private void UpdateGameOverReason()
@@ -342,7 +371,9 @@ public class GameStateManager : MonoBehaviour
         if (reason == null) return;
 
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
-        reason.text = isMoveMode ? "OUT OF MOVES" : "OUT OF TIME";
+        reason.text = isMoveMode
+            ? LocalizationManager.Get("out_of_moves")
+            : LocalizationManager.Get("out_of_time");
     }
 
     public bool IsPlaying => CurrentState == GameState.Playing;

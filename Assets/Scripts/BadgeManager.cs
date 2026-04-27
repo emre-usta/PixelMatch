@@ -45,11 +45,11 @@ public class BadgeManager : MonoBehaviour
 
     private string GetTitle(int stars)
     {
-        if (stars >= 120) return "LEGEND";
-        if (stars >= 80) return "MASTER";
-        if (stars >= 45) return "EXPLORER";
-        if (stars >= 15) return "NOVICE";
-        return "ROOKIE";
+        if (stars >= 120) return LocalizationManager.Get("badge_legend");
+        if (stars >= 80) return LocalizationManager.Get("badge_master");
+        if (stars >= 45) return LocalizationManager.Get("badge_explorer");
+        if (stars >= 15) return LocalizationManager.Get("badge_novice");
+        return LocalizationManager.Get("badge_rookie");
     }
 
     private Color GetTitleColor(int stars)

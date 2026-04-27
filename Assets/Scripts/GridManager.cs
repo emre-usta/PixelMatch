@@ -383,6 +383,7 @@ public class GridManager : MonoBehaviour
 
     public int MatchedPairCount => matchedPairCount;
     public int TotalPairCount => totalPairCount;
+    public int RemainingPairs => totalPairCount - matchedPairCount;
     public List<CardController> AllCards => allCards;
 
     private IEnumerator PeekAndStart()

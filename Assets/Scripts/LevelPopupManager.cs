@@ -4,15 +4,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static LevelSelectManager;
 
-/// <summary>
-/// PixelMatch — Level Popup Yöneticisi
-/// Level seçilince açılan mod seçim popup'ını yönetir.
-/// </summary>
 public class LevelPopupManager : MonoBehaviour
 {
     public static LevelPopupManager Instance { get; private set; }
-
-    // ─── INSPECTOR AYARLARI ───────────────────────────────────────
 
     [Header("Popup")]
     [SerializeField] private GameObject popupPanel;
@@ -24,20 +18,12 @@ public class LevelPopupManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI classicDetailText;
     [SerializeField] private TextMeshProUGUI moveDetailText;
 
-    // ─── RUNTIME VERİSİ ───────────────────────────────────────────
-
     private LevelConfig pendingLevel;
     private int pendingLevelIndex;
 
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
-
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
         if (popupPanel != null)
@@ -45,44 +31,44 @@ public class LevelPopupManager : MonoBehaviour
     }
 
     // ─── POPUP AÇMA ───────────────────────────────────────────────
-
     public void ShowPopup(LevelConfig level, int levelIndex)
     {
         pendingLevel = level;
         pendingLevelIndex = levelIndex;
 
-        // Level adını güncelle
+        // Level adı
         if (levelNameText != null)
             levelNameText.text = level.levelName;
 
-        // Klasik mod bilgisini güncelle
+        // Klasik mod başlığı
         if (classicModeText != null)
-        {
-            int minutes = Mathf.FloorToInt(level.timeLimit / 60);
-            int seconds = Mathf.FloorToInt(level.timeLimit % 60);
-            classicModeText.text = $"CLASSIC MODE";
-        }
+            classicModeText.text = LocalizationManager.Get("classic_title");
 
-        // Hamle mod bilgisini güncelle
+        // Hamle mod başlığı
         if (moveModeText != null)
-            moveModeText.text = $"MOVEMENT MODE";
+            moveModeText.text = LocalizationManager.Get("movement_title");
 
-        if (popupPanel != null)
-            popupPanel.SetActive(true);
-
+        // Klasik mod detay
         if (classicDetailText != null)
         {
             int minutes = Mathf.FloorToInt(level.timeLimit / 60);
             int seconds = Mathf.FloorToInt(level.timeLimit % 60);
-            classicDetailText.text = $"Time: {minutes:00}:{seconds:00}  ·  {level.columns}×{level.rows}";
+            string timeLabel = LocalizationManager.Get("time_label");
+            classicDetailText.text = $"{timeLabel}: {minutes:00}:{seconds:00}  ·  {level.columns}×{level.rows}";
         }
 
+        // Hamle mod detay
         if (moveDetailText != null)
-            moveDetailText.text = $"{level.moveLimit} Movement  ·  {level.columns}×{level.rows}";
+        {
+            string moveLabel = LocalizationManager.Get("move_label");
+            moveDetailText.text = $"{level.moveLimit} {moveLabel}  ·  {level.columns}×{level.rows}";
+        }
+
+        if (popupPanel != null)
+            popupPanel.SetActive(true);
     }
 
     // ─── BUTON HANDLER'LARI ───────────────────────────────────────
-
     public void OnClassicModeClicked()
     {
         LevelSelectManager.SelectedMode = GameMode.Classic;
@@ -102,16 +88,12 @@ public class LevelPopupManager : MonoBehaviour
     }
 
     // ─── LEVEL BAŞLATMA ───────────────────────────────────────────
-
     private void StartLevel()
     {
         if (pendingLevel == null) return;
-
         LevelSelectManager.SetSelectedLevel(pendingLevel, pendingLevelIndex);
-
         if (popupPanel != null)
             popupPanel.SetActive(false);
-
         SceneManager.LoadScene("Level1");
     }
 }

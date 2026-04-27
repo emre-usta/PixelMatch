@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -19,6 +20,7 @@ public class DailyChallengeManager : MonoBehaviour
     {
         IsDailyChallengeActive = false;
     }
+    private Coroutine pulseCoroutine;
 
     // ─── PLAYERPREFS ANAHTARLARI ──────────────────────────────────
     private const string KEY_LAST_PLAYED = "dc_last_played";
@@ -185,38 +187,57 @@ public class DailyChallengeManager : MonoBehaviour
 
     // ─── UI GÜNCELLEME ────────────────────────────────────────────
 
-    private void UpdateUI()
+    public void UpdateUI()
     {
         if (dcCard == null) return;
 
         bool playedToday = IsPlayedToday();
 
+        // Oynandıysa animasyonu durdur
+        if (playedToday && pulseCoroutine != null)
+        {
+            StopCoroutine(pulseCoroutine);
+            pulseCoroutine = null;
+        }
+
         // Zorluk metni
         if (txtDifficulty != null)
         {
-            string diffText = DCDifficulty switch
+            string diffKey = DCDifficulty switch
             {
-                DifficultyLevel.Easy => "EASY",
-                DifficultyLevel.Medium => "MEDIUM",
-                DifficultyLevel.Hard => "HARD",
-                _ => ""
+                DifficultyLevel.Easy => "difficulty_easy",
+                DifficultyLevel.Medium => "difficulty_medium",
+                DifficultyLevel.Hard => "difficulty_hard",
+                _ => "difficulty_easy"
             };
-            txtDifficulty.text = $"{diffText} · {DCColumns}×{DCRows}";
+            txtDifficulty.text = $"{LocalizationManager.Get(diffKey)} · {DCColumns}×{DCRows}";
         }
 
         // Durum metni
-        if (playedToday)
+        if (txtStatus != null)
         {
-            int stars = GetTodayStars();
-            if (stars > 0)
+            if (playedToday)
             {
-                txtStatus.text = "Tamamlandi!";
-                txtStatus.color = new Color(0.59f, 0.77f, 0.35f);
+                int stars = GetTodayStars();
+                if (stars > 0)
+                {
+                    txtStatus.text = LocalizationManager.Get("dc_completed");
+                    txtStatus.color = new Color(0.59f, 0.77f, 0.35f);
+                }
+                else
+                {
+                    txtStatus.text = LocalizationManager.Get("dc_failed");
+                    txtStatus.color = new Color(0.89f, 0.29f, 0.29f);
+                }
             }
             else
             {
-                txtStatus.text = "Bugun basarisiz oldun. Yarin tekrar dene!";
-                txtStatus.color = new Color(0.89f, 0.29f, 0.29f);
+                txtStatus.text = LocalizationManager.Get("dc_play_hint");
+                txtStatus.color = new Color(0.96f, 0.65f, 0.14f);
+
+                // Pulse animasyonu başlat
+                if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
+                pulseCoroutine = StartCoroutine(PulseText(txtStatus));
             }
         }
 
@@ -234,6 +255,32 @@ public class DailyChallengeManager : MonoBehaviour
         TimeSpan remaining = tomorrow - now;
 
         txtTimer.text = $"{remaining.Hours:00}:{remaining.Minutes:00}:{remaining.Seconds:00}";
+    }
+
+    private IEnumerator PulseText(TextMeshProUGUI txt)
+    {
+        Color baseColor = new Color(0.96f, 0.65f, 0.14f);
+        Color dimColor = new Color(0.96f, 0.65f, 0.14f, 0.3f);
+        float duration = 1f;
+
+        while (true)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration / 2f)
+            {
+                elapsed += Time.deltaTime;
+                txt.color = Color.Lerp(baseColor, dimColor, elapsed / (duration / 2f));
+                yield return null;
+            }
+
+            elapsed = 0f;
+            while (elapsed < duration / 2f)
+            {
+                elapsed += Time.deltaTime;
+                txt.color = Color.Lerp(dimColor, baseColor, elapsed / (duration / 2f));
+                yield return null;
+            }
+        }
     }
 
     [ContextMenu("DC'yi Sıfırla")]

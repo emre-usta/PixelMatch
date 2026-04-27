@@ -26,8 +26,18 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtBGMMute;
     [SerializeField] private TextMeshProUGUI txtSFXMute;
 
+    [Header("Dil Butonları")]
+    [SerializeField] private Button btnTR;
+    [SerializeField] private Button btnEN;
+
     private bool bgmMuted = false;
     private bool sfxMuted = false;
+
+    // ─── Aktif/Pasif renkleri ─────────────────────────────────────
+    private readonly Color colorLangActive = new Color(0.10f, 0.23f, 0.06f); // #1A3A10
+    private readonly Color colorLangInactive = new Color(0.04f, 0.04f, 0.08f); // #0A0A14
+    private readonly Color colorTextActive = new Color(0.96f, 0.65f, 0.14f); // #F5A623
+    private readonly Color colorTextInactive = new Color(0.32f, 0.26f, 0.20f); // #524534
 
     private void Awake()
     {
@@ -57,12 +67,15 @@ public class SettingsManager : MonoBehaviour
         btnBGMMute?.onClick.AddListener(ToggleBGMMute);
         btnSFXMute?.onClick.AddListener(ToggleSFXMute);
 
-        // Başlangıç değerlerini uygula
+        btnTR?.onClick.AddListener(() => SetLanguage(LocalizationManager.Language.TR));
+        btnEN?.onClick.AddListener(() => SetLanguage(LocalizationManager.Language.EN));
+
         ApplyBGM(bgm);
         ApplySFX(sfx);
         UpdateBGMText(bgm);
         UpdateSFXText(sfx);
         UpdateMuteButtons();
+        UpdateLanguageButtons();
 
         if (settingsPanel != null)
             settingsPanel.SetActive(false);
@@ -131,14 +144,13 @@ public class SettingsManager : MonoBehaviour
         if (txtSFXMute != null)
             txtSFXMute.text = sfxMuted ? "🔇" : "🔊";
 
-        // Buton rengi: mute ise kırmızı, açık ise yeşil
         if (btnBGMMute != null)
         {
             Image img = btnBGMMute.GetComponent<Image>();
             if (img != null)
                 img.color = bgmMuted
-                    ? new Color(0.58f, 0.00f, 0.04f)  // #93000A kırmızı
-                    : new Color(0.04f, 0.12f, 0.06f); // #0A1F10 yeşil
+                    ? new Color(0.58f, 0.00f, 0.04f)
+                    : new Color(0.04f, 0.12f, 0.06f);
         }
 
         if (btnSFXMute != null)
@@ -148,6 +160,35 @@ public class SettingsManager : MonoBehaviour
                 img.color = sfxMuted
                     ? new Color(0.58f, 0.00f, 0.04f)
                     : new Color(0.04f, 0.12f, 0.06f);
+        }
+    }
+
+    // ─── DİL BUTONLARI ────────────────────────────────────────────
+
+    private void SetLanguage(LocalizationManager.Language lang)
+    {
+        LocalizationManager.Instance?.SetLanguage(lang);
+        UpdateLanguageButtons();
+    }
+
+    private void UpdateLanguageButtons()
+    {
+        bool isTR = LocalizationManager.CurrentLanguage == LocalizationManager.Language.TR;
+
+        if (btnTR != null)
+        {
+            Image img = btnTR.GetComponent<Image>();
+            if (img != null) img.color = isTR ? colorLangActive : colorLangInactive;
+            TextMeshProUGUI txt = btnTR.GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null) txt.color = isTR ? colorTextActive : colorTextInactive;
+        }
+
+        if (btnEN != null)
+        {
+            Image img = btnEN.GetComponent<Image>();
+            if (img != null) img.color = !isTR ? colorLangActive : colorLangInactive;
+            TextMeshProUGUI txt = btnEN.GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null) txt.color = !isTR ? colorTextActive : colorTextInactive;
         }
     }
 

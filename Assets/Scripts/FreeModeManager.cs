@@ -7,7 +7,6 @@ public class FreeModeManager : MonoBehaviour
 {
     public static FreeModeManager Instance { get; private set; }
 
-    // ─── SEÇİLEN DEĞERLER (Static) ────────────────────────────────
     public static bool IsFreeModeActive { get; private set; }
     public static int SelectedColumns { get; private set; }
     public static int SelectedRows { get; private set; }
@@ -26,7 +25,6 @@ public class FreeModeManager : MonoBehaviour
         SelectedCategory = null;
     }
 
-    // ─── INSPECTOR ────────────────────────────────────────────────
     [Header("Konfigürasyon")]
     [SerializeField] private FreeModeLimitConfig limitConfig;
     [SerializeField] private CategoryConfig[] categories;
@@ -56,21 +54,12 @@ public class FreeModeManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtTimeValue;
     [SerializeField] private TextMeshProUGUI txtMoveValue;
 
-    // ─── RENK PALETİ ──────────────────────────────────────────────
-    // Kategori & Grid & Mod için amber
-    private readonly Color colorActiveBg = new Color(0.10f, 0.07f, 0.00f); // #1A1200
-    private readonly Color colorInactiveBg = new Color(0.04f, 0.04f, 0.08f); // #0A0A14
-    private readonly Color colorActiveText = new Color(0.96f, 0.65f, 0.14f); // #F5A623
-    private readonly Color colorInactiveText = new Color(0.32f, 0.26f, 0.20f); // #524534
-    private readonly Color colorActiveBorder = new Color(0.96f, 0.65f, 0.14f); // #F5A623
-    private readonly Color colorInactiveBorder = new Color(0.16f, 0.16f, 0.31f); // #2A2A50
-
-    // Zorluk için yeşil
-    private readonly Color colorEasyBg = new Color(0.04f, 0.12f, 0.06f); // #0A1F10
-    private readonly Color colorEasyText = new Color(0.32f, 0.93f, 0.51f); // #51ED82
-    private readonly Color colorEasyBorder = new Color(0.32f, 0.93f, 0.51f); // #51ED82
-
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
+    private readonly Color colorActiveBg = new Color(0.10f, 0.07f, 0.00f);
+    private readonly Color colorInactiveBg = new Color(0.04f, 0.04f, 0.08f);
+    private readonly Color colorActiveText = new Color(0.96f, 0.65f, 0.14f);
+    private readonly Color colorInactiveText = new Color(0.32f, 0.26f, 0.20f);
+    private readonly Color colorActiveBorder = new Color(0.96f, 0.65f, 0.14f);
+    private readonly Color colorInactiveBorder = new Color(0.16f, 0.16f, 0.31f);
 
     private void Awake()
     {
@@ -89,13 +78,13 @@ public class FreeModeManager : MonoBehaviour
 
         SetupButtons();
         UpdateLimitInfo();
+        UpdateButtonLabels();
 
-        // Default vurgulamalar
         Button[] gridBtns = { btn4x4, btn4x5, btn5x4, btn6x6 };
         HighlightButton(gridBtns, 0, false);
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
-        HighlightButton(gridBtns, 0, false);
+        HighlightButton(diffBtns, 0, false);
 
         Button[] modeBtns = { btnClassic, btnMove };
         HighlightButton(modeBtns, 0, false);
@@ -105,10 +94,9 @@ public class FreeModeManager : MonoBehaviour
 
     private void SetupButtons()
     {
-        // Kategori butonları
+        // Kategori butonları — categoryName kullan (zaten lokalize)
         for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
         {
-            int index = i;
             CategoryConfig cat = categories[i];
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (txt != null) txt.text = cat.categoryName;
@@ -128,6 +116,30 @@ public class FreeModeManager : MonoBehaviour
         btnMove?.onClick.AddListener(() => SelectMode(LevelSelectManager.GameMode.Move));
 
         btnStart?.onClick.AddListener(StartFreeMode);
+    }
+
+    // ─── DİL GÜNCELLEMESİ ────────────────────────────────────────
+    public void UpdateButtonLabels()
+    {
+        // Zorluk butonları
+        SetButtonLabel(btnEasy, "difficulty_easy");
+        SetButtonLabel(btnMedium, "difficulty_medium");
+        SetButtonLabel(btnHard, "difficulty_hard");
+
+        // Mod butonları
+        SetButtonLabel(btnClassic, "mode_classic");
+        SetButtonLabel(btnMove, "mode_move");
+
+        // Limit bilgisi label'ları varsa güncelle
+        UpdateLimitInfo();
+    }
+
+    private void SetButtonLabel(Button btn, string key)
+    {
+        if (btn == null) return;
+        TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
+        if (txt != null)
+            txt.text = LocalizationManager.Get(key);
     }
 
     // ─── SEÇİM METOTLARI ──────────────────────────────────────────
@@ -160,7 +172,6 @@ public class FreeModeManager : MonoBehaviour
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
         HighlightButton(diffBtns, (int)difficulty, false);
-
         Debug.Log($"[FreeModeManager] Zorluk: {difficulty}");
     }
 
@@ -175,8 +186,6 @@ public class FreeModeManager : MonoBehaviour
     }
 
     // ─── BUTON VURGULAMA ──────────────────────────────────────────
-
-    // Kategori, Grid, Mod için — amber renk
     private void HighlightButton(Button[] buttons, int selectedIndex, bool isDifficulty)
     {
         for (int i = 0; i < buttons.Length; i++)
@@ -185,17 +194,14 @@ public class FreeModeManager : MonoBehaviour
 
             bool isActive = (i == selectedIndex);
 
-            // Buton arka plan
             Image bg = buttons[i].GetComponent<Image>();
             if (bg != null)
                 bg.color = isActive ? colorActiveBg : colorInactiveBg;
 
-            // Metin rengi
             TextMeshProUGUI txt = buttons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (txt != null)
                 txt.color = isActive ? colorActiveText : colorInactiveText;
 
-            // Border_Bottom rengi
             Transform borderBottom = buttons[i].transform.Find("Border_Bottom");
             if (borderBottom != null)
             {
@@ -207,7 +213,6 @@ public class FreeModeManager : MonoBehaviour
     }
 
     // ─── LİMİT BİLGİSİ ───────────────────────────────────────────
-
     private void UpdateLimitInfo()
     {
         if (limitConfig == null) return;
@@ -225,7 +230,6 @@ public class FreeModeManager : MonoBehaviour
     }
 
     // ─── OYUN BAŞLATMA ────────────────────────────────────────────
-
     private void StartFreeMode()
     {
         if (SelectedCategory == null)

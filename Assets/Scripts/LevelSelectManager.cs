@@ -11,10 +11,9 @@ public class LevelSelectManager : MonoBehaviour
     public static GameMode SelectedMode { get; set; }
     public static LevelSelectManager Instance { get; private set; }
 
-    // ─── INSPECTOR ────────────────────────────────────────────────
     [Header("Kategoriler")]
     [SerializeField] private CategoryConfig[] categories;
-    [SerializeField] private GameObject[] categoryButtons; // Btn_Cat_Animals, Food, Nature
+    [SerializeField] private GameObject[] categoryButtons;
 
     [Header("Levellar")]
     [SerializeField] private Transform levelContainer;
@@ -28,15 +27,13 @@ public class LevelSelectManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtHintCount;
     [SerializeField] private TextMeshProUGUI txtFreezeCount;
 
-    // ─── KATEGORİ BUTON RENKLERİ ──────────────────────────────────
-    private readonly Color colorCatActive = new Color(0.10f, 0.23f, 0.06f); // #1A3A10
-    private readonly Color colorCatInactive = new Color(0.05f, 0.07f, 0.09f); // #0D1117
-    private readonly Color colorBorderActive = new Color(0.27f, 0.80f, 0.40f); // #44CC66
-    private readonly Color colorBorderInactive = new Color(0.16f, 0.19f, 0.25f); // #2A3040
-    private readonly Color colorTextActive = new Color(0.27f, 0.80f, 0.40f); // #44CC66
-    private readonly Color colorTextInactive = new Color(0.23f, 0.29f, 0.35f); // #3A4A5A
+    private readonly Color colorCatActive = new Color(0.10f, 0.23f, 0.06f);
+    private readonly Color colorCatInactive = new Color(0.05f, 0.07f, 0.09f);
+    private readonly Color colorBorderActive = new Color(0.27f, 0.80f, 0.40f);
+    private readonly Color colorBorderInactive = new Color(0.16f, 0.19f, 0.25f);
+    private readonly Color colorTextActive = new Color(0.27f, 0.80f, 0.40f);
+    private readonly Color colorTextInactive = new Color(0.23f, 0.29f, 0.35f);
 
-    // ─── STATE ────────────────────────────────────────────────────
     private CategoryConfig selectedCategory;
     private int selectedCategoryIndex = 0;
 
@@ -55,7 +52,6 @@ public class LevelSelectManager : MonoBehaviour
         SelectedMode = GameMode.Classic;
     }
 
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -82,13 +78,9 @@ public class LevelSelectManager : MonoBehaviour
         selectedCategoryIndex = index;
         selectedCategory = categories[index];
 
-        // Kategori buton renklerini güncelle
         UpdateCategoryButtons(index);
-
-        // Progress güncelle
         UpdateProgress(index);
 
-        // Level kartlarını temizle ve yeniden oluştur
         foreach (Transform child in levelContainer)
             Destroy(child.gameObject);
 
@@ -126,7 +118,6 @@ public class LevelSelectManager : MonoBehaviour
             Image bg = categoryButtons[i].GetComponent<Image>();
             if (bg != null) bg.color = isActive ? colorCatActive : colorCatInactive;
 
-            // Border renkleri
             string[] borderNames = { "Border_Top", "Border_Bottom", "Border_Left", "Border_Right" };
             foreach (string borderName in borderNames)
             {
@@ -139,7 +130,6 @@ public class LevelSelectManager : MonoBehaviour
                 }
             }
 
-            // Metin rengi
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (txt != null) txt.color = isActive ? colorTextActive : colorTextInactive;
         }
@@ -152,7 +142,11 @@ public class LevelSelectManager : MonoBehaviour
 
         CategoryConfig cat = categories[categoryIndex];
         int total = cat.levels.Length;
-        if (total == 0) { txtProgress.text = "PROGRESS: %0"; return; }
+        if (total == 0)
+        {
+            txtProgress.text = $"{LocalizationManager.Get("progress")}: %0";
+            return;
+        }
 
         int completed = 0;
         for (int i = 0; i < total; i++)
@@ -162,7 +156,7 @@ public class LevelSelectManager : MonoBehaviour
         }
 
         int percent = Mathf.RoundToInt((float)completed / total * 100f);
-        txtProgress.text = $"PROGRESS: %{percent}";
+        txtProgress.text = $"{LocalizationManager.Get("progress")}: %{percent}";
     }
 
     // ─── LEVEL KARTI OLUŞTURMA ────────────────────────────────────
@@ -170,16 +164,15 @@ public class LevelSelectManager : MonoBehaviour
     {
         GameObject card = Instantiate(levelCardPrefab, levelContainer);
 
-        // ── Border rengi: kilitli/yeni/tamamlandı ──
         int bestStars = LevelProgressManager.Instance != null
             ? LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, levelIndex)
             : 0;
 
         Color borderColor = !isUnlocked
-            ? new Color(0.12f, 0.16f, 0.19f)   // #1E2830 kilitli
+            ? new Color(0.12f, 0.16f, 0.19f)
             : isNew
-                ? new Color(0.27f, 0.67f, 1.00f) // #44AAFF yeni
-                : new Color(0.27f, 0.80f, 0.40f); // #44CC66 tamamlandı/açık
+                ? new Color(0.27f, 0.67f, 1.00f)
+                : new Color(0.27f, 0.80f, 0.40f);
 
         string[] borderNames = { "Border_Top", "Border_Bottom", "Border_Left", "Border_Right" };
         foreach (string b in borderNames)
@@ -199,7 +192,7 @@ public class LevelSelectManager : MonoBehaviour
             TextMeshProUGUI txt = levelNameT.GetComponent<TextMeshProUGUI>();
             if (txt != null)
             {
-                txt.text = isUnlocked ? $"LVL {levelIndex + 1:D2}" : $"LVL {levelIndex + 1:D2}";
+                txt.text = $"LVL {levelIndex + 1:D2}";
                 txt.color = !isUnlocked
                     ? new Color(0.16f, 0.19f, 0.25f)
                     : isNew
@@ -208,7 +201,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Text_LevelStat (rekor: süre veya hamle) ──
+        // ── Text_LevelStat ──
         Transform levelStatT = card.transform.Find("Panel_CardInfo/Text_LevelStat");
         if (levelStatT != null)
         {
@@ -221,19 +214,21 @@ public class LevelSelectManager : MonoBehaviour
                 }
                 else
                 {
-                    // Her iki mod için de rekor oku
                     string classicKey = $"record_{selectedCategory.categoryID}_{levelIndex}_0";
                     string moveKey = $"record_{selectedCategory.categoryID}_{levelIndex}_1";
 
                     float classicRecord = PlayerPrefs.GetFloat(classicKey, 0f);
                     int moveRecord = PlayerPrefs.GetInt(moveKey + "_moves", 0);
 
+                    // Lokalize edilmiş "moves" etiketi
+                    string movesLabel = LocalizationManager.Get("move_label");
+
                     if (classicRecord > 0f && moveRecord > 0)
-                        stat.text = $"{classicRecord:F1}s / {moveRecord}moves";
+                        stat.text = $"{classicRecord:F1}s / {moveRecord}{movesLabel}";
                     else if (classicRecord > 0f)
                         stat.text = $"{classicRecord:F1}s";
                     else if (moveRecord > 0)
-                        stat.text = $"{moveRecord} moves";
+                        stat.text = $"{moveRecord} {movesLabel}";
                     else
                         stat.text = "";
                 }
@@ -246,11 +241,10 @@ public class LevelSelectManager : MonoBehaviour
         if (lockIcon != null)
             lockIcon.gameObject.SetActive(!isUnlocked);
 
-        // ── Img_LevelArt (level görseli) ──
+        // ── Img_LevelArt ──
         Transform levelArt = card.transform.Find("Img_LevelArt");
         if (levelArt != null)
         {
-            // Açık levelda level görselini göster
             Transform artImg = levelArt.Find("Img_Art");
             if (artImg != null)
             {
@@ -259,7 +253,7 @@ public class LevelSelectManager : MonoBehaviour
                 {
                     if (isUnlocked && level.cardBackSprite != null)
                     {
-                        img.sprite = level.previewSprite; // LevelConfig'e ekleyeceğiz
+                        img.sprite = level.previewSprite;
                         img.gameObject.SetActive(true);
                     }
                     else
@@ -270,10 +264,19 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Tag_New animasyonu ──
+        // ── Tag_New ──
         Transform tagNew = card.transform.Find("Img_LevelArt/Tag_New");
         if (tagNew != null)
         {
+            // Lokalize NEW! etiketi
+            Transform textNew = tagNew.Find("Text_New");
+            if (textNew != null)
+            {
+                TextMeshProUGUI newTxt = textNew.GetComponent<TextMeshProUGUI>();
+                if (newTxt != null)
+                    newTxt.text = LocalizationManager.Get("new_tag");
+            }
+
             tagNew.gameObject.SetActive(isNew);
             if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
         }
@@ -287,8 +290,8 @@ public class LevelSelectManager : MonoBehaviour
                 Image starImg = starsPanel.GetChild(s).GetComponent<Image>();
                 if (starImg != null)
                     starImg.color = (s < bestStars)
-                        ? new Color(0.98f, 0.78f, 0.46f)  // #FAC775 aktif
-                        : new Color(0.16f, 0.13f, 0.06f); // #2A2010 pasif
+                        ? new Color(0.98f, 0.78f, 0.46f)
+                        : new Color(0.16f, 0.13f, 0.06f);
             }
         }
 
@@ -299,18 +302,32 @@ public class LevelSelectManager : MonoBehaviour
             TextMeshProUGUI diff = diffT.GetComponent<TextMeshProUGUI>();
             if (diff != null)
             {
-                diff.text = isUnlocked ? level.difficulty.ToString().ToUpper() : "";
-                diff.color = level.difficulty switch
+                if (isUnlocked)
                 {
-                    DifficultyLevel.Easy => new Color(0.59f, 0.77f, 0.35f),
-                    DifficultyLevel.Medium => new Color(0.98f, 0.78f, 0.46f),
-                    DifficultyLevel.Hard => new Color(0.89f, 0.29f, 0.29f),
-                    _ => Color.gray
-                };
+                    string diffKey = level.difficulty switch
+                    {
+                        DifficultyLevel.Easy => "difficulty_easy",
+                        DifficultyLevel.Medium => "difficulty_medium",
+                        DifficultyLevel.Hard => "difficulty_hard",
+                        _ => "difficulty_easy"
+                    };
+                    diff.text = LocalizationManager.Get(diffKey);
+                    diff.color = level.difficulty switch
+                    {
+                        DifficultyLevel.Easy => new Color(0.59f, 0.77f, 0.35f),
+                        DifficultyLevel.Medium => new Color(0.98f, 0.78f, 0.46f),
+                        DifficultyLevel.Hard => new Color(0.89f, 0.29f, 0.29f),
+                        _ => Color.gray
+                    };
+                }
+                else
+                {
+                    diff.text = "";
+                }
             }
         }
 
-        // ── Kilitli kart görünümü ──
+        // ── Kilitli kart ──
         if (!isUnlocked)
         {
             Image cardImage = card.GetComponent<Image>();
@@ -357,7 +374,6 @@ public class LevelSelectManager : MonoBehaviour
     // ─── POWER-UP UI ──────────────────────────────────────────────
     public void UpdatePowerUpUI()
     {
-        // PowerUpManager varsa ondan, yoksa direkt PlayerPrefs'ten oku
         int peekCount = PowerUpManager.Instance != null
             ? PowerUpManager.Instance.GetCount(PowerUpType.XRay)
             : PlayerPrefs.GetInt("powerup_reveal", 0);
@@ -371,11 +387,11 @@ public class LevelSelectManager : MonoBehaviour
             : PlayerPrefs.GetInt("powerup_freeze", 0);
 
         if (txtPeekCount != null)
-            txtPeekCount.text = $"PEEK({peekCount})";
+            txtPeekCount.text = $"{LocalizationManager.Get("powerup_peek")}({peekCount})";
         if (txtHintCount != null)
-            txtHintCount.text = $"HINT({hintCount})";
+            txtHintCount.text = $"{LocalizationManager.Get("powerup_hint")}({hintCount})";
         if (txtFreezeCount != null)
-            txtFreezeCount.text = $"FREEZE({freezeCount})";
+            txtFreezeCount.text = $"{LocalizationManager.Get("powerup_freeze")}({freezeCount})";
     }
 
     // ─── LEVEL SEÇİMİ ─────────────────────────────────────────────
