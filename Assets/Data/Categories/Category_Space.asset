@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e7e4c026a3573a49b13785d9bad4072, type: 3}
+  m_Name: Category_Space
+  m_EditorClassIdentifier: 
+  categoryID: 3
+  categoryName: Space
+  categoryDescription: 
+  categoryIcon: {fileID: 0}
+  categoryColor: {r: 1, g: 1, b: 1, a: 1}
+  levels:
+  - {fileID: 11400000, guid: 0333cf2cfcc2b9842b54f55e21ddaf62, type: 2}
+  - {fileID: 11400000, guid: 136263a2add6cb1479028b4bf9ae6e39, type: 2}
+  - {fileID: 11400000, guid: a247a378f0e626840a504988f66ec8f2, type: 2}
+  - {fileID: 11400000, guid: ad0e45774fdfb3a40b026ddbd2b2ee14, type: 2}
+  - {fileID: 11400000, guid: 76e4533a596a76b4cb076ad2de783696, type: 2}
+  - {fileID: 11400000, guid: e8af483e9be3006499d307fde64ec885, type: 2}
+  - {fileID: 11400000, guid: e24ca8621bbcf4a44934d5e463b3ce02, type: 2}
+  - {fileID: 11400000, guid: 77aa05a3ff622a84d9871ad8a0152aab, type: 2}
+  - {fileID: 11400000, guid: 82e9daae176ddff4fa433aad17486972, type: 2}
+  - {fileID: 11400000, guid: 9874a403d941bce47b76611bf6facb6c, type: 2}

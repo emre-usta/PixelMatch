@@ -18,9 +18,9 @@ MonoBehaviour:
   columns: 4
   rows: 4
   useTimer: 1
-  timeLimit: 120
+  timeLimit: 70
   useMoveLimit: 0
-  moveLimit: 30
+  moveLimit: 22
   cardSprites:
   - {fileID: 21300000, guid: 2e3b34101be96b2408785fea85fb856e, type: 3}
   - {fileID: 21300000, guid: 828f913551a91b4418d520c45600c69f, type: 3}
@@ -32,7 +32,5 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5e86c9cb903d25c47ad8124cb4b1e70c, type: 3}
   cardBackSprite: {fileID: 21300000, guid: 9ee3fc3fd3d95a0488ebc8beb5b9f562, type: 3}
   difficulty: 0
-  threeStarTime: 66
-  twoStarTime: 36
-  threeStarMoves: 14
-  twoStarMoves: 21
+  timeThiefSprite: {fileID: 0}
+  previewSprite: {fileID: 0}

@@ -22,6 +22,9 @@ public class LevelSelectManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI txtProgress;
 
+    [Header("Scroll Arrow")]                          // ← YENİ
+    [SerializeField] private TextMeshProUGUI txtScrollArrow; // ← YENİ
+
     [Header("Power-up UI")]
     [SerializeField] private TextMeshProUGUI txtPeekCount;
     [SerializeField] private TextMeshProUGUI txtHintCount;
@@ -68,6 +71,34 @@ public class LevelSelectManager : MonoBehaviour
 
         UpdatePowerUpUI();
         LoadCategory(0);
+
+        // Scroll arrow pulse animasyonu başlat  // ← YENİ
+        if (txtScrollArrow != null)              // ← YENİ
+            StartCoroutine(PulseScrollArrow());  // ← YENİ
+    }
+
+    // ─── SCROLL ARROW PULSE ───────────────────────────────────────  // ← YENİ BLOK
+    private IEnumerator PulseScrollArrow()
+    {
+        while (true)
+        {
+            float elapsed = 0f;
+            while (elapsed < 0.6f)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Lerp(0.3f, 1f, elapsed / 0.6f);
+                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha); // #44CC66
+                yield return null;
+            }
+            elapsed = 0f;
+            while (elapsed < 0.6f)
+            {
+                elapsed += Time.deltaTime;
+                float alpha = Mathf.Lerp(1f, 0.3f, elapsed / 0.6f);
+                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha); // #44CC66
+                yield return null;
+            }
+        }
     }
 
     // ─── KATEGORİ YÜKLEMESİ ──────────────────────────────────────
@@ -185,7 +216,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Text_LevelName ──
         Transform levelNameT = card.transform.Find("Panel_CardInfo/Text_LevelName");
         if (levelNameT != null)
         {
@@ -201,7 +231,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Text_LevelStat ──
         Transform levelStatT = card.transform.Find("Panel_CardInfo/Text_LevelStat");
         if (levelStatT != null)
         {
@@ -216,11 +245,8 @@ public class LevelSelectManager : MonoBehaviour
                 {
                     string classicKey = $"record_{selectedCategory.categoryID}_{levelIndex}_0";
                     string moveKey = $"record_{selectedCategory.categoryID}_{levelIndex}_1";
-
                     float classicRecord = PlayerPrefs.GetFloat(classicKey, 0f);
                     int moveRecord = PlayerPrefs.GetInt(moveKey + "_moves", 0);
-
-                    // Lokalize edilmiş "moves" etiketi
                     string movesLabel = LocalizationManager.Get("move_label");
 
                     if (classicRecord > 0f && moveRecord > 0)
@@ -236,12 +262,10 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Img_LockIcon ──
         Transform lockIcon = card.transform.Find("Img_LevelArt/Img_LockIcon");
         if (lockIcon != null)
             lockIcon.gameObject.SetActive(!isUnlocked);
 
-        // ── Img_LevelArt ──
         Transform levelArt = card.transform.Find("Img_LevelArt");
         if (levelArt != null)
         {
@@ -264,11 +288,9 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Tag_New ──
         Transform tagNew = card.transform.Find("Img_LevelArt/Tag_New");
         if (tagNew != null)
         {
-            // Lokalize NEW! etiketi
             Transform textNew = tagNew.Find("Text_New");
             if (textNew != null)
             {
@@ -276,12 +298,10 @@ public class LevelSelectManager : MonoBehaviour
                 if (newTxt != null)
                     newTxt.text = LocalizationManager.Get("new_tag");
             }
-
             tagNew.gameObject.SetActive(isNew);
             if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
         }
 
-        // ── Panel_Stars ──
         Transform starsPanel = card.transform.Find("Panel_Stars");
         if (starsPanel != null)
         {
@@ -295,7 +315,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Text_Difficulty ──
         Transform diffT = card.transform.Find("Text_Difficulty");
         if (diffT != null)
         {
@@ -327,7 +346,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // ── Kilitli kart ──
         if (!isUnlocked)
         {
             Image cardImage = card.GetComponent<Image>();
@@ -335,7 +353,6 @@ public class LevelSelectManager : MonoBehaviour
                 cardImage.color = new Color(0.05f, 0.04f, 0.03f);
         }
 
-        // ── Button ──
         Button btn = card.GetComponent<Button>();
         if (btn != null)
         {

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db900b700fd33a743bb035839a3a1e37, type: 3}
+  m_Name: Level_4_2
+  m_EditorClassIdentifier: 
+  levelID: 1
+  levelName: SPACE 02
+  levelIcon: {fileID: 0}
+  columns: 4
+  rows: 4
+  useTimer: 1
+  timeLimit: 70
+  useMoveLimit: 0
+  moveLimit: 22
+  cardSprites:
+  - {fileID: 21300000, guid: 568a8dae6f066ee418f71806e1acd132, type: 3}
+  - {fileID: 21300000, guid: c89720a1b8f30c148b5149d7833fb0a9, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 33c4b151e2054c74db8f4cf9ff79b7c1, type: 3}
+  - {fileID: 21300000, guid: 1249fa70d50ec8449a72818c9062d92c, type: 3}
+  - {fileID: 21300000, guid: 78798bab8408a0142afb65d4114abd3a, type: 3}
+  - {fileID: 21300000, guid: 4e5ebada47b178f468651d7eaa32622e, type: 3}
+  - {fileID: 21300000, guid: 2bb54e4168ddb8b4ab5df090d1d000be, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: a6dacab4fa6fab74cb0bcfe7a896ce5f, type: 3}
+  difficulty: 0
+  timeThiefSprite: {fileID: 0}
+  previewSprite: {fileID: 0}
