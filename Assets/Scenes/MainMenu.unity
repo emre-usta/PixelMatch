@@ -1932,7 +1932,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -140, y: 35}
+  m_AnchoredPosition: {x: -172, y: 57}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &186251041
@@ -4460,6 +4460,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cc77b7acc85534346ac9ffaab3dd4db1, type: 2}
   - {fileID: 11400000, guid: cb07658784aa97742b5911a0b1778139, type: 2}
   - {fileID: 11400000, guid: 335a2f49532c6274b85387bd55fc2686, type: 2}
+  - {fileID: 11400000, guid: cb6489c83cb3914429d58a687acfb933, type: 2}
   limitConfig: {fileID: 11400000, guid: 9b416457dd6997843bd2de659e607aab, type: 2}
   dcCard: {fileID: 296340941}
   txtTimer: {fileID: 890429257}
@@ -19766,7 +19767,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -120, y: 0}
+  m_AnchoredPosition: {x: -120, y: 40}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2049880614

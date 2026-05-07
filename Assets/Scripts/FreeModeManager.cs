@@ -35,7 +35,7 @@ public class FreeModeManager : MonoBehaviour
     [Header("Grid Butonları")]
     [SerializeField] private Button btn4x4;
     [SerializeField] private Button btn4x5;
-    [SerializeField] private Button btn5x4;
+    [SerializeField] private Button btn5x6;  // ← 5x4 yerine 5x6
     [SerializeField] private Button btn6x6;
 
     [Header("Zorluk Butonları")]
@@ -80,7 +80,7 @@ public class FreeModeManager : MonoBehaviour
         UpdateLimitInfo();
         UpdateButtonLabels();
 
-        Button[] gridBtns = { btn4x4, btn4x5, btn5x4, btn6x6 };
+        Button[] gridBtns = { btn4x4, btn4x5, btn5x6, btn6x6 };
         HighlightButton(gridBtns, 0, false);
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
@@ -94,18 +94,18 @@ public class FreeModeManager : MonoBehaviour
 
     private void SetupButtons()
     {
-        // Kategori butonları — categoryName kullan (zaten lokalize)
+        // Kategori butonları
         for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
         {
             CategoryConfig cat = categories[i];
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-            if (txt != null) txt.text = cat.categoryName;
+            if (txt != null) txt.text = LocalizationManager.Get(cat.categoryName);
             categoryButtons[i].onClick.AddListener(() => SelectCategory(cat));
         }
 
         btn4x4?.onClick.AddListener(() => SelectGrid(4, 4));
         btn4x5?.onClick.AddListener(() => SelectGrid(4, 5));
-        btn5x4?.onClick.AddListener(() => SelectGrid(5, 4));
+        btn5x6?.onClick.AddListener(() => SelectGrid(5, 6)); // ← 5x6
         btn6x6?.onClick.AddListener(() => SelectGrid(6, 6));
 
         btnEasy?.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Easy));
@@ -121,16 +121,20 @@ public class FreeModeManager : MonoBehaviour
     // ─── DİL GÜNCELLEMESİ ────────────────────────────────────────
     public void UpdateButtonLabels()
     {
-        // Zorluk butonları
         SetButtonLabel(btnEasy, "difficulty_easy");
         SetButtonLabel(btnMedium, "difficulty_medium");
         SetButtonLabel(btnHard, "difficulty_hard");
-
-        // Mod butonları
         SetButtonLabel(btnClassic, "mode_classic");
         SetButtonLabel(btnMove, "mode_move");
 
-        // Limit bilgisi label'ları varsa güncelle
+        // Kategori butonlarını da güncelle
+        for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
+        {
+            TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+                txt.text = LocalizationManager.Get(categories[i].categoryName);
+        }
+
         UpdateLimitInfo();
     }
 
@@ -157,10 +161,10 @@ public class FreeModeManager : MonoBehaviour
         SelectedRows = rows;
         UpdateLimitInfo();
 
-        Button[] gridBtns = { btn4x4, btn4x5, btn5x4, btn6x6 };
+        Button[] gridBtns = { btn4x4, btn4x5, btn5x6, btn6x6 };
         int index = (cols == 4 && rows == 4) ? 0 :
                     (cols == 4 && rows == 5) ? 1 :
-                    (cols == 5 && rows == 4) ? 2 : 3;
+                    (cols == 5 && rows == 6) ? 2 : 3; // ← 5x6
         HighlightButton(gridBtns, index, false);
         Debug.Log($"[FreeModeManager] Grid: {cols}x{rows}");
     }

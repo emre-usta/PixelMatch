@@ -35,4 +35,4 @@ MonoBehaviour:
   cardBackSprite: {fileID: 0}
   difficulty: 0
   timeThiefSprite: {fileID: 0}
-  previewSprite: {fileID: 0}
+  previewSprite: {fileID: 21300000, guid: 7ec4b8fd036e28045aca6d03849f0a4d, type: 3}

@@ -126,8 +126,6 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_animals"] = "HAYVANLAR";
         strings["btn_food"] = "YİYECEKLER";
         strings["btn_nature"] = "DOĞA";
-        strings["btn_space"] = "UZAY";
-        strings["legends"] = "EFSANELER";
         strings["locked"] = "KİLİTLİ";
         strings["new_tag"] = "YENİ!";
         strings["powerup_peek"] = "GÖZETLE";
@@ -205,6 +203,8 @@ public class LocalizationManager : MonoBehaviour
         strings["Animals"] = "HAYVANLAR";
         strings["Foods"] = "YİYECEKLER";
         strings["Natures"] = "DOĞA";
+        strings["Space"] = "UZAY";
+        strings["legends"] = "EFSANELER";
 
         // Efektler
         strings["time_thief_title"] = "ZAMAN HIRSIZI";
@@ -254,8 +254,6 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_animals"] = "ANIMALS";
         strings["btn_food"] = "FOOD";
         strings["btn_nature"] = "NATURE";
-        strings["btn_space"] = "SPACE";
-        strings["legends"] = "LEGENDS";
         strings["locked"] = "LOCKED";
         strings["new_tag"] = "NEW!";
         strings["powerup_peek"] = "PEEK";
@@ -332,6 +330,8 @@ public class LocalizationManager : MonoBehaviour
         strings["Animals"] = "ANIMALS";
         strings["Foods"] = "FOODS";
         strings["Natures"] = "NATURES";
+        strings["Space"] = "SPACE";
+        strings["legends"] = "LEGENDS";
 
         // Efektler
         strings["time_thief_title"] = "TIME THIEF";
