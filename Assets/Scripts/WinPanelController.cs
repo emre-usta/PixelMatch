@@ -28,9 +28,6 @@ public class WinPanelController : MonoBehaviour
     [SerializeField] private RectTransform txtYouWin;
     [SerializeField] private RectTransform panelNewRecordRect;
 
-    [Header("0 Yıldız Uyarısı")]
-    [SerializeField] private GameObject noStarWarningPanel;
-
     [Header("Toplam Yıldız")]
     [SerializeField] private TextMeshProUGUI txtTotalStars;
 
@@ -69,25 +66,8 @@ public class WinPanelController : MonoBehaviour
         if (panelNewRecord != null && panelNewRecord.activeSelf && panelNewRecordRect != null)
             StartCoroutine(BounceAnimation(panelNewRecordRect));
 
-        // Toplam yıldız güncelle
-        if (txtTotalStars != null)
-        {
-            int total = PlayerPrefs.GetInt("total_stars", 0);
-            txtTotalStars.text = $"TOTAL: {total} STARS";
-        }
-
         // Power-up ödüllerini göster
         StartCoroutine(ShowPowerUpRewards());
-    }
-
-    public void ShowNoStarWarning()
-    {
-        if (star1) star1.color = starInactiveColor;
-        if (star2) star2.color = starInactiveColor;
-        if (star3) star3.color = starInactiveColor;
-
-        if (noStarWarningPanel != null)
-            noStarWarningPanel.SetActive(true);
     }
 
     // ─── POWER-UP ÖDÜL GÖSTERİMİ ─────────────────────────────────
@@ -151,9 +131,12 @@ public class WinPanelController : MonoBehaviour
 
         // Label güncelle
         if (txtTimeBonusLabel != null)
-            txtTimeBonusLabel.text = isMoveMode ? "KULLANILAN HAMLE" : "KALAN SÜRE";
+            txtTimeBonusLabel.text = isMoveMode
+                ? LocalizationManager.Get("stat_moves_used")
+                : LocalizationManager.Get("stat_time_remaining");
+
         if (txtScoreLabel != null)
-            txtScoreLabel.text = "PERFORMANS";
+            txtScoreLabel.text = LocalizationManager.Get("stat_performance");
 
         if (isMoveMode)
         {
@@ -202,15 +185,15 @@ public class WinPanelController : MonoBehaviour
         if (txtTotalStars != null)
         {
             int total = PlayerPrefs.GetInt("total_stars", 0);
-            txtTotalStars.text = $"TOTAL: {total}";
+            txtTotalStars.text = $"{LocalizationManager.Get("total_stars")}: {total}";
         }
     }
 
     private string GetPerformanceLabel(float ratio)
     {
-        if (ratio >= 0.60f) return "PERFECT!";
-        if (ratio >= 0.30f) return "GOOD!";
-        return "COMPLETED";
+        if (ratio >= 0.60f) return LocalizationManager.Get("perf_perfect");
+        if (ratio >= 0.30f) return LocalizationManager.Get("perf_good");
+        return LocalizationManager.Get("perf_completed");
     }
 
     // ─── NEW RECORD ───────────────────────────────────────────────

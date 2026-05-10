@@ -197,7 +197,6 @@ public class GameStateManager : MonoBehaviour
 
     private void SaveRecord(int stars)
     {
-        if (stars == 0) return;
         if (LevelSelectManager.SelectedLevel == null) return;
 
         int categoryID = LevelSelectManager.SelectedCategoryID;
@@ -244,19 +243,6 @@ public class GameStateManager : MonoBehaviour
         int nextLevelID = currentLevelID + 1;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
-        if (stars == 0)
-        {
-            int previousBestStars = LevelProgressManager.Instance.GetBestStars(categoryID, currentLevelID);
-            if (previousBestStars > 0)
-            {
-                Debug.Log("[GameStateManager] 0 yıldız ama daha önce geçilmiş — uyarı yok.");
-                return;
-            }
-            Debug.Log("[GameStateManager] 0 yıldız — level açılmadı.");
-            WinPanelController winPanel = panelWin?.GetComponentInChildren<WinPanelController>();
-            winPanel?.ShowNoStarWarning();
-            return;
-        }
 
         if (!isLastLevel)
         {

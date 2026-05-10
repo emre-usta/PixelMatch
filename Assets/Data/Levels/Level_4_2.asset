@@ -24,7 +24,7 @@ MonoBehaviour:
   cardSprites:
   - {fileID: 21300000, guid: 568a8dae6f066ee418f71806e1acd132, type: 3}
   - {fileID: 21300000, guid: c89720a1b8f30c148b5149d7833fb0a9, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: ce724e1d97abbde489a0e95e8cd066da, type: 3}
   - {fileID: 21300000, guid: 33c4b151e2054c74db8f4cf9ff79b7c1, type: 3}
   - {fileID: 21300000, guid: 1249fa70d50ec8449a72818c9062d92c, type: 3}
   - {fileID: 21300000, guid: 78798bab8408a0142afb65d4114abd3a, type: 3}

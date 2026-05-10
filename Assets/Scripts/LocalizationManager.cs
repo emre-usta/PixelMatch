@@ -174,8 +174,15 @@ public class LocalizationManager : MonoBehaviour
         strings["perf_complete"] = "TAMAMLANDI";
         strings["new_record"] = "YENİ REKOR!";
         strings["btn_next_mission"] = "SONRAKI GÖREV";
-        strings["total_stars"] = "TOPLAM";
         strings["reward_title"] = "KAZANDIĞIN ÖDÜLLER";
+        strings["perf_perfect"] = "MÜKEMMEL!";
+        strings["perf_good"] = "İYİ!";
+        strings["perf_completed"] = "TAMAMLANDI";
+        strings["stat_moves_used"] = "KULLANILAN HAMLE";
+        strings["stat_time_remaining"] = "KALAN SÜRE";
+        strings["stat_performance"] = "PERFORMANS";
+        strings["total_stars"] = "TOPLAM";
+        strings["no_star_warning"] = "Devam etmek için\nen az 1 yıldız\nalmalısın!";
 
         // Game Over
         strings["game_over"] = "OYUN BİTTİ";
@@ -303,6 +310,14 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_next_mission"] = "NEXT MISSION";
         strings["total_stars"] = "TOTAL";
         strings["reward_title"] = "REWARDS EARNED";
+        strings["perf_perfect"] = "PERFECT!";
+        strings["perf_completed"] = "COMPLETED";
+        strings["stat_moves_used"] = "MOVES USED";
+        strings["stat_time_remaining"] = "TIME LEFT";
+        strings["stat_performance"] = "PERFORMANCE";
+        strings["total_stars"] = "TOTAL";
+        strings["no_star_warning"] = "You need at least\n1 star\nto continue!";
+
 
         // Game Over
         strings["game_over"] = "GAME OVER";
