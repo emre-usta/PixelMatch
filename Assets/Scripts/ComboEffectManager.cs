@@ -11,6 +11,8 @@ public class ComboEffectManager : MonoBehaviour
     [SerializeField] private Image flashOverlay;        // Tam ekran flash image
     [SerializeField] private TextMeshProUGUI txtCombo;  // "COMBO x3!" yazısı
 
+    [Header("Combo Ödül")]
+    [SerializeField] private TextMeshProUGUI txtComboReward;
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -202,5 +204,40 @@ public class ComboEffectManager : MonoBehaviour
 
         txtCombo.gameObject.SetActive(false);
         txtCombo.color = new Color(txtCombo.color.r, txtCombo.color.g, txtCombo.color.b, 1f);
+    }
+
+    public void ShowComboReward(string rewardText)
+    {
+        StartCoroutine(ShowRewardText(rewardText));
+    }
+
+    private IEnumerator ShowRewardText(string text)
+    {
+        if (txtCombo == null) yield break;
+
+        // Mevcut combo yazısının altına ödül yaz
+        // Bunun için ayrı bir text objesi kullanacağız
+        if (txtComboReward == null) yield break;
+
+        txtComboReward.text = text;
+        txtComboReward.gameObject.SetActive(true);
+        txtComboReward.color = new Color(0.32f, 0.93f, 0.51f, 1f); // yeşil
+
+        // Yukarı kayarak kaybol
+        Vector3 startPos = txtComboReward.transform.localPosition;
+        float elapsed = 0f;
+        float duration = 1f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            txtComboReward.transform.localPosition = startPos + Vector3.up * (40f * t);
+            txtComboReward.color = new Color(0.32f, 0.93f, 0.51f, 1f - t);
+            yield return null;
+        }
+
+        txtComboReward.gameObject.SetActive(false);
+        txtComboReward.transform.localPosition = startPos;
     }
 }

@@ -292,7 +292,7 @@ public class GridManager : MonoBehaviour
         isChecking = true;
         SetAllCardsInteractable(false);
 
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(0.2f);
 
         if (firstSelectedCard.CardID == secondSelectedCard.CardID)
         {

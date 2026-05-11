@@ -117,6 +117,16 @@ public class MoveController : MonoBehaviour
             GameStateManager.Instance.LoseGame();
     }
 
+    public void AddMoves(int amount)
+    {
+        if (!useMoveLimit) return; // Move modunda değilse ekleme
+
+        moveLimit += amount;
+        UpdateUI();
+        GameEvents.RaiseMoveUsed(moveLimit - moveCount);
+        Debug.Log($"[MoveController] Combo ödülü: +{amount} hamle. Yeni limit: {moveLimit}");
+    }
+
     // ─── PUBLIC ERİŞİM ────────────────────────────────────────────
 
     public int MoveCount => moveCount;

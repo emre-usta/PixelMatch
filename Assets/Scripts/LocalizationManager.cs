@@ -223,6 +223,8 @@ public class LocalizationManager : MonoBehaviour
         strings["freeze_sub"] = "5 SANİYE";
         strings["banner_time_thief"] = "ZAMAN HIRSIZI!";
         strings["banner_move_thief"] = "HAMLE HIRSIZI!";
+        strings["combo_moves"] = "HAMLE";
+        strings["combo_seconds"] = "SN";
 
         // Badge
         strings["badge_rookie"] = "ÇAYLAK";
@@ -282,7 +284,7 @@ public class LocalizationManager : MonoBehaviour
         strings["difficulty_easy"] = "EASY";
         strings["difficulty_medium"] = "MEDIUM";
         strings["difficulty_hard"] = "HARD";
-        strings["dc_completed"] = "COMPLETED ✓";
+        strings["dc_completed"] = "COMPLETED";
         strings["dc_failed"] = "Failed today.\nTry again tomorrow!";
         strings["dc_play_hint"] = "Tap to play!";
         // HUD
@@ -358,6 +360,8 @@ public class LocalizationManager : MonoBehaviour
         strings["freeze_sub"] = "5 SECONDS";
         strings["banner_time_thief"] = "TIME THIEF!";
         strings["banner_move_thief"] = "MOVE THIEF!";
+        strings["combo_moves"] = "MOVES";
+        strings["combo_seconds"] = "SEC";
 
         // Badge
         strings["badge_rookie"] = "ROOKIE";

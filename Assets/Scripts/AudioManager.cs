@@ -124,9 +124,17 @@ public class AudioManager : MonoBehaviour
         lastMatchTime = Time.time;
         comboCount++;
 
+        if (GameStateManager.Instance != null &&
+            GameStateManager.Instance.CurrentState == GameState.Win)
+        {
+            comboCount = 0;
+            return;
+        }
+
         if (comboCount >= 3)
         {
             PlaySFX(sfxCombo);
+            GiveComboReward(comboCount);
 
             if (comboCount == 3)
                 ComboEffectManager.Instance?.TriggerComboFlash(comboCount);
@@ -137,6 +145,39 @@ public class AudioManager : MonoBehaviour
         {
             if (sfxMatchVariants != null && sfxMatchVariants.Length > 0)
                 PlaySFX(sfxMatchVariants[Random.Range(0, sfxMatchVariants.Length)]);
+        }
+    }
+
+    private void GiveComboReward(int combo)
+    {
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        string label = isMoveMode
+            ? LocalizationManager.Get("combo_moves")
+            : LocalizationManager.Get("combo_seconds");
+
+        if (isMoveMode)
+        {
+            int bonus = combo switch
+            {
+                3 => 2,
+                4 => 3,
+                5 => 4,
+                _ => 5
+            };
+            MoveController.Instance?.AddMoves(bonus);
+            ComboEffectManager.Instance?.ShowComboReward($"+{bonus} {label}");
+        }
+        else
+        {
+            float bonus = combo switch
+            {
+                3 => 3f,
+                4 => 5f,
+                5 => 8f,
+                _ => 10f
+            };
+            TimerController.Instance?.AddTime(bonus);
+            ComboEffectManager.Instance?.ShowComboReward($"+{bonus:0} {label}");
         }
     }
 

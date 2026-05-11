@@ -70,7 +70,7 @@ public class LevelSelectManager : MonoBehaviour
         }
 
         UpdatePowerUpUI();
-        LoadCategory(0);
+        LoadCategory(SelectedCategoryID);
 
         // Scroll arrow pulse animasyonu başlat  // ← YENİ
         if (txtScrollArrow != null)              // ← YENİ

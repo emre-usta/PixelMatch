@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameStateManager : MonoBehaviour
@@ -54,6 +55,15 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
 
+        // Combo efekti varsa bekle, yoksa direkt aç
+        float delay = ComboEffectManager.Instance != null ? 1.2f : 0f;
+        StartCoroutine(ShowWinPanelDelayed(delay));
+    }
+
+    private IEnumerator ShowWinPanelDelayed(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+
         if (FreeModeManager.IsFreeModeActive)
         {
             if (panelWin != null)
@@ -63,7 +73,7 @@ public class GameStateManager : MonoBehaviour
                 WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
                 winPanel?.ShowFreeModeResult(stars);
             }
-            return;
+            yield break;
         }
 
         if (DailyChallengeManager.IsDailyChallengeActive)
@@ -83,7 +93,7 @@ public class GameStateManager : MonoBehaviour
                 WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
                 winPanel?.ShowResult(stars);
             }
-            return;
+            yield break;
         }
 
         int starsNormal = CalculateStars();
