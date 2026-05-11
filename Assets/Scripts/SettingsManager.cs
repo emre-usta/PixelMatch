@@ -23,8 +23,12 @@ public class SettingsManager : MonoBehaviour
     [Header("Mute Butonları")]
     [SerializeField] private Button btnBGMMute;
     [SerializeField] private Button btnSFXMute;
-    [SerializeField] private TextMeshProUGUI txtBGMMute;
-    [SerializeField] private TextMeshProUGUI txtSFXMute;
+
+    [Header("Mute İkonları")]
+    [SerializeField] private Image imgBGMMuteIcon;
+    [SerializeField] private Image imgSFXMuteIcon;
+    [SerializeField] private Sprite sprSpeakerOn;
+    [SerializeField] private Sprite sprSpeakerOff;
 
     [Header("Dil Butonları")]
     [SerializeField] private Button btnTR;
@@ -33,7 +37,8 @@ public class SettingsManager : MonoBehaviour
     private bool bgmMuted = false;
     private bool sfxMuted = false;
 
-    // ─── Aktif/Pasif renkleri ─────────────────────────────────────
+    private readonly Color colorMuteActive = new Color(0.58f, 0.00f, 0.04f); // #93000A kırmızı
+    private readonly Color colorMuteInactive = new Color(0.04f, 0.12f, 0.06f); // #0A1F10 yeşil
     private readonly Color colorLangActive = new Color(0.10f, 0.23f, 0.06f); // #1A3A10
     private readonly Color colorLangInactive = new Color(0.04f, 0.04f, 0.08f); // #0A0A14
     private readonly Color colorTextActive = new Color(0.96f, 0.65f, 0.14f); // #F5A623
@@ -139,28 +144,25 @@ public class SettingsManager : MonoBehaviour
 
     private void UpdateMuteButtons()
     {
-        if (txtBGMMute != null)
-            txtBGMMute.text = bgmMuted ? "🔇" : "🔊";
-        if (txtSFXMute != null)
-            txtSFXMute.text = sfxMuted ? "🔇" : "🔊";
-
+        // BGM arka plan rengi
         if (btnBGMMute != null)
         {
-            Image img = btnBGMMute.GetComponent<Image>();
-            if (img != null)
-                img.color = bgmMuted
-                    ? new Color(0.58f, 0.00f, 0.04f)
-                    : new Color(0.04f, 0.12f, 0.06f);
+            Image bg = btnBGMMute.GetComponent<Image>();
+            if (bg != null) bg.color = bgmMuted ? colorMuteActive : colorMuteInactive;
         }
+        // BGM ikon sprite
+        if (imgBGMMuteIcon != null)
+            imgBGMMuteIcon.sprite = bgmMuted ? sprSpeakerOff : sprSpeakerOn;
 
+        // SFX arka plan rengi
         if (btnSFXMute != null)
         {
-            Image img = btnSFXMute.GetComponent<Image>();
-            if (img != null)
-                img.color = sfxMuted
-                    ? new Color(0.58f, 0.00f, 0.04f)
-                    : new Color(0.04f, 0.12f, 0.06f);
+            Image bg = btnSFXMute.GetComponent<Image>();
+            if (bg != null) bg.color = sfxMuted ? colorMuteActive : colorMuteInactive;
         }
+        // SFX ikon sprite
+        if (imgSFXMuteIcon != null)
+            imgSFXMuteIcon.sprite = sfxMuted ? sprSpeakerOff : sprSpeakerOn;
     }
 
     // ─── DİL BUTONLARI ────────────────────────────────────────────

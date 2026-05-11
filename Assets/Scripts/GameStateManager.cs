@@ -26,6 +26,15 @@ public class GameStateManager : MonoBehaviour
 
     public void OnGridReady()
     {
+        // Tutorial aktifse başlatma — tutorial tamamlayınca tekrar çağrılacak
+        if (TutorialManager.Instance != null &&
+            TutorialManager.Instance.gameObject.activeInHierarchy &&
+            PlayerPrefs.GetInt("tutorial_done", 0) == 0)
+        {
+            Debug.Log("[GameStateManager] Tutorial bekleniyor...");
+            return;
+        }
+
         SetState(GameState.Playing);
         GameEvents.RaiseGameStarted();
     }

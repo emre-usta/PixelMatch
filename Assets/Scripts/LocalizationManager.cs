@@ -193,6 +193,15 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_menu"] = "MENÜ";
         strings["dc_no_attempts"] = "HAKKIN DOLDU";
 
+        // Tutorial
+        strings["tutorial_step1"] = "Kartları bulmak için\nüzerlerine dokun!";
+        strings["tutorial_step2"] = "Aynı kartları eşleştirerek\ntüm çiftleri bul!";
+        strings["tutorial_step3"] = "Art arda eşleştirerek\nCOMBO kazan ve bonus al!";
+        strings["tutorial_step4"] = "Süren veya hamlen bitmeden\ntüm çiftleri bul!";
+        strings["tutorial_skip"] = "ATLA";
+        strings["tutorial_start"] = "BAŞLA";
+        strings["tutorial_tap_hint"] = "DEVAM ETMEK İÇİN DOKUN";
+
         // Serbest Mod
         strings["free_mode_title"] = "SERBEST MOD";
         strings["category_label"] = "KATEGORİ";
@@ -329,6 +338,16 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_retry"] = "RETRY";
         strings["btn_menu"] = "MENU";
         strings["dc_no_attempts"] = "NO ATTEMPTS LEFT";
+
+        // Tutorial
+        strings["tutorial_step1"] = "Tap on cards\nto find matches!";
+        strings["tutorial_step2"] = "Match the same cards\nto find all pairs!";
+        strings["tutorial_step3"] = "Match in a row\nto earn a COMBO bonus!";
+        strings["tutorial_step4"] = "Find all pairs before\nyour time or moves run out!";
+        strings["tutorial_skip"] = "SKIP";
+        strings["tutorial_start"] = "START";
+        strings["tutorial_tap_hint"] = "TAP TO CONTINUE";
+
 
         // Serbest Mod
         strings["free_mode_title"] = "FREE MODE";
