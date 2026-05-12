@@ -118,6 +118,17 @@ public class FreeModeManager : MonoBehaviour
         btnStart?.onClick.AddListener(StartFreeMode);
     }
 
+    public static void ResetFreeModeState()
+    {
+        IsFreeModeActive = false;
+        SelectedColumns = 4;
+        SelectedRows = 4;
+        SelectedDifficulty = DifficultyLevel.Easy;
+        SelectedMode = LevelSelectManager.GameMode.Classic;
+        SelectedCategory = null;
+        Debug.Log("[FreeModeManager] State sıfırlandı.");
+    }
+
     // ─── DİL GÜNCELLEMESİ ────────────────────────────────────────
     public void UpdateButtonLabels()
     {

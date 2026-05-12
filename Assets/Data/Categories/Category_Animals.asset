@@ -15,7 +15,7 @@ MonoBehaviour:
   categoryID: 0
   categoryName: Animals
   categoryDescription: Match the cute pixel animals!
-  categoryIcon: {fileID: 0}
+  categoryIcon: {fileID: 21300000, guid: 39fa4f43bf877c8489faf445f8b7933a, type: 3}
   categoryColor: {r: 0.17011857, g: 1, b: 0, a: 1}
   levels:
   - {fileID: 11400000, guid: 69412c09362fecf4988c43b956eff350, type: 2}

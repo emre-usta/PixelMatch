@@ -131,7 +131,7 @@ public class EffectManager : MonoBehaviour
         if (timeThiefTutorialPopup != null)
         {
             bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
-
+ 
             Transform titleTransform = timeThiefTutorialPopup.transform
                 .Find("Panel_Content/Panel_Title/Text_PauseTitle");
             if (titleTransform != null)

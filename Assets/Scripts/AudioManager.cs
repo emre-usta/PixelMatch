@@ -17,6 +17,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("Özel Sesler")]
     [SerializeField] private AudioClip sfxLevelComplete;
+    [SerializeField] private AudioClip sfxGameOver;
     [SerializeField] private AudioClip sfxTimeThief;
     [SerializeField] private AudioClip sfxFreeze;
     [SerializeField] private AudioClip sfxPowerUp;
@@ -85,6 +86,7 @@ public class AudioManager : MonoBehaviour
         GameEvents.OnPairMismatch += HandlePairMismatch;
         GameEvents.OnGameStarted += HandleGameStarted;
         GameEvents.OnGameWon += HandleGameWon;
+        GameEvents.OnGameLost += HandleGameLost;
         GameEvents.OnEffectTriggered += HandleEffectTriggered;
     }
 
@@ -95,6 +97,7 @@ public class AudioManager : MonoBehaviour
         GameEvents.OnPairMismatch -= HandlePairMismatch;
         GameEvents.OnGameStarted -= HandleGameStarted;
         GameEvents.OnGameWon -= HandleGameWon;
+        GameEvents.OnGameLost -= HandleGameLost;
         GameEvents.OnEffectTriggered -= HandleEffectTriggered;
     }
 
@@ -197,6 +200,11 @@ public class AudioManager : MonoBehaviour
     private void HandleGameWon()
     {
         PlaySFX(sfxLevelComplete);
+    }
+
+    private void HandleGameLost()
+    {
+        PlaySFX(sfxGameOver);
     }
 
     private void HandleEffectTriggered(CardEffectType effectType)

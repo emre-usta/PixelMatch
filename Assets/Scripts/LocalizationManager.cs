@@ -192,6 +192,7 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_retry"] = "TEKRAR";
         strings["btn_menu"] = "MENÜ";
         strings["dc_no_attempts"] = "HAKKIN DOLDU";
+        strings["completion_label"] = "TAMAMLANMA";
 
         // Tutorial
         strings["tutorial_step1"] = "Kartları bulmak için\nüzerlerine dokun!";
@@ -338,6 +339,7 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_retry"] = "RETRY";
         strings["btn_menu"] = "MENU";
         strings["dc_no_attempts"] = "NO ATTEMPTS LEFT";
+        strings["completion_label"] = "COMPLETION";
 
         // Tutorial
         strings["tutorial_step1"] = "Tap on cards\nto find matches!";

@@ -319,6 +319,7 @@ public class GameStateManager : MonoBehaviour
                 panelGameOver.SetActive(true);
                 UpdateGameOverReason();
                 UpdateTilesRemaining();
+                UpdateTotalPoints();
 
                 var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>();
                 foreach (var btn in buttons)
@@ -342,6 +343,7 @@ public class GameStateManager : MonoBehaviour
             panelGameOver.SetActive(true);
             UpdateGameOverReason();
             UpdateTilesRemaining();
+            UpdateTotalPoints();
         }
     }
 
@@ -361,6 +363,40 @@ public class GameStateManager : MonoBehaviour
                     ? GridManager.Instance.RemainingPairs * 2
                     : 0;
                 tilesTxt.text = remaining.ToString("D2");
+            }
+        }
+    }
+
+    private void UpdateTotalPoints()
+    {
+        if (panelGameOver == null) return;
+
+        Transform labelT = panelGameOver.transform
+            .Find("Panel_LoseContent/Panel_LoseStatCard/Panel_TotalPoints/TextPointsLabel");
+        Transform valueT = panelGameOver.transform
+            .Find("Panel_LoseContent/Panel_LoseStatCard/Panel_TotalPoints/Text_PointsValue");
+
+        // Label
+        if (labelT != null)
+        {
+            TMPro.TextMeshProUGUI label = labelT.GetComponent<TMPro.TextMeshProUGUI>();
+            if (label != null)
+                label.text = LocalizationManager.Get("completion_label");
+        }
+
+        // Yüzde değeri
+        if (valueT != null)
+        {
+            TMPro.TextMeshProUGUI value = valueT.GetComponent<TMPro.TextMeshProUGUI>();
+            if (value != null)
+            {
+                int matched = GridManager.Instance != null
+                    ? GridManager.Instance.MatchedPairCount : 0;
+                int total = GridManager.Instance != null
+                    ? GridManager.Instance.TotalPairCount : 1;
+
+                int percent = Mathf.RoundToInt((float)matched / total * 100f);
+                value.text = $"%{percent}";
             }
         }
     }
@@ -393,6 +429,10 @@ public class GameStateManager : MonoBehaviour
     {
         if (DailyChallengeManager.IsDailyChallengeActive)
             DailyChallengeManager.SetInactive();
+
+        // FreeModeManager'ı sıfırla ← ekle
+        FreeModeManager.ResetFreeModeState();
+
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
