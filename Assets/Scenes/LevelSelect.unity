@@ -3872,7 +3872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50f28a57b0b51cd4182a1a71929d09b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localizationKey: legends
+  localizationKey: Legends
 --- !u!114 &557036022
 MonoBehaviour:
   m_ObjectHideFlags: 0

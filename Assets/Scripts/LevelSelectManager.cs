@@ -21,9 +21,7 @@ public class LevelSelectManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI txtProgress;
-
-    [Header("Scroll Arrow")]                          // ← YENİ
-    [SerializeField] private TextMeshProUGUI txtScrollArrow; // ← YENİ
+    [SerializeField] private TextMeshProUGUI txtScrollArrow;
 
     [Header("Power-up UI")]
     [SerializeField] private TextMeshProUGUI txtPeekCount;
@@ -63,21 +61,17 @@ public class LevelSelectManager : MonoBehaviour
 
     private void Start()
     {
-        if (categories == null || categories.Length == 0)
-        {
-            Debug.LogError("[LevelSelectManager] Kategori atanmamış!");
-            return;
-        }
+        if (categories == null || categories.Length == 0) return;
 
         UpdatePowerUpUI();
         LoadCategory(SelectedCategoryID);
 
-        // Scroll arrow pulse animasyonu başlat  // ← YENİ
-        if (txtScrollArrow != null)              // ← YENİ
-            StartCoroutine(PulseScrollArrow());  // ← YENİ
+        if (txtScrollArrow != null)
+            StartCoroutine(PulseScrollArrow());
     }
 
-    // ─── SCROLL ARROW PULSE ───────────────────────────────────────  // ← YENİ BLOK
+    // ─── SCROLL ARROW PULSE ───────────────────────────────────────
+
     private IEnumerator PulseScrollArrow()
     {
         while (true)
@@ -87,7 +81,7 @@ public class LevelSelectManager : MonoBehaviour
             {
                 elapsed += Time.deltaTime;
                 float alpha = Mathf.Lerp(0.3f, 1f, elapsed / 0.6f);
-                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha); // #44CC66
+                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha);
                 yield return null;
             }
             elapsed = 0f;
@@ -95,13 +89,14 @@ public class LevelSelectManager : MonoBehaviour
             {
                 elapsed += Time.deltaTime;
                 float alpha = Mathf.Lerp(1f, 0.3f, elapsed / 0.6f);
-                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha); // #44CC66
+                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha);
                 yield return null;
             }
         }
     }
 
     // ─── KATEGORİ YÜKLEMESİ ──────────────────────────────────────
+
     public void LoadCategory(int index)
     {
         if (index < 0 || index >= categories.Length) return;
@@ -118,6 +113,7 @@ public class LevelSelectManager : MonoBehaviour
         for (int i = 0; i < selectedCategory.levels.Length; i++)
         {
             LevelConfig level = selectedCategory.levels[i];
+
             bool isUnlocked = LevelProgressManager.Instance != null
                 ? LevelProgressManager.Instance.IsLevelUnlocked(selectedCategory.categoryID, i)
                 : i == 0;
@@ -131,12 +127,10 @@ public class LevelSelectManager : MonoBehaviour
         }
     }
 
-    public void OnCategoryClicked(int index)
-    {
-        LoadCategory(index);
-    }
+    public void OnCategoryClicked(int index) => LoadCategory(index);
 
     // ─── KATEGORİ BUTON GÜNCELLEMESİ ─────────────────────────────
+
     private void UpdateCategoryButtons(int activeIndex)
     {
         if (categoryButtons == null) return;
@@ -146,6 +140,7 @@ public class LevelSelectManager : MonoBehaviour
             if (categoryButtons[i] == null) continue;
 
             bool isActive = (i == activeIndex);
+
             Image bg = categoryButtons[i].GetComponent<Image>();
             if (bg != null) bg.color = isActive ? colorCatActive : colorCatInactive;
 
@@ -167,6 +162,7 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     // ─── PROGRESS GÜNCELLEMESİ ────────────────────────────────────
+
     private void UpdateProgress(int categoryIndex)
     {
         if (txtProgress == null || LevelProgressManager.Instance == null) return;
@@ -181,16 +177,15 @@ public class LevelSelectManager : MonoBehaviour
 
         int completed = 0;
         for (int i = 0; i < total; i++)
-        {
-            int stars = LevelProgressManager.Instance.GetBestStars(cat.categoryID, i);
-            if (stars > 0) completed++;
-        }
+            if (LevelProgressManager.Instance.GetBestStars(cat.categoryID, i) > 0)
+                completed++;
 
         int percent = Mathf.RoundToInt((float)completed / total * 100f);
         txtProgress.text = $"{LocalizationManager.Get("progress")}: %{percent}";
     }
 
     // ─── LEVEL KARTI OLUŞTURMA ────────────────────────────────────
+
     private void CreateLevelCard(LevelConfig level, int levelIndex, bool isUnlocked, bool isNew)
     {
         GameObject card = Instantiate(levelCardPrefab, levelContainer);
@@ -216,6 +211,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Text_LevelName
         Transform levelNameT = card.transform.Find("Panel_CardInfo/Text_LevelName");
         if (levelNameT != null)
         {
@@ -231,6 +227,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Text_LevelStat
         Transform levelStatT = card.transform.Find("Panel_CardInfo/Text_LevelStat");
         if (levelStatT != null)
         {
@@ -262,10 +259,12 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Img_LockIcon
         Transform lockIcon = card.transform.Find("Img_LevelArt/Img_LockIcon");
         if (lockIcon != null)
             lockIcon.gameObject.SetActive(!isUnlocked);
 
+        // Img_LevelArt
         Transform levelArt = card.transform.Find("Img_LevelArt");
         if (levelArt != null)
         {
@@ -288,6 +287,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Tag_New
         Transform tagNew = card.transform.Find("Img_LevelArt/Tag_New");
         if (tagNew != null)
         {
@@ -302,6 +302,7 @@ public class LevelSelectManager : MonoBehaviour
             if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
         }
 
+        // Panel_Stars
         Transform starsPanel = card.transform.Find("Panel_Stars");
         if (starsPanel != null)
         {
@@ -315,6 +316,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Text_Difficulty
         Transform diffT = card.transform.Find("Text_Difficulty");
         if (diffT != null)
         {
@@ -346,6 +348,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
+        // Kilitli kart görünümü
         if (!isUnlocked)
         {
             Image cardImage = card.GetComponent<Image>();
@@ -353,6 +356,7 @@ public class LevelSelectManager : MonoBehaviour
                 cardImage.color = new Color(0.05f, 0.04f, 0.03f);
         }
 
+        // Button
         Button btn = card.GetComponent<Button>();
         if (btn != null)
         {
@@ -367,6 +371,7 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     // ─── NEW TAG ANİMASYONU ───────────────────────────────────────
+
     private IEnumerator AnimateNewTag(GameObject tag)
     {
         RectTransform rt = tag.GetComponent<RectTransform>();
@@ -389,6 +394,7 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     // ─── POWER-UP UI ──────────────────────────────────────────────
+
     public void UpdatePowerUpUI()
     {
         int peekCount = PowerUpManager.Instance != null
@@ -412,6 +418,7 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     // ─── LEVEL SEÇİMİ ─────────────────────────────────────────────
+
     public static void SetSelectedLevel(LevelConfig level, int levelIndex)
     {
         SelectedLevel = level;
@@ -422,16 +429,15 @@ public class LevelSelectManager : MonoBehaviour
     public static bool IsLastLevelInCategory(int levelID)
     {
         if (Instance == null || Instance.categories == null) return false;
+
         CategoryConfig category = null;
         foreach (var cat in Instance.categories)
             if (cat.categoryID == SelectedCategoryID)
                 category = cat;
+
         if (category == null) return false;
         return levelID >= category.levels.Length - 1;
     }
 
-    public void OnBackClicked()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
+    public void OnBackClicked() => SceneManager.LoadScene("MainMenu");
 }

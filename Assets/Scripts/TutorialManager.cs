@@ -19,7 +19,8 @@ public class TutorialManager : MonoBehaviour
     private readonly int totalSteps = 4;
     private bool isActive = false;
 
-    private readonly string[] stepKeys = {
+    private readonly string[] stepKeys =
+    {
         "tutorial_step1",
         "tutorial_step2",
         "tutorial_step3",
@@ -48,7 +49,7 @@ public class TutorialManager : MonoBehaviour
         ShowTutorial();
     }
 
-    // ─── TUTORIAL BAŞLAT ──────────────────────────────────────────
+    // ─── TUTORIAL ─────────────────────────────────────────────────
 
     private void ShowTutorial()
     {
@@ -60,13 +61,9 @@ public class TutorialManager : MonoBehaviour
         UpdateUI();
     }
 
-    // ─── EKRANA TIKLAMA ───────────────────────────────────────────
-
     public void OnScreenTapped()
     {
         if (!isActive) return;
-
-        // Son adımda ekrana tıklama engelle
         if (currentStep >= totalSteps - 1) return;
 
         currentStep++;
@@ -79,22 +76,17 @@ public class TutorialManager : MonoBehaviour
         CompleteTutorial();
     }
 
-    // ─── UI GÜNCELLEME ────────────────────────────────────────────
-
     private void UpdateUI()
     {
-        // Tutorial metni
         if (txtTutorial != null)
             txtTutorial.text = LocalizationManager.Get(stepKeys[currentStep]);
 
-        // Adım göstergesi — sadece son adımda gizle
         if (txtStepIndicator != null)
         {
             txtStepIndicator.gameObject.SetActive(currentStep < totalSteps - 1);
             txtStepIndicator.text = $"{currentStep + 1} / {totalSteps}";
         }
 
-        // Başla butonu — sadece son adımda görünsün
         if (btnAction != null)
         {
             btnAction.gameObject.SetActive(currentStep == totalSteps - 1);
@@ -102,8 +94,6 @@ public class TutorialManager : MonoBehaviour
                 txtActionButton.text = LocalizationManager.Get("tutorial_start");
         }
     }
-
-    // ─── TAMAMLA ──────────────────────────────────────────────────
 
     private void CompleteTutorial()
     {
@@ -115,7 +105,5 @@ public class TutorialManager : MonoBehaviour
 
         Time.timeScale = 1f;
         GameStateManager.Instance?.OnGridReady();
-
-        Debug.Log("[TutorialManager] Tutorial tamamlandı, oyun başlıyor.");
     }
 }

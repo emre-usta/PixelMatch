@@ -2,26 +2,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// PixelMatch — Kart Kontrolcüsü
-/// Her kartın state'ini, davranışını ve animasyonlarını yönetir.
-/// </summary>
 public class CardController : MonoBehaviour
 {
-    // ─── KART VERİSİ ──────────────────────────────────────────────
-
     public int CardID { get; private set; }
     public CardState State { get; private set; } = CardState.Closed;
     public CardEffectType EffectType { get; private set; } = CardEffectType.None;
-
-    // ─── GÖRSEL REFERANSLAR ───────────────────────────────────────
 
     [Header("Görsel")]
     [SerializeField] private Image cardImage;
     [SerializeField] private Sprite cardBackSprite;
     private Sprite cardFrontSprite;
-
-    // ─── ANİMASYON AYARLARI ───────────────────────────────────────
 
     [Header("Animasyon")]
     [SerializeField] private float flipDuration = 0.15f;
@@ -29,8 +19,6 @@ public class CardController : MonoBehaviour
     [SerializeField] private float shakeStrength = 8f;
 
     private Coroutine activeCoroutine;
-
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
     private void Awake()
     {
@@ -48,7 +36,6 @@ public class CardController : MonoBehaviour
         EffectType = effectType;
 
         cardImage.preserveAspect = true;
-
         SetState(CardState.Closed);
         ShowBack();
         transform.localScale = Vector3.one;
@@ -63,30 +50,25 @@ public class CardController : MonoBehaviour
         Reveal();
     }
 
-    // ─── KART STATE İŞLEMLERİ ─────────────────────────────────────
+    // ─── STATE ────────────────────────────────────────────────────
 
     public void Reveal()
     {
         SetState(CardState.Open);
-        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
-        activeCoroutine = StartCoroutine(FlipAnimation(cardBackSprite, cardFrontSprite));
+        PlayFlip(cardBackSprite, cardFrontSprite);
         GameEvents.RaiseCardRevealed(this);
     }
 
-    // Mevcut Reveal() metodunu koru, yanına yeni metod ekle
     public void RevealSilent()
     {
         SetState(CardState.Open);
-        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
-        activeCoroutine = StartCoroutine(FlipAnimation(cardBackSprite, cardFrontSprite));
-        // GameEvents tetiklenmez — sadece görsel
+        PlayFlip(cardBackSprite, cardFrontSprite);
     }
 
     public void Hide()
     {
         SetState(CardState.Closed);
-        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
-        activeCoroutine = StartCoroutine(FlipAnimation(cardFrontSprite, cardBackSprite));
+        PlayFlip(cardFrontSprite, cardBackSprite);
     }
 
     public void SetMatched()
@@ -96,15 +78,21 @@ public class CardController : MonoBehaviour
         activeCoroutine = StartCoroutine(MatchAnimation());
     }
 
-    public void SetLocked()
+    public void SetLocked() => SetState(CardState.Locked);
+    public void Unlock() { SetState(CardState.Closed); ShowBack(); }
+
+    private void PlayFlip(Sprite from, Sprite to)
     {
-        SetState(CardState.Locked);
+        if (activeCoroutine != null) StopCoroutine(activeCoroutine);
+        activeCoroutine = StartCoroutine(FlipAnimation(from, to));
     }
 
-    public void Unlock()
+    private void SetState(CardState newState) => State = newState;
+
+    public void SetInteractable(bool interactable)
     {
-        SetState(CardState.Closed);
-        ShowBack();
+        if (cardImage != null)
+            cardImage.raycastTarget = interactable;
     }
 
     // ─── ANİMASYONLAR ─────────────────────────────────────────────
@@ -117,8 +105,7 @@ public class CardController : MonoBehaviour
         while (elapsed < half)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / half;
-            transform.localScale = new Vector3(1f - t, 1f, 1f);
+            transform.localScale = new Vector3(1f - elapsed / half, 1f, 1f);
             yield return null;
         }
 
@@ -129,8 +116,7 @@ public class CardController : MonoBehaviour
         while (elapsed < half)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / half;
-            transform.localScale = new Vector3(t, 1f, 1f);
+            transform.localScale = new Vector3(elapsed / half, 1f, 1f);
             yield return null;
         }
 
@@ -145,8 +131,7 @@ public class CardController : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            float scale = Mathf.Lerp(1f, 1.2f, t);
+            float scale = Mathf.Lerp(1f, 1.2f, elapsed / duration);
             transform.localScale = new Vector3(scale, scale, 1f);
             yield return null;
         }
@@ -156,8 +141,8 @@ public class CardController : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            cardImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, 1f - t);
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            cardImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
             yield return null;
         }
 
@@ -183,23 +168,12 @@ public class CardController : MonoBehaviour
         transform.localPosition = originalPos;
     }
 
-    // ─── GÖRSEL YARDIMCILAR ───────────────────────────────────────
+    // ─── GÖRSEL ───────────────────────────────────────────────────
 
     private void ShowBack()
     {
         if (cardImage != null && cardBackSprite != null)
             cardImage.sprite = cardBackSprite;
-    }
-
-    private void SetState(CardState newState)
-    {
-        State = newState;
-    }
-
-    public void SetInteractable(bool interactable)
-    {
-        if (cardImage != null)
-            cardImage.raycastTarget = interactable;
     }
 }
 

@@ -8,7 +8,6 @@ public class DailyChallengeManager : MonoBehaviour
 {
     public static DailyChallengeManager Instance { get; private set; }
 
-    // ─── STATIC STATE ─────────────────────────────────────────────
     public static bool IsDailyChallengeActive { get; private set; }
     public static int DCColumns { get; private set; }
     public static int DCRows { get; private set; }
@@ -20,14 +19,13 @@ public class DailyChallengeManager : MonoBehaviour
     {
         IsDailyChallengeActive = false;
     }
+
     private Coroutine pulseCoroutine;
 
-    // ─── PLAYERPREFS ANAHTARLARI ──────────────────────────────────
     private const string KEY_LAST_PLAYED = "dc_last_played";
     private const string KEY_LAST_STARS = "dc_last_stars";
     private const string KEY_ATTEMPTS = "dc_attempts";
 
-    // ─── INSPECTOR ────────────────────────────────────────────────
     [Header("Kategoriler")]
     [SerializeField] private CategoryConfig[] categories;
 
@@ -40,8 +38,6 @@ public class DailyChallengeManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtDifficulty;
     [SerializeField] private TextMeshProUGUI txtStatus;
     [SerializeField] private UnityEngine.UI.Button btnPlay;
-
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
 
     private void Awake()
     {
@@ -57,31 +53,26 @@ public class DailyChallengeManager : MonoBehaviour
 
     private void Update()
     {
-        // Timer'ı her saniye güncelle
         UpdateTimerText();
     }
 
-    // ─── GÜNLÜK CONFIG ÜRETİMİ ────────────────────────────────────
+    // ─── GÜNLÜK CONFIG ────────────────────────────────────────────
 
     private void GenerateDailyConfig()
     {
         DateTime today = DateTime.Now;
         int seed = today.Year * 10000 + today.Month * 100 + today.Day;
 
-        // Seed ile rastgele üretim
         UnityEngine.Random.InitState(seed);
 
-        // Kategori — seed ile rastgele
         if (categories != null && categories.Length > 0)
             DCCategory = categories[UnityEngine.Random.Range(0, categories.Length)];
 
-        // Grid — seed ile rastgele
         int[][] grids = { new[] { 4, 4 }, new[] { 4, 5 }, new[] { 5, 4 }, new[] { 6, 6 } };
         int[] grid = grids[UnityEngine.Random.Range(0, grids.Length)];
         DCColumns = grid[0];
         DCRows = grid[1];
 
-        // Zorluk — haftanın gününe göre
         DCDifficulty = today.DayOfWeek switch
         {
             DayOfWeek.Monday => DifficultyLevel.Easy,
@@ -94,13 +85,10 @@ public class DailyChallengeManager : MonoBehaviour
             _ => DifficultyLevel.Easy
         };
 
-        // Random state'i sıfırla — diğer sistemleri etkilemesin
         UnityEngine.Random.InitState((int)DateTime.Now.Ticks);
-
-        Debug.Log($"[DC] Seed:{seed} Grid:{DCColumns}x{DCRows} Zorluk:{DCDifficulty} Kategori:{DCCategory?.categoryName}");
     }
 
-    // ─── GÜNLÜK OYNANDI MI? ───────────────────────────────────────
+    // ─── DURUM KONTROL ────────────────────────────────────────────
 
     public bool IsPlayedToday()
     {
@@ -123,11 +111,7 @@ public class DailyChallengeManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public bool CanRetry()
-    {
-        if (!IsPlayedToday()) return true; // Henüz tamamlanmamış
-        return false; // Tamamlandıysa retry yok
-    }
+    public bool CanRetry() => !IsPlayedToday();
 
     public int GetTodayAttempts()
     {
@@ -141,48 +125,34 @@ public class DailyChallengeManager : MonoBehaviour
         int current = GetTodayAttempts();
         PlayerPrefs.SetInt(KEY_ATTEMPTS + "_" + today, current + 1);
         PlayerPrefs.Save();
-        Debug.Log($"[DC] Deneme: {current + 1}/2");
     }
 
-    public bool HasAttemptsLeft()
-    {
-        return GetTodayAttempts() < 2;
-    }
+    public bool HasAttemptsLeft() => GetTodayAttempts() < 2;
 
     public static void SetInactive()
     {
         IsDailyChallengeActive = false;
 
-        // Sadece eğer bugün henüz tamamlanmamışsa kapat
         string today = DateTime.Now.ToString("yyyy-MM-dd");
         string lastPlayed = PlayerPrefs.GetString("dc_last_played", "");
 
         if (lastPlayed != today)
         {
-            // Başarısız — bugün oynadı ama tamamlayamadı
             PlayerPrefs.SetString("dc_last_played", today);
             PlayerPrefs.SetInt("dc_last_stars", 0);
             PlayerPrefs.Save();
         }
-        // Başarılı tamamlamada MarkPlayedToday zaten doğru değeri yazmış
-
-        Debug.Log("[DC] SetInactive — bugün DC kapandı.");
     }
 
     // ─── OYUN BAŞLATMA ────────────────────────────────────────────
 
     public void StartDailyChallenge()
     {
-        if (IsPlayedToday())
-        {
-            Debug.Log("[DC] Bugün zaten oynadın!");
-            return;
-        }
+        if (IsPlayedToday()) return;
 
         IsDailyChallengeActive = true;
         LevelSelectManager.SelectedMode = LevelSelectManager.GameMode.Classic;
         SceneManager.LoadScene("Level1");
-        Debug.Log($"[DC] Daily Challenge başlatıldı!");
     }
 
     // ─── UI GÜNCELLEME ────────────────────────────────────────────
@@ -193,14 +163,12 @@ public class DailyChallengeManager : MonoBehaviour
 
         bool playedToday = IsPlayedToday();
 
-        // Oynandıysa animasyonu durdur
         if (playedToday && pulseCoroutine != null)
         {
             StopCoroutine(pulseCoroutine);
             pulseCoroutine = null;
         }
 
-        // Zorluk metni
         if (txtDifficulty != null)
         {
             string diffKey = DCDifficulty switch
@@ -213,7 +181,6 @@ public class DailyChallengeManager : MonoBehaviour
             txtDifficulty.text = $"{LocalizationManager.Get(diffKey)} · {DCColumns}×{DCRows}";
         }
 
-        // Durum metni
         if (txtStatus != null)
         {
             if (playedToday)
@@ -235,13 +202,11 @@ public class DailyChallengeManager : MonoBehaviour
                 txtStatus.text = LocalizationManager.Get("dc_play_hint");
                 txtStatus.color = new Color(0.96f, 0.65f, 0.14f);
 
-                // Pulse animasyonu başlat
                 if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
                 pulseCoroutine = StartCoroutine(PulseText(txtStatus));
             }
         }
 
-        // Buton
         if (btnPlay != null)
             btnPlay.interactable = !playedToday;
     }
@@ -291,6 +256,5 @@ public class DailyChallengeManager : MonoBehaviour
         PlayerPrefs.DeleteKey(KEY_LAST_STARS);
         PlayerPrefs.DeleteKey(KEY_ATTEMPTS + "_" + today);
         PlayerPrefs.Save();
-        Debug.Log("[DC] Sıfırlandı!");
     }
 }

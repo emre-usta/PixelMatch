@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Category_Legends
   m_EditorClassIdentifier: 
   categoryID: 4
-  categoryName: legends
+  categoryName: Legends
   categoryDescription: 
   categoryIcon: {fileID: 0}
   categoryColor: {r: 1, g: 1, b: 1, a: 1}

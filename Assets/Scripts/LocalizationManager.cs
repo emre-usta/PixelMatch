@@ -11,11 +11,9 @@ public class LocalizationManager : MonoBehaviour
     private const string KEY_LANGUAGE = "settings_language";
     private static Dictionary<string, string> strings = new();
 
-    // ─── STATİK CONSTRUCTOR — sahne yüklenmeden önce çalışır ─────
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void InitializeBeforeSceneLoad()
     {
-        // Dili en başta yükle — herhangi bir sahne açılmadan önce
         if (PlayerPrefs.HasKey(KEY_LANGUAGE))
         {
             string saved = PlayerPrefs.GetString(KEY_LANGUAGE, "EN");
@@ -30,7 +28,6 @@ public class LocalizationManager : MonoBehaviour
         }
 
         LoadStrings();
-        Debug.Log($"[LocalizationManager] Başlatıldı: {CurrentLanguage}");
     }
 
     private void Awake()
@@ -47,18 +44,13 @@ public class LocalizationManager : MonoBehaviour
         PlayerPrefs.Save();
         LoadStrings();
 
-        // inactive objeler dahil tüm LocalizedText'leri güncelle
         var allTexts = FindObjectsOfType<LocalizedText>(true);
         foreach (var t in allTexts)
             t.UpdateText();
 
-        // DC UI'ını da güncelle
         DailyChallengeManager.Instance?.UpdateUI();
-
-        // Badge güncelle
         BadgeManager.Instance?.UpdateBadge();
 
-        // LevelSelect güncelle — sadece LevelSelect sahnesindeyse
         if (LevelSelectManager.Instance != null &&
             LevelSelectManager.Instance.gameObject.scene.isLoaded)
         {
@@ -66,14 +58,11 @@ public class LocalizationManager : MonoBehaviour
             LevelSelectManager.Instance.UpdatePowerUpUI();
         }
 
-        // FreeMode güncelle — sadece FreeMode sahnesindeyse
         if (FreeModeManager.Instance != null &&
             FreeModeManager.Instance.gameObject.scene.isLoaded)
         {
             FreeModeManager.Instance.UpdateButtonLabels();
         }
-
-        Debug.Log($"[LocalizationManager] Dil: {lang}");
     }
 
     public static string Get(string key)
@@ -141,15 +130,17 @@ public class LocalizationManager : MonoBehaviour
         strings["movement_desc"] = "Sınırlı hamle hakkı.\nHer hamle önemli.";
         strings["movement_avail"] = "LVL 1-10 AKTİF";
 
-        // Daily Challenge Mode Select
+        // Daily Challenge
         strings["dc_title"] = "GÜNLÜK GÖREV";
         strings["dc_play"] = "OYNA";
-        strings["difficulty_easy"] = "KOLAY";
-        strings["difficulty_medium"] = "ORTA";
-        strings["difficulty_hard"] = "ZOR";
         strings["dc_completed"] = "TAMAMLANDI";
         strings["dc_failed"] = "Bugün başarısız oldun.\nYarın tekrar dene!";
         strings["dc_play_hint"] = "Oynamak için tıkla!";
+
+        // Zorluk
+        strings["difficulty_easy"] = "KOLAY";
+        strings["difficulty_medium"] = "ORTA";
+        strings["difficulty_hard"] = "ZOR";
 
         // HUD
         strings["hud_time"] = "SÜRE";
@@ -169,9 +160,6 @@ public class LocalizationManager : MonoBehaviour
         strings["remaining_time"] = "KALAN SÜRE";
         strings["used_moves"] = "KULLANILAN HAMLE";
         strings["performance"] = "PERFORMANS";
-        strings["perf_excellent"] = "MÜKEMMEL!";
-        strings["perf_good"] = "İYİ!";
-        strings["perf_complete"] = "TAMAMLANDI";
         strings["new_record"] = "YENİ REKOR!";
         strings["btn_next_mission"] = "SONRAKI GÖREV";
         strings["reward_title"] = "KAZANDIĞIN ÖDÜLLER";
@@ -182,7 +170,6 @@ public class LocalizationManager : MonoBehaviour
         strings["stat_time_remaining"] = "KALAN SÜRE";
         strings["stat_performance"] = "PERFORMANS";
         strings["total_stars"] = "TOPLAM";
-        strings["no_star_warning"] = "Devam etmek için\nen az 1 yıldız\nalmalısın!";
 
         // Game Over
         strings["game_over"] = "OYUN BİTTİ";
@@ -209,19 +196,18 @@ public class LocalizationManager : MonoBehaviour
         strings["grid_label"] = "GRİD";
         strings["difficulty_label"] = "ZORLUK";
         strings["mode_label"] = "MOD";
-        strings["difficulty_easy"] = "KOLAY";
-        strings["difficulty_medium"] = "ORTA";
-        strings["difficulty_hard"] = "ZOR";
         strings["mode_classic"] = "KLASİK";
         strings["mode_move"] = "HAMLE";
         strings["time_label"] = "SÜRE";
         strings["move_label"] = "HAMLE";
         strings["btn_play_start"] = "OYNA";
+
+        // Kategori isimleri
         strings["Animals"] = "HAYVANLAR";
         strings["Foods"] = "YİYECEKLER";
         strings["Natures"] = "DOĞA";
         strings["Space"] = "UZAY";
-        strings["legends"] = "EFSANELER";
+        strings["Legends"] = "EFSANELER"; // ← düzeltildi
 
         // Efektler
         strings["time_thief_title"] = "ZAMAN HIRSIZI";
@@ -288,15 +274,18 @@ public class LocalizationManager : MonoBehaviour
         strings["movement_desc"] = "Limited number of flips.\nEvery move counts.";
         strings["movement_avail"] = "LVL 1-10 AVAILABLE";
 
-        // Daily Challenge Mode Select
+        // Daily Challenge
         strings["dc_title"] = "DAILY CHALLENGE";
         strings["dc_play"] = "PLAY";
-        strings["difficulty_easy"] = "EASY";
-        strings["difficulty_medium"] = "MEDIUM";
-        strings["difficulty_hard"] = "HARD";
         strings["dc_completed"] = "COMPLETED";
         strings["dc_failed"] = "Failed today.\nTry again tomorrow!";
         strings["dc_play_hint"] = "Tap to play!";
+
+        // Zorluk
+        strings["difficulty_easy"] = "EASY";
+        strings["difficulty_medium"] = "MEDIUM";
+        strings["difficulty_hard"] = "HARD";
+
         // HUD
         strings["hud_time"] = "TIME";
         strings["hud_moves"] = "MOVES";
@@ -315,21 +304,16 @@ public class LocalizationManager : MonoBehaviour
         strings["remaining_time"] = "TIME REMAINING";
         strings["used_moves"] = "MOVES USED";
         strings["performance"] = "PERFORMANCE";
-        strings["perf_excellent"] = "EXCELLENT!";
-        strings["perf_good"] = "GOOD!";
-        strings["perf_complete"] = "COMPLETE";
         strings["new_record"] = "NEW RECORD!";
         strings["btn_next_mission"] = "NEXT MISSION";
-        strings["total_stars"] = "TOTAL";
         strings["reward_title"] = "REWARDS EARNED";
         strings["perf_perfect"] = "PERFECT!";
+        strings["perf_good"] = "GOOD!";
         strings["perf_completed"] = "COMPLETED";
         strings["stat_moves_used"] = "MOVES USED";
         strings["stat_time_remaining"] = "TIME LEFT";
         strings["stat_performance"] = "PERFORMANCE";
         strings["total_stars"] = "TOTAL";
-        strings["no_star_warning"] = "You need at least\n1 star\nto continue!";
-
 
         // Game Over
         strings["game_over"] = "GAME OVER";
@@ -350,26 +334,24 @@ public class LocalizationManager : MonoBehaviour
         strings["tutorial_start"] = "START";
         strings["tutorial_tap_hint"] = "TAP TO CONTINUE";
 
-
         // Serbest Mod
         strings["free_mode_title"] = "FREE MODE";
         strings["category_label"] = "CATEGORY";
         strings["grid_label"] = "GRID";
         strings["difficulty_label"] = "DIFFICULTY";
         strings["mode_label"] = "MODE";
-        strings["difficulty_easy"] = "EASY";
-        strings["difficulty_medium"] = "MEDIUM";
-        strings["difficulty_hard"] = "HARD";
         strings["mode_classic"] = "CLASSIC";
         strings["mode_move"] = "MOVEMENT";
         strings["time_label"] = "TIME";
         strings["move_label"] = "MOVES";
         strings["btn_play_start"] = "PLAY";
+
+        // Kategori isimleri
         strings["Animals"] = "ANIMALS";
         strings["Foods"] = "FOODS";
         strings["Natures"] = "NATURES";
         strings["Space"] = "SPACE";
-        strings["legends"] = "LEGENDS";
+        strings["Legends"] = "LEGENDS"; // ← düzeltildi
 
         // Efektler
         strings["time_thief_title"] = "TIME THIEF";

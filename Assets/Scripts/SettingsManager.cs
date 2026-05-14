@@ -37,12 +37,12 @@ public class SettingsManager : MonoBehaviour
     private bool bgmMuted = false;
     private bool sfxMuted = false;
 
-    private readonly Color colorMuteActive = new Color(0.58f, 0.00f, 0.04f); // #93000A kırmızı
-    private readonly Color colorMuteInactive = new Color(0.04f, 0.12f, 0.06f); // #0A1F10 yeşil
-    private readonly Color colorLangActive = new Color(0.10f, 0.23f, 0.06f); // #1A3A10
-    private readonly Color colorLangInactive = new Color(0.04f, 0.04f, 0.08f); // #0A0A14
-    private readonly Color colorTextActive = new Color(0.96f, 0.65f, 0.14f); // #F5A623
-    private readonly Color colorTextInactive = new Color(0.32f, 0.26f, 0.20f); // #524534
+    private readonly Color colorMuteActive = new Color(0.58f, 0.00f, 0.04f);
+    private readonly Color colorMuteInactive = new Color(0.04f, 0.12f, 0.06f);
+    private readonly Color colorLangActive = new Color(0.10f, 0.23f, 0.06f);
+    private readonly Color colorLangInactive = new Color(0.04f, 0.04f, 0.08f);
+    private readonly Color colorTextActive = new Color(0.96f, 0.65f, 0.14f);
+    private readonly Color colorTextInactive = new Color(0.32f, 0.26f, 0.20f);
 
     private void Awake()
     {
@@ -71,7 +71,6 @@ public class SettingsManager : MonoBehaviour
 
         btnBGMMute?.onClick.AddListener(ToggleBGMMute);
         btnSFXMute?.onClick.AddListener(ToggleSFXMute);
-
         btnTR?.onClick.AddListener(() => SetLanguage(LocalizationManager.Language.TR));
         btnEN?.onClick.AddListener(() => SetLanguage(LocalizationManager.Language.EN));
 
@@ -82,20 +81,17 @@ public class SettingsManager : MonoBehaviour
         UpdateMuteButtons();
         UpdateLanguageButtons();
 
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
-    // ─── SLIDER HANDLERS ──────────────────────────────────────────
+    // ─── SLIDER ───────────────────────────────────────────────────
 
     private void OnBGMChanged(float value)
     {
         PlayerPrefs.SetFloat(KEY_BGM, value);
         PlayerPrefs.Save();
         UpdateBGMText(value);
-
-        if (!bgmMuted)
-            AudioManager.Instance?.SetBGMVolume(value);
+        if (!bgmMuted) AudioManager.Instance?.SetBGMVolume(value);
     }
 
     private void OnSFXChanged(float value)
@@ -103,21 +99,17 @@ public class SettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat(KEY_SFX, value);
         PlayerPrefs.Save();
         UpdateSFXText(value);
-
-        if (!sfxMuted)
-            AudioManager.Instance?.SetSFXVolume(value);
+        if (!sfxMuted) AudioManager.Instance?.SetSFXVolume(value);
     }
 
-    // ─── MUTE TOGGLE ──────────────────────────────────────────────
+    // ─── MUTE ─────────────────────────────────────────────────────
 
     public void ToggleBGMMute()
     {
         bgmMuted = !bgmMuted;
         PlayerPrefs.SetInt(KEY_BGM_MUTED, bgmMuted ? 1 : 0);
         PlayerPrefs.Save();
-
-        float value = bgmMuted ? 0f : PlayerPrefs.GetFloat(KEY_BGM, 0.5f);
-        AudioManager.Instance?.SetBGMVolume(value);
+        AudioManager.Instance?.SetBGMVolume(bgmMuted ? 0f : PlayerPrefs.GetFloat(KEY_BGM, 0.5f));
         UpdateMuteButtons();
     }
 
@@ -126,46 +118,30 @@ public class SettingsManager : MonoBehaviour
         sfxMuted = !sfxMuted;
         PlayerPrefs.SetInt(KEY_SFX_MUTED, sfxMuted ? 1 : 0);
         PlayerPrefs.Save();
-
-        float value = sfxMuted ? 0f : PlayerPrefs.GetFloat(KEY_SFX, 1f);
-        AudioManager.Instance?.SetSFXVolume(value);
+        AudioManager.Instance?.SetSFXVolume(sfxMuted ? 0f : PlayerPrefs.GetFloat(KEY_SFX, 1f));
         UpdateMuteButtons();
     }
 
-    private void ApplyBGM(float value)
-    {
-        AudioManager.Instance?.SetBGMVolume(bgmMuted ? 0f : value);
-    }
-
-    private void ApplySFX(float value)
-    {
-        AudioManager.Instance?.SetSFXVolume(sfxMuted ? 0f : value);
-    }
+    private void ApplyBGM(float value) => AudioManager.Instance?.SetBGMVolume(bgmMuted ? 0f : value);
+    private void ApplySFX(float value) => AudioManager.Instance?.SetSFXVolume(sfxMuted ? 0f : value);
 
     private void UpdateMuteButtons()
     {
-        // BGM arka plan rengi
-        if (btnBGMMute != null)
-        {
-            Image bg = btnBGMMute.GetComponent<Image>();
-            if (bg != null) bg.color = bgmMuted ? colorMuteActive : colorMuteInactive;
-        }
-        // BGM ikon sprite
-        if (imgBGMMuteIcon != null)
-            imgBGMMuteIcon.sprite = bgmMuted ? sprSpeakerOff : sprSpeakerOn;
+        SetButtonColor(btnBGMMute, bgmMuted);
+        SetButtonColor(btnSFXMute, sfxMuted);
 
-        // SFX arka plan rengi
-        if (btnSFXMute != null)
-        {
-            Image bg = btnSFXMute.GetComponent<Image>();
-            if (bg != null) bg.color = sfxMuted ? colorMuteActive : colorMuteInactive;
-        }
-        // SFX ikon sprite
-        if (imgSFXMuteIcon != null)
-            imgSFXMuteIcon.sprite = sfxMuted ? sprSpeakerOff : sprSpeakerOn;
+        if (imgBGMMuteIcon != null) imgBGMMuteIcon.sprite = bgmMuted ? sprSpeakerOff : sprSpeakerOn;
+        if (imgSFXMuteIcon != null) imgSFXMuteIcon.sprite = sfxMuted ? sprSpeakerOff : sprSpeakerOn;
     }
 
-    // ─── DİL BUTONLARI ────────────────────────────────────────────
+    private void SetButtonColor(Button btn, bool muted)
+    {
+        if (btn == null) return;
+        Image bg = btn.GetComponent<Image>();
+        if (bg != null) bg.color = muted ? colorMuteActive : colorMuteInactive;
+    }
+
+    // ─── DİL ──────────────────────────────────────────────────────
 
     private void SetLanguage(LocalizationManager.Language lang)
     {
@@ -176,49 +152,40 @@ public class SettingsManager : MonoBehaviour
     private void UpdateLanguageButtons()
     {
         bool isTR = LocalizationManager.CurrentLanguage == LocalizationManager.Language.TR;
+        SetLangButton(btnTR, isTR);
+        SetLangButton(btnEN, !isTR);
+    }
 
-        if (btnTR != null)
-        {
-            Image img = btnTR.GetComponent<Image>();
-            if (img != null) img.color = isTR ? colorLangActive : colorLangInactive;
-            TextMeshProUGUI txt = btnTR.GetComponentInChildren<TextMeshProUGUI>();
-            if (txt != null) txt.color = isTR ? colorTextActive : colorTextInactive;
-        }
-
-        if (btnEN != null)
-        {
-            Image img = btnEN.GetComponent<Image>();
-            if (img != null) img.color = !isTR ? colorLangActive : colorLangInactive;
-            TextMeshProUGUI txt = btnEN.GetComponentInChildren<TextMeshProUGUI>();
-            if (txt != null) txt.color = !isTR ? colorTextActive : colorTextInactive;
-        }
+    private void SetLangButton(Button btn, bool isActive)
+    {
+        if (btn == null) return;
+        Image img = btn.GetComponent<Image>();
+        if (img != null) img.color = isActive ? colorLangActive : colorLangInactive;
+        TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
+        if (txt != null) txt.color = isActive ? colorTextActive : colorTextInactive;
     }
 
     // ─── VALUE TEXTS ──────────────────────────────────────────────
 
     private void UpdateBGMText(float value)
     {
-        if (bgmValueText != null)
-            bgmValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
+        if (bgmValueText != null) bgmValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
     }
 
     private void UpdateSFXText(float value)
     {
-        if (sfxValueText != null)
-            sfxValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
+        if (sfxValueText != null) sfxValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
     }
 
-    // ─── PANEL AÇMA/KAPAMA ────────────────────────────────────────
+    // ─── PANEL ────────────────────────────────────────────────────
 
     public void OpenSettings()
     {
-        if (settingsPanel != null)
-            settingsPanel.SetActive(true);
+        if (settingsPanel != null) settingsPanel.SetActive(true);
     }
 
     public void CloseSettings()
     {
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 }

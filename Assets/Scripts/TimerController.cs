@@ -2,41 +2,28 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// PixelMatch — Timer Kontrolcüsü
-/// Süreyi yönetir, event sistemi üzerinden herkese bildirir.
-/// Update() yerine Coroutine kullanır — performans için.
-/// </summary>
 public class TimerController : MonoBehaviour
 {
     public static TimerController Instance { get; private set; }
 
-    // ─── INSPECTOR AYARLARI ───────────────────────────────────────
-
     [Header("Süre Ayarları")]
-    [SerializeField] private float totalTime = 120f;   // Saniye cinsinden
+    [SerializeField] private float totalTime = 120f;
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI timerText; // Text_Timer objesi
-
-    // ─── RUNTIME VERİSİ ───────────────────────────────────────────
+    [SerializeField] private TextMeshProUGUI timerText;
 
     private float remainingTime;
     private bool isRunning = false;
-    private Coroutine timerCoroutine;
     private bool useTimer = true;
+    private Coroutine timerCoroutine;
 
     public float TotalTime => totalTime;
-
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
+    public float RemainingTime => remainingTime;
+    public bool IsRunning => isRunning;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
@@ -60,26 +47,10 @@ public class TimerController : MonoBehaviour
 
     // ─── EVENT HANDLERS ───────────────────────────────────────────
 
-    private void HandleGameStarted()
-    {
-        if (!useTimer) return;
-        StartTimer();
-    }
-
-    private void HandleGamePaused()
-    {
-        PauseTimer();
-    }
-
-    private void HandleGameResumed()
-    {
-        ResumeTimer();
-    }
-
-    private void HandleGameEnded()
-    {
-        StopTimer();
-    }
+    private void HandleGameStarted() { if (useTimer) StartTimer(); }
+    private void HandleGamePaused() => PauseTimer();
+    private void HandleGameResumed() => ResumeTimer();
+    private void HandleGameEnded() => StopTimer();
 
     // ─── TIMER KONTROLÜ ───────────────────────────────────────────
 
@@ -89,21 +60,12 @@ public class TimerController : MonoBehaviour
         isRunning = true;
         UpdateTimerUI();
 
-        if (timerCoroutine != null)
-            StopCoroutine(timerCoroutine);
-
+        if (timerCoroutine != null) StopCoroutine(timerCoroutine);
         timerCoroutine = StartCoroutine(TimerCoroutine());
     }
 
-    public void PauseTimer()
-    {
-        isRunning = false;
-    }
-
-    public void ResumeTimer()
-    {
-        isRunning = true;
-    }
+    public void PauseTimer() => isRunning = false;
+    public void ResumeTimer() => isRunning = true;
 
     public void StopTimer()
     {
@@ -120,18 +82,12 @@ public class TimerController : MonoBehaviour
         this.useTimer = useTimer;
         if (!useTimer)
         {
-            // Timer'ı gizle/disable et, başlatma
             if (timerText != null) timerText.gameObject.SetActive(false);
             return;
         }
         totalTime = timeLimit;
     }
 
-    /// <summary>
-    /// Süreye delta ekler — pozitif = süre artar, negatif = azalır.
-    /// Zaman Hırsızı kartı için: AddTime(-5)
-    /// Zaman Donması power-up için: AddTime(+5)
-    /// </summary>
     public void AddTime(float delta)
     {
         remainingTime = Mathf.Max(0, remainingTime + delta);
@@ -149,9 +105,7 @@ public class TimerController : MonoBehaviour
 
             if (!isRunning) continue;
 
-            remainingTime -= 1f;
-            remainingTime = Mathf.Max(0, remainingTime);
-
+            remainingTime = Mathf.Max(0, remainingTime - 1f);
             UpdateTimerUI();
             GameEvents.RaiseTimeChanged(remainingTime);
 
@@ -164,19 +118,13 @@ public class TimerController : MonoBehaviour
         }
     }
 
-    // ─── UI GÜNCELLEME ────────────────────────────────────────────
+    // ─── UI ───────────────────────────────────────────────────────
 
     private void UpdateTimerUI()
     {
         if (timerText == null) return;
-
         int minutes = Mathf.FloorToInt(remainingTime / 60f);
         int seconds = Mathf.FloorToInt(remainingTime % 60f);
-        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        timerText.text = $"{minutes:00}:{seconds:00}";
     }
-
-    // ─── PUBLIC ERİŞİM ────────────────────────────────────────────
-
-    public float RemainingTime => remainingTime;
-    public bool IsRunning => isRunning;
 }

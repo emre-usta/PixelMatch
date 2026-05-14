@@ -209,12 +209,8 @@ public class AudioManager : MonoBehaviour
 
     private void HandleEffectTriggered(CardEffectType effectType)
     {
-        switch (effectType)
-        {
-            case CardEffectType.TimeThief:
-                PlaySFX(sfxTimeThief);
-                break;
-        }
+        if (effectType == CardEffectType.TimeThief)
+            PlaySFX(sfxTimeThief);
     }
 
     // ─── PUBLIC METOTLAR ──────────────────────────────────────────

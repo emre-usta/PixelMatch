@@ -19,54 +19,38 @@ public class EffectManager : MonoBehaviour
         Instance = this;
     }
 
-    private void OnEnable()
-    {
-        GameEvents.OnEffectTriggered += HandleEffectTriggered;
-    }
-
-    private void OnDisable()
-    {
-        GameEvents.OnEffectTriggered -= HandleEffectTriggered;
-    }
+    private void OnEnable() => GameEvents.OnEffectTriggered += HandleEffectTriggered;
+    private void OnDisable() => GameEvents.OnEffectTriggered -= HandleEffectTriggered;
 
     private void HandleEffectTriggered(CardEffectType effectType)
     {
-        switch (effectType)
+        if (effectType != CardEffectType.TimeThief) return;
+
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        Color red = new Color(0.89f, 0.29f, 0.29f);
+
+        ComboEffectManager.Instance?.TriggerTimeThiefFlash();
+
+        if (isMoveMode)
         {
-            case CardEffectType.TimeThief:
-                bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+            MoveController.Instance?.StealMoves(3);
+            string text = LocalizationManager.Get("banner_move_thief");
+            StartCoroutine(ShowFeedback(text, red));
+            StartCoroutine(ShowBanner(text, red));
+        }
+        else
+        {
+            TimerController.Instance?.AddTime(-5f);
+            string text = LocalizationManager.Get("banner_time_thief");
+            StartCoroutine(ShowFeedback(text, red));
+            StartCoroutine(ShowBanner(text, red));
+        }
 
-                // Kırmızı flash efekti
-                ComboEffectManager.Instance?.TriggerTimeThiefFlash();
-
-                if (isMoveMode)
-                {
-                    MoveController.Instance?.StealMoves(3);
-                    StartCoroutine(ShowFeedback(
-                        LocalizationManager.Get("banner_move_thief"),
-                        new Color(0.89f, 0.29f, 0.29f)));
-                    StartCoroutine(ShowBanner(
-                        LocalizationManager.Get("banner_move_thief"),
-                        new Color(0.89f, 0.29f, 0.29f)));
-                }
-                else
-                {
-                    TimerController.Instance?.AddTime(-5f);
-                    StartCoroutine(ShowFeedback(
-                        LocalizationManager.Get("banner_time_thief"),
-                        new Color(0.89f, 0.29f, 0.29f)));
-                    StartCoroutine(ShowBanner(
-                        LocalizationManager.Get("banner_time_thief"),
-                        new Color(0.89f, 0.29f, 0.29f)));
-                }
-
-                if (PlayerPrefs.GetInt("seen_timethief", 0) == 0)
-                {
-                    PlayerPrefs.SetInt("seen_timethief", 1);
-                    PlayerPrefs.Save();
-                    StartCoroutine(ShowTutorialPopup());
-                }
-                break;
+        if (PlayerPrefs.GetInt("seen_timethief", 0) == 0)
+        {
+            PlayerPrefs.SetInt("seen_timethief", 1);
+            PlayerPrefs.Save();
+            StartCoroutine(ShowTutorialPopup());
         }
     }
 
@@ -114,8 +98,8 @@ public class EffectManager : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
-            bannerText.color = new Color(color.r, color.g, color.b, alpha);
+            bannerText.color = new Color(color.r, color.g, color.b,
+                Mathf.Lerp(1f, 0f, elapsed / duration));
             yield return null;
         }
 
@@ -128,35 +112,34 @@ public class EffectManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
 
-        if (timeThiefTutorialPopup != null)
+        if (timeThiefTutorialPopup == null) yield break;
+
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
+        Transform titleT = timeThiefTutorialPopup.transform
+            .Find("Panel_Content/Panel_Title/Text_PauseTitle");
+        if (titleT != null)
         {
-            bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
- 
-            Transform titleTransform = timeThiefTutorialPopup.transform
-                .Find("Panel_Content/Panel_Title/Text_PauseTitle");
-            if (titleTransform != null)
-            {
-                TextMeshProUGUI title = titleTransform.GetComponent<TextMeshProUGUI>();
-                if (title != null)
-                    title.text = isMoveMode
-                        ? LocalizationManager.Get("move_thief_title")
-                        : LocalizationManager.Get("time_thief_title");
-            }
-
-            Transform descTransform = timeThiefTutorialPopup.transform
-                .Find("Panel_Content/Text_Desc");
-            if (descTransform != null)
-            {
-                TextMeshProUGUI desc = descTransform.GetComponent<TextMeshProUGUI>();
-                if (desc != null)
-                    desc.text = isMoveMode
-                        ? LocalizationManager.Get("move_thief_desc")
-                        : LocalizationManager.Get("time_thief_desc");
-            }
-
-            Time.timeScale = 0f;
-            timeThiefTutorialPopup.SetActive(true);
+            TextMeshProUGUI title = titleT.GetComponent<TextMeshProUGUI>();
+            if (title != null)
+                title.text = isMoveMode
+                    ? LocalizationManager.Get("move_thief_title")
+                    : LocalizationManager.Get("time_thief_title");
         }
+
+        Transform descT = timeThiefTutorialPopup.transform
+            .Find("Panel_Content/Text_Desc");
+        if (descT != null)
+        {
+            TextMeshProUGUI desc = descT.GetComponent<TextMeshProUGUI>();
+            if (desc != null)
+                desc.text = isMoveMode
+                    ? LocalizationManager.Get("move_thief_desc")
+                    : LocalizationManager.Get("time_thief_desc");
+        }
+
+        Time.timeScale = 0f;
+        timeThiefTutorialPopup.SetActive(true);
     }
 
     public void OnTutorialPopupClosed()

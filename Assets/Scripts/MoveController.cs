@@ -1,42 +1,28 @@
 ﻿using UnityEngine;
 using TMPro;
 
-/// <summary>
-/// PixelMatch — Hamle Kontrolcüsü
-/// Yapılan hamleleri sayar ve UI'a yansıtır.
-/// İleride Hamle Modu için limit desteği de burada.
-/// </summary>
 public class MoveController : MonoBehaviour
 {
     public static MoveController Instance { get; private set; }
 
-    // ─── INSPECTOR AYARLARI ───────────────────────────────────────
-
     [Header("Hamle Modu Ayarları")]
-    [SerializeField] private bool useMoveLimit = false;   // Klasik modda false
-    [SerializeField] private int moveLimit = 30;          // Hamle modu için
+    [SerializeField] private bool useMoveLimit = false;
+    [SerializeField] private int moveLimit = 30;
 
     [Header("UI")]
-    [SerializeField] private TextMeshProUGUI moveText;    // Opsiyonel — HUD'a eklenirse
-
-    public int MoveLimit => moveLimit;
-
-    // ─── RUNTIME VERİSİ ───────────────────────────────────────────
+    [SerializeField] private TextMeshProUGUI moveText;
 
     private int moveCount = 0;
+    private int frozenMoves = 0;
 
-    // ─── FREEZE ───────────────────────────────────────────────────
-    private int frozenMoves = 0; // Kaç hamle daha ücretsiz
-
-    // ─── UNITY LIFECYCLE ──────────────────────────────────────────
+    public int MoveLimit => moveLimit;
+    public int MoveCount => moveCount;
+    public bool UseMoveLimit => useMoveLimit;
+    public int RemainingMoves => moveLimit - moveCount;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
@@ -60,19 +46,15 @@ public class MoveController : MonoBehaviour
         this.moveLimit = moveLimit;
     }
 
-
-    // ─── EVENT HANDLERS ───────────────────────────────────────────
-
     private void HandleGameStarted()
     {
         moveCount = 0;
-        UpdateUI(); // "Moves: 0" yerine UpdateUI() çağır — moveLimit'i gösterir
+        UpdateUI();
     }
 
     public void ActivateFreezeForMoves(int freeMovesCount)
     {
         frozenMoves = freeMovesCount;
-        Debug.Log($"[MoveController] {freeMovesCount} hamle ücretsiz!");
     }
 
     private void HandlePairResult(CardController a, CardController b)
@@ -80,9 +62,8 @@ public class MoveController : MonoBehaviour
         if (frozenMoves > 0)
         {
             frozenMoves--;
-            Debug.Log($"[MoveController] Ücretsiz hamle kullanıldı. Kalan: {frozenMoves}");
             UpdateUI();
-            return; // Hamle sayılmaz
+            return;
         }
 
         moveCount++;
@@ -93,25 +74,19 @@ public class MoveController : MonoBehaviour
             GameStateManager.Instance.LoseGame();
     }
 
-    // ─── UI GÜNCELLEME ────────────────────────────────────────────
-
     private void UpdateUI()
     {
         if (moveText == null) return;
-
-        if (useMoveLimit)
-            moveText.text = $"{moveLimit - moveCount}";
-        else
-            moveText.text = $"{moveCount}";
+        moveText.text = useMoveLimit
+            ? $"{moveLimit - moveCount}"
+            : $"{moveCount}";
     }
 
-    //--------------------------------------------------------------
     public void StealMoves(int amount)
     {
         moveCount += amount;
         UpdateUI();
         GameEvents.RaiseMoveUsed(useMoveLimit ? moveLimit - moveCount : moveCount);
-        Debug.Log($"[MoveController] Hamle Hırsızı: +{amount} hamle eklendi. Toplam: {moveCount}");
 
         if (useMoveLimit && moveCount >= moveLimit)
             GameStateManager.Instance.LoseGame();
@@ -119,17 +94,9 @@ public class MoveController : MonoBehaviour
 
     public void AddMoves(int amount)
     {
-        if (!useMoveLimit) return; // Move modunda değilse ekleme
-
+        if (!useMoveLimit) return;
         moveLimit += amount;
         UpdateUI();
         GameEvents.RaiseMoveUsed(moveLimit - moveCount);
-        Debug.Log($"[MoveController] Combo ödülü: +{amount} hamle. Yeni limit: {moveLimit}");
     }
-
-    // ─── PUBLIC ERİŞİM ────────────────────────────────────────────
-
-    public int MoveCount => moveCount;
-    public bool UseMoveLimit => useMoveLimit;
-    public int RemainingMoves => moveLimit - moveCount;
 }

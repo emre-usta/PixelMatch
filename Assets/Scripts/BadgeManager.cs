@@ -14,27 +14,17 @@ public class BadgeManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
-    {
-        UpdateBadge();
-    }
+    private void Start() => UpdateBadge();
 
     public void UpdateBadge()
     {
         if (txtBadge == null) return;
-
         int totalStars = GetTotalStars();
-        string title = GetTitle(totalStars);
-        txtBadge.text = title;
-
-        // Renge göre unvan
+        txtBadge.text = GetTitle(totalStars);
         txtBadge.color = GetTitleColor(totalStars);
     }
 
-    public int GetTotalStars()
-    {
-        return PlayerPrefs.GetInt("total_stars", 0);
-    }
+    public int GetTotalStars() => PlayerPrefs.GetInt("total_stars", 0);
 
     public void AddStars(int amount)
     {
@@ -54,10 +44,10 @@ public class BadgeManager : MonoBehaviour
 
     private Color GetTitleColor(int stars)
     {
-        if (stars >= 120) return new Color(0.32f, 0.93f, 0.51f); // #51ED82 yeşil
-        if (stars >= 80) return new Color(0.96f, 0.65f, 0.14f); // #F5A623 amber
-        if (stars >= 45) return new Color(0.27f, 0.67f, 1.00f); // #44AAFF mavi
-        if (stars >= 15) return new Color(0.98f, 0.78f, 0.46f); // #FAC775 sarı
-        return new Color(0.67f, 0.67f, 0.67f);                   // #AAAAAA gri
+        if (stars >= 120) return new Color(0.32f, 0.93f, 0.51f);
+        if (stars >= 80) return new Color(0.96f, 0.65f, 0.14f);
+        if (stars >= 45) return new Color(0.27f, 0.67f, 1.00f);
+        if (stars >= 15) return new Color(0.98f, 0.78f, 0.46f);
+        return new Color(0.67f, 0.67f, 0.67f);
     }
 }

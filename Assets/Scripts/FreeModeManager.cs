@@ -35,7 +35,7 @@ public class FreeModeManager : MonoBehaviour
     [Header("Grid Butonları")]
     [SerializeField] private Button btn4x4;
     [SerializeField] private Button btn4x5;
-    [SerializeField] private Button btn5x6;  // ← 5x4 yerine 5x6
+    [SerializeField] private Button btn5x6;
     [SerializeField] private Button btn6x6;
 
     [Header("Zorluk Butonları")]
@@ -73,6 +73,7 @@ public class FreeModeManager : MonoBehaviour
         SelectedRows = 4;
         SelectedDifficulty = DifficultyLevel.Easy;
         SelectedMode = LevelSelectManager.GameMode.Classic;
+
         if (categories != null && categories.Length > 0)
             SelectedCategory = categories[0];
 
@@ -92,9 +93,10 @@ public class FreeModeManager : MonoBehaviour
         HighlightButton(categoryButtons, 0, false);
     }
 
+    // ─── BUTON KURULUM ────────────────────────────────────────────
+
     private void SetupButtons()
     {
-        // Kategori butonları
         for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
         {
             CategoryConfig cat = categories[i];
@@ -105,7 +107,7 @@ public class FreeModeManager : MonoBehaviour
 
         btn4x4?.onClick.AddListener(() => SelectGrid(4, 4));
         btn4x5?.onClick.AddListener(() => SelectGrid(4, 5));
-        btn5x6?.onClick.AddListener(() => SelectGrid(5, 6)); // ← 5x6
+        btn5x6?.onClick.AddListener(() => SelectGrid(5, 6));
         btn6x6?.onClick.AddListener(() => SelectGrid(6, 6));
 
         btnEasy?.onClick.AddListener(() => SelectDifficulty(DifficultyLevel.Easy));
@@ -118,6 +120,8 @@ public class FreeModeManager : MonoBehaviour
         btnStart?.onClick.AddListener(StartFreeMode);
     }
 
+    // ─── STATİK RESET ─────────────────────────────────────────────
+
     public static void ResetFreeModeState()
     {
         IsFreeModeActive = false;
@@ -126,10 +130,10 @@ public class FreeModeManager : MonoBehaviour
         SelectedDifficulty = DifficultyLevel.Easy;
         SelectedMode = LevelSelectManager.GameMode.Classic;
         SelectedCategory = null;
-        Debug.Log("[FreeModeManager] State sıfırlandı.");
     }
 
     // ─── DİL GÜNCELLEMESİ ────────────────────────────────────────
+
     public void UpdateButtonLabels()
     {
         SetButtonLabel(btnEasy, "difficulty_easy");
@@ -138,7 +142,6 @@ public class FreeModeManager : MonoBehaviour
         SetButtonLabel(btnClassic, "mode_classic");
         SetButtonLabel(btnMove, "mode_move");
 
-        // Kategori butonlarını da güncelle
         for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
         {
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
@@ -153,8 +156,7 @@ public class FreeModeManager : MonoBehaviour
     {
         if (btn == null) return;
         TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
-        if (txt != null)
-            txt.text = LocalizationManager.Get(key);
+        if (txt != null) txt.text = LocalizationManager.Get(key);
     }
 
     // ─── SEÇİM METOTLARI ──────────────────────────────────────────
@@ -163,7 +165,6 @@ public class FreeModeManager : MonoBehaviour
     {
         SelectedCategory = category;
         HighlightButton(categoryButtons, System.Array.IndexOf(categories, category), false);
-        Debug.Log($"[FreeModeManager] Kategori: {category.categoryName}");
     }
 
     private void SelectGrid(int cols, int rows)
@@ -175,9 +176,8 @@ public class FreeModeManager : MonoBehaviour
         Button[] gridBtns = { btn4x4, btn4x5, btn5x6, btn6x6 };
         int index = (cols == 4 && rows == 4) ? 0 :
                     (cols == 4 && rows == 5) ? 1 :
-                    (cols == 5 && rows == 6) ? 2 : 3; // ← 5x6
+                    (cols == 5 && rows == 6) ? 2 : 3;
         HighlightButton(gridBtns, index, false);
-        Debug.Log($"[FreeModeManager] Grid: {cols}x{rows}");
     }
 
     private void SelectDifficulty(DifficultyLevel difficulty)
@@ -187,7 +187,6 @@ public class FreeModeManager : MonoBehaviour
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
         HighlightButton(diffBtns, (int)difficulty, false);
-        Debug.Log($"[FreeModeManager] Zorluk: {difficulty}");
     }
 
     private void SelectMode(LevelSelectManager.GameMode mode)
@@ -197,10 +196,10 @@ public class FreeModeManager : MonoBehaviour
 
         Button[] modeBtns = { btnClassic, btnMove };
         HighlightButton(modeBtns, mode == LevelSelectManager.GameMode.Classic ? 0 : 1, false);
-        Debug.Log($"[FreeModeManager] Mod: {mode}");
     }
 
     // ─── BUTON VURGULAMA ──────────────────────────────────────────
+
     private void HighlightButton(Button[] buttons, int selectedIndex, bool isDifficulty)
     {
         for (int i = 0; i < buttons.Length; i++)
@@ -228,6 +227,7 @@ public class FreeModeManager : MonoBehaviour
     }
 
     // ─── LİMİT BİLGİSİ ───────────────────────────────────────────
+
     private void UpdateLimitInfo()
     {
         if (limitConfig == null) return;
@@ -245,18 +245,14 @@ public class FreeModeManager : MonoBehaviour
     }
 
     // ─── OYUN BAŞLATMA ────────────────────────────────────────────
+
     private void StartFreeMode()
     {
-        if (SelectedCategory == null)
-        {
-            Debug.LogWarning("[FreeModeManager] Kategori seçilmedi!");
-            return;
-        }
+        if (SelectedCategory == null) return;
 
         IsFreeModeActive = true;
         LevelSelectManager.SelectedMode = SelectedMode;
         SceneManager.LoadScene("Level1");
-        Debug.Log($"[FreeModeManager] Serbest Mod başlatıldı: {SelectedColumns}x{SelectedRows} {SelectedDifficulty} {SelectedMode}");
     }
 
     public void OnBackClicked()

@@ -14,6 +14,10 @@ public class GameStateManager : MonoBehaviour
 
     private void Awake()
     {
+#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+            Debug.unityLogger.logEnabled = false;
+#endif
+
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         SetState(GameState.Initializing);
@@ -26,14 +30,10 @@ public class GameStateManager : MonoBehaviour
 
     public void OnGridReady()
     {
-        // Tutorial aktifse başlatma — tutorial tamamlayınca tekrar çağrılacak
         if (TutorialManager.Instance != null &&
             TutorialManager.Instance.gameObject.activeInHierarchy &&
             PlayerPrefs.GetInt("tutorial_done", 0) == 0)
-        {
-            Debug.Log("[GameStateManager] Tutorial bekleniyor...");
             return;
-        }
 
         SetState(GameState.Playing);
         GameEvents.RaiseGameStarted();
@@ -64,7 +64,6 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
 
-        // Combo efekti varsa bekle, yoksa direkt aç
         float delay = ComboEffectManager.Instance != null ? 1.2f : 0f;
         StartCoroutine(ShowWinPanelDelayed(delay));
     }
@@ -130,7 +129,6 @@ public class GameStateManager : MonoBehaviour
         if (PowerUpManager.Instance == null) return;
         PowerUpManager.Instance.AddPowerUp(PowerUpType.MindFreeze);
         PowerUpManager.Instance.AddPowerUp(PowerUpType.TimeFreeze);
-        Debug.Log("[DC] Ödül: 1 İpucu + 1 Süre Dondur kazanıldı!");
     }
 
     private int CalculateStars()
@@ -161,9 +159,6 @@ public class GameStateManager : MonoBehaviour
             int remainingMoves = moveLimit - usedMoves;
             float remainingRatio = (float)remainingMoves / moveLimit;
 
-            // %50+ kalan → 3 yıldız
-            // %20-50 kalan → 2 yıldız
-            // %0-20 kalan → 1 yıldız
             if (remainingRatio >= 0.50f) return 3;
             if (remainingRatio >= 0.20f) return 2;
             return 1;
@@ -175,40 +170,26 @@ public class GameStateManager : MonoBehaviour
                 ? TimerController.Instance.RemainingTime : 0f;
             float remainingRatio = remainingTime / timeLimit;
 
-            // %60+ kalan → 3 yıldız
-            // %30-60 kalan → 2 yıldız
-            // %0-30 kalan → 1 yıldız
             if (remainingRatio >= 0.60f) return 3;
             if (remainingRatio >= 0.30f) return 2;
             return 1;
         }
     }
+
     private void SaveStars(int stars)
     {
-        if (LevelProgressManager.Instance == null)
-        {
-            Debug.LogError("[SaveStars] LevelProgressManager null!");
-            return;
-        }
+        if (LevelProgressManager.Instance == null) return;
 
         int categoryID = LevelSelectManager.SelectedCategoryID;
         int levelID = LevelSelectManager.SelectedLevel.levelID;
-
         int previousStars = LevelProgressManager.Instance.GetBestStars(categoryID, levelID);
-        Debug.Log($"[SaveStars] Önceki:{previousStars}, Yeni:{stars}");
 
         if (stars > previousStars)
         {
             int diff = stars - previousStars;
             int totalStars = PlayerPrefs.GetInt("total_stars", 0);
-            int newTotal = totalStars + diff;
-            PlayerPrefs.SetInt("total_stars", newTotal);
+            PlayerPrefs.SetInt("total_stars", totalStars + diff);
             PlayerPrefs.Save();
-            Debug.Log($"[SaveStars] Toplam yıldız güncellendi: {totalStars} → {newTotal}");
-        }
-        else
-        {
-            Debug.Log($"[SaveStars] Yıldız artmadı: yeni({stars}) <= önceki({previousStars})");
         }
 
         LevelProgressManager.Instance.SaveBestStars(categoryID, levelID, stars);
@@ -224,8 +205,6 @@ public class GameStateManager : MonoBehaviour
         string recordKey = $"record_{categoryID}_{levelID}_{mode}";
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
-        Debug.Log($"[SaveRecord] categoryID:{categoryID}, levelID:{levelID}, mode:{mode}, key:{recordKey}");
-
         if (isMoveMode)
         {
             int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 0;
@@ -234,7 +213,6 @@ public class GameStateManager : MonoBehaviour
             {
                 PlayerPrefs.SetInt(recordKey + "_moves", usedMoves);
                 PlayerPrefs.Save();
-                Debug.Log($"[GameStateManager] Hamle rekoru kaydedildi: {usedMoves}");
             }
         }
         else
@@ -246,7 +224,6 @@ public class GameStateManager : MonoBehaviour
             {
                 PlayerPrefs.SetFloat(recordKey, usedTime);
                 PlayerPrefs.Save();
-                Debug.Log($"[GameStateManager] Süre rekoru kaydedildi: {usedTime:F1}s");
             }
         }
     }
@@ -262,42 +239,29 @@ public class GameStateManager : MonoBehaviour
         int nextLevelID = currentLevelID + 1;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
-
         if (!isLastLevel)
         {
             LevelProgressManager.Instance.UnlockLevel(categoryID, nextLevelID);
-            Debug.Log($"[GameStateManager] Level açıldı: Cat{categoryID} Lv{nextLevelID}");
         }
         else
         {
             int nextCategoryID = categoryID + 1;
             if (LevelSelectManager.Instance != null &&
                 nextCategoryID < LevelSelectManager.TotalCategoryCount)
-            {
                 LevelProgressManager.Instance.UnlockCategory(nextCategoryID);
-                Debug.Log($"[GameStateManager] Kategori açıldı: {nextCategoryID}");
-            }
-            else
-            {
-                Debug.Log("[GameStateManager] Son kategori tamamlandı.");
-            }
         }
 
-        // 2 yıldız
         if (stars == 2)
         {
             PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
             NotifyWinPanel(PowerUpType.XRay);
-            Debug.Log("[GameStateManager] 2 yıldız — Açık Bak kazanıldı!");
         }
 
-        // 3 yıldız
         if (stars == 3)
         {
             PowerUpType reward = Random.value > 0.5f ? PowerUpType.MindFreeze : PowerUpType.TimeFreeze;
             PowerUpManager.Instance?.AddPowerUp(reward);
             NotifyWinPanel(reward);
-            Debug.Log($"[GameStateManager] 3 yıldız — {reward} kazanıldı!");
         }
     }
 
@@ -360,8 +324,7 @@ public class GameStateManager : MonoBehaviour
             if (tilesTxt != null)
             {
                 int remaining = GridManager.Instance != null
-                    ? GridManager.Instance.RemainingPairs * 2
-                    : 0;
+                    ? GridManager.Instance.RemainingPairs * 2 : 0;
                 tilesTxt.text = remaining.ToString("D2");
             }
         }
@@ -376,7 +339,6 @@ public class GameStateManager : MonoBehaviour
         Transform valueT = panelGameOver.transform
             .Find("Panel_LoseContent/Panel_LoseStatCard/Panel_TotalPoints/Text_PointsValue");
 
-        // Label
         if (labelT != null)
         {
             TMPro.TextMeshProUGUI label = labelT.GetComponent<TMPro.TextMeshProUGUI>();
@@ -384,7 +346,6 @@ public class GameStateManager : MonoBehaviour
                 label.text = LocalizationManager.Get("completion_label");
         }
 
-        // Yüzde değeri
         if (valueT != null)
         {
             TMPro.TextMeshProUGUI value = valueT.GetComponent<TMPro.TextMeshProUGUI>();
@@ -422,7 +383,6 @@ public class GameStateManager : MonoBehaviour
     private void SetState(GameState newState)
     {
         CurrentState = newState;
-        Debug.Log($"[GameStateManager] State: {newState}");
     }
 
     public void LoadMainMenu()
@@ -430,9 +390,7 @@ public class GameStateManager : MonoBehaviour
         if (DailyChallengeManager.IsDailyChallengeActive)
             DailyChallengeManager.SetInactive();
 
-        // FreeModeManager'ı sıfırla ← ekle
         FreeModeManager.ResetFreeModeState();
-
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
@@ -446,7 +404,6 @@ public class GameStateManager : MonoBehaviour
                 DailyChallengeManager.SetInactive();
                 Time.timeScale = 1f;
                 SceneManager.LoadScene("MainMenu");
-                Debug.Log("[DC] Deneme hakkı doldu, ana menüye dönüldü.");
                 return;
             }
         }

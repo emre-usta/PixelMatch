@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,7 +30,6 @@ public class PowerUpUI : MonoBehaviour
     private void Start()
     {
         UpdateUI();
-
         btnReveal?.onClick.AddListener(() => PowerUpManager.Instance?.UseXRay());
         btnHint?.onClick.AddListener(() => PowerUpManager.Instance?.UseHint());
         btnFreeze?.onClick.AddListener(() => PowerUpManager.Instance?.UseTimeFreeze());
@@ -45,12 +43,10 @@ public class PowerUpUI : MonoBehaviour
         int hintCount = PowerUpManager.Instance.GetCount(PowerUpType.MindFreeze);
         int freezeCount = PowerUpManager.Instance.GetCount(PowerUpType.TimeFreeze);
 
-        // Adet metinleri
         if (txtRevealCount) txtRevealCount.text = revealCount.ToString();
         if (txtHintCount) txtHintCount.text = hintCount.ToString();
         if (txtFreezeCount) txtFreezeCount.text = freezeCount.ToString();
 
-        // 0 ise buton gri
         if (btnReveal) btnReveal.interactable = revealCount > 0;
         if (btnHint) btnHint.interactable = hintCount > 0;
         if (btnFreeze) btnFreeze.interactable = freezeCount > 0;
@@ -58,14 +54,12 @@ public class PowerUpUI : MonoBehaviour
 
     public void ShowFreezeFeedback()
     {
-        if (freezeFeedbackPanel != null)
-            freezeFeedbackPanel.SetActive(true);
+        if (freezeFeedbackPanel != null) freezeFeedbackPanel.SetActive(true);
         Invoke(nameof(HideFreezeFeedback), 5f);
     }
 
     public void HideFreezeFeedback()
     {
-        if (freezeFeedbackPanel != null)
-            freezeFeedbackPanel.SetActive(false);
+        if (freezeFeedbackPanel != null) freezeFeedbackPanel.SetActive(false);
     }
 }
