@@ -34,13 +34,33 @@ public class PowerUpManager : MonoBehaviour
     {
         string key = GetKey(type);
         int current = PlayerPrefs.GetInt(key, 0);
-        if (current <= 0) return false;
+
+        if (current <= 0)
+        {
+            Debug.Log($"AdRewardPopup instance: {AdRewardPopup.Instance}");
+            AdRewardPopup.Instance?.ShowForPowerUp(type, () =>
+            {
+                AddPowerUp(type, 1);
+                //UseAfterAd(type);
+            });
+            return false;
+        }
 
         PlayerPrefs.SetInt(key, current - 1);
         PlayerPrefs.Save();
         PowerUpUI.Instance?.UpdateUI();
         return true;
     }
+
+    /*private void UseAfterAd(PowerUpType type)
+    {
+        switch (type)
+        {
+            case PowerUpType.XRay: StartCoroutine(XRayCoroutine()); break;
+            case PowerUpType.MindFreeze: StartCoroutine(HintCoroutine()); break;
+            case PowerUpType.TimeFreeze: StartCoroutine(TimeFreezeCoroutine()); break;
+        }
+    }*/
 
     private string GetKey(PowerUpType type) => type switch
     {

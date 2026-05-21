@@ -121,6 +121,21 @@ public class LocalizationManager : MonoBehaviour
         strings["powerup_hint"] = "İPUCU";
         strings["powerup_freeze"] = "DONDUR";
 
+        // Ads
+        strings["ad_powerup_title"] = "GÜÇLENME KAZAN!";
+        strings["ad_powerup_desc"] = "Reklam izle, 1 adet kazan:";
+        strings["ad_second_chance_title"] = "İKİNCİ ŞANS!";
+        strings["ad_second_chance_time"] = "Reklam izle, +30 saniye kazan!";
+        strings["ad_second_chance_move"] = "Reklam izle, +10 hamle kazan!";
+        strings["ad_unlock_title"] = "SEVİYEYİ AÇ!";
+        strings["ad_unlock_desc"] = "Reklam izleyerek bu seviyeyi kalıcı aç!";
+        strings["ad_watch"] = "REKLAMI İZLE";
+        strings["ad_decline"] = "HAYIR, TEŞEKKÜRLER";
+        strings["btn_ok"] = "TAMAM";
+        strings["ad_locked_title"] = "SEVİYE KİLİTLİ!";
+        strings["ad_locked_desc"] = "Reklam ile açtığın seviyeyi\ntamamlamadan yeni seviye açamazsın.";
+
+
         // Game Mode Select
         strings["select_mode"] = "MOD SEÇ";
         strings["classic_title"] = "KLASİK";
@@ -264,6 +279,20 @@ public class LocalizationManager : MonoBehaviour
         strings["powerup_peek"] = "PEEK";
         strings["powerup_hint"] = "HINT";
         strings["powerup_freeze"] = "FREEZE";
+
+        // Ads
+        strings["ad_powerup_title"] = "EARN A POWER-UP!";
+        strings["ad_powerup_desc"] = "Watch an ad to earn 1:";
+        strings["ad_second_chance_title"] = "SECOND CHANCE!";
+        strings["ad_second_chance_time"] = "Watch ad, earn +30 seconds!";
+        strings["ad_second_chance_move"] = "Watch ad, earn +10 moves!";
+        strings["ad_unlock_title"] = "UNLOCK LEVEL!";
+        strings["ad_unlock_desc"] = "Watch an ad to permanently unlock!";
+        strings["ad_watch"] = "WATCH AD";
+        strings["ad_decline"] = "NO, THANKS";
+        strings["btn_ok"] = "OK";
+        strings["ad_locked_title"] = "LEVEL LOCKED!";
+        strings["ad_locked_desc"] = "Complete the level you unlocked\nwith an ad before opening a new one.";
 
         // Game Mode Select
         strings["select_mode"] = "SELECT MODE";

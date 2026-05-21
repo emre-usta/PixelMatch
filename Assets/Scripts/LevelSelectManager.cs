@@ -118,6 +118,11 @@ public class LevelSelectManager : MonoBehaviour
                 ? LevelProgressManager.Instance.IsLevelUnlocked(selectedCategory.categoryID, i)
                 : i == 0;
 
+            // Reklam ile açılmış leveller de unlocked sayılır
+            bool adUnlockedCheck = PlayerPrefs.GetInt(
+                $"ad_unlocked_{selectedCategory.categoryID}_{i}", 0) == 1;
+            if (adUnlockedCheck) isUnlocked = true;
+
             bool isNew = isUnlocked && i > 0 &&
                 LevelProgressManager.Instance != null &&
                 LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i) == 0 &&
@@ -360,14 +365,99 @@ public class LevelSelectManager : MonoBehaviour
         Button btn = card.GetComponent<Button>();
         if (btn != null)
         {
-            btn.interactable = isUnlocked;
+            btn.interactable = true;
+            int capturedIndex = levelIndex;
+
             if (isUnlocked)
             {
-                int capturedIndex = levelIndex;
                 btn.onClick.AddListener(() =>
                     LevelPopupManager.Instance.ShowPopup(level, capturedIndex));
             }
+            else
+            {
+                bool canUnlock = IsNextUnlockableLevel(selectedCategory, levelIndex);
+
+                if (canUnlock)
+                {
+                    btn.onClick.AddListener(() =>
+                    {
+                        AdRewardPopup.Instance?.ShowForLockedLevel(
+                            selectedCategory.categoryID,
+                            capturedIndex,
+                            onSuccess: () =>
+                            {
+                                LevelProgressManager.Instance?.UnlockLevel(
+                                    selectedCategory.categoryID, capturedIndex);
+                                LevelPopupManager.Instance.ShowPopup(level, capturedIndex);
+                                LoadCategory(selectedCategoryIndex);
+                            }
+                        );
+                    });
+                }
+                else
+                {
+                    // Tamamlanmamış reklam leveli var mı kontrol et
+                    bool hasUnfinishedAdLevel = false;
+                    for (int i = 0; i < selectedCategory.levels.Length; i++)
+                    {
+                        bool adUnlocked = PlayerPrefs.GetInt(
+                            $"ad_unlocked_{selectedCategory.categoryID}_{i}", 0) == 1;
+                        int stars = LevelProgressManager.Instance?.GetBestStars(
+                            selectedCategory.categoryID, i) ?? 0;
+
+                        if (adUnlocked && stars == 0)
+                        {
+                            hasUnfinishedAdLevel = true;
+                            break;
+                        }
+                    }
+
+                    if (hasUnfinishedAdLevel)
+                    {
+                        btn.onClick.AddListener(() =>
+                            AdRewardPopup.Instance?.ShowInfo(
+                                LocalizationManager.Get("ad_locked_title"),
+                                LocalizationManager.Get("ad_locked_desc")
+                            ));
+                    }
+                    else
+                    {
+                        btn.interactable = false;
+                    }
+                }
+            }
         }
+    }
+
+    // ─── REKLAM İLE AÇILABİLİR Mİ ───────────────────────────────
+
+    private bool IsNextUnlockableLevel(CategoryConfig category, int levelIndex)
+    {
+        if (LevelProgressManager.Instance == null) return false;
+
+        int lastUnlockedIndex = -1;
+        for (int i = 0; i < category.levels.Length; i++)
+        {
+            bool unlocked = LevelProgressManager.Instance.IsLevelUnlocked(category.categoryID, i);
+            bool adUnlocked = PlayerPrefs.GetInt($"ad_unlocked_{category.categoryID}_{i}", 0) == 1;
+
+            if (unlocked || adUnlocked)
+                lastUnlockedIndex = i;
+            else
+                break;
+        }
+
+        if (levelIndex != lastUnlockedIndex + 1) return false;
+
+        for (int i = 0; i <= lastUnlockedIndex; i++)
+        {
+            bool adUnlocked = PlayerPrefs.GetInt($"ad_unlocked_{category.categoryID}_{i}", 0) == 1;
+            int stars = LevelProgressManager.Instance.GetBestStars(category.categoryID, i);
+
+            if (adUnlocked && stars == 0) return false;
+        }
+
+        return true;
     }
 
     // ─── NEW TAG ANİMASYONU ───────────────────────────────────────
@@ -415,6 +505,16 @@ public class LevelSelectManager : MonoBehaviour
             txtHintCount.text = $"{LocalizationManager.Get("powerup_hint")}({hintCount})";
         if (txtFreezeCount != null)
             txtFreezeCount.text = $"{LocalizationManager.Get("powerup_freeze")}({freezeCount})";
+    }
+
+    public void OnPowerUpClicked(int powerUpType)
+    {
+        PowerUpType type = (PowerUpType)powerUpType;
+        AdRewardPopup.Instance?.ShowForPowerUp(type, () =>
+        {
+            PowerUpManager.Instance?.AddPowerUp(type, 1);
+            UpdatePowerUpUI();
+        });
     }
 
     // ─── LEVEL SEÇİMİ ─────────────────────────────────────────────

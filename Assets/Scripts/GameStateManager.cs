@@ -17,7 +17,6 @@ public class GameStateManager : MonoBehaviour
 #if !UNITY_EDITOR && !DEVELOPMENT_BUILD
             Debug.unityLogger.logEnabled = false;
 #endif
-
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         SetState(GameState.Initializing);
@@ -156,9 +155,7 @@ public class GameStateManager : MonoBehaviour
         {
             if (moveLimit <= 0) return 0;
             int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 99;
-            int remainingMoves = moveLimit - usedMoves;
-            float remainingRatio = (float)remainingMoves / moveLimit;
-
+            float remainingRatio = (float)(moveLimit - usedMoves) / moveLimit;
             if (remainingRatio >= 0.50f) return 3;
             if (remainingRatio >= 0.20f) return 2;
             return 1;
@@ -166,10 +163,8 @@ public class GameStateManager : MonoBehaviour
         else
         {
             if (timeLimit <= 0) return 0;
-            float remainingTime = TimerController.Instance != null
-                ? TimerController.Instance.RemainingTime : 0f;
+            float remainingTime = TimerController.Instance != null ? TimerController.Instance.RemainingTime : 0f;
             float remainingRatio = remainingTime / timeLimit;
-
             if (remainingRatio >= 0.60f) return 3;
             if (remainingRatio >= 0.30f) return 2;
             return 1;
@@ -209,22 +204,14 @@ public class GameStateManager : MonoBehaviour
         {
             int usedMoves = MoveController.Instance != null ? MoveController.Instance.MoveCount : 0;
             int existing = PlayerPrefs.GetInt(recordKey + "_moves", 9999);
-            if (usedMoves < existing)
-            {
-                PlayerPrefs.SetInt(recordKey + "_moves", usedMoves);
-                PlayerPrefs.Save();
-            }
+            if (usedMoves < existing) { PlayerPrefs.SetInt(recordKey + "_moves", usedMoves); PlayerPrefs.Save(); }
         }
         else
         {
             float usedTime = LevelSelectManager.SelectedLevel.timeLimit -
                 (TimerController.Instance != null ? TimerController.Instance.RemainingTime : 0f);
             float existing = PlayerPrefs.GetFloat(recordKey, 9999f);
-            if (usedTime < existing)
-            {
-                PlayerPrefs.SetFloat(recordKey, usedTime);
-                PlayerPrefs.Save();
-            }
+            if (usedTime < existing) { PlayerPrefs.SetFloat(recordKey, usedTime); PlayerPrefs.Save(); }
         }
     }
 
@@ -236,12 +223,11 @@ public class GameStateManager : MonoBehaviour
         int currentLevelID = LevelSelectManager.SelectedLevel.levelID;
         int categoryID = LevelSelectManager.SelectedCategoryID;
         int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
-        int nextLevelID = currentLevelID + 1;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
         if (!isLastLevel)
         {
-            LevelProgressManager.Instance.UnlockLevel(categoryID, nextLevelID);
+            LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID + 1);
         }
         else
         {
@@ -264,6 +250,8 @@ public class GameStateManager : MonoBehaviour
             NotifyWinPanel(reward);
         }
     }
+
+    // ─── LOSE ─────────────────────────────────────────────────────
 
     public void LoseGame()
     {
@@ -302,6 +290,27 @@ public class GameStateManager : MonoBehaviour
             return;
         }
 
+        // İkinci şans popup
+        AdRewardPopup.Instance?.ShowForSecondChance(
+            onSuccess: () => ApplySecondChance(),
+            onDecline: () => ShowGameOverPanel()
+        );
+    }
+
+    private void ApplySecondChance()
+    {
+        SetState(GameState.Playing);
+        Time.timeScale = 1f;
+
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        if (isMoveMode)
+            MoveController.Instance?.AddMoves(10);
+        else
+            TimerController.Instance?.AddTime(30f);
+    }
+
+    private void ShowGameOverPanel()
+    {
         if (panelGameOver != null)
         {
             panelGameOver.SetActive(true);
@@ -310,6 +319,8 @@ public class GameStateManager : MonoBehaviour
             UpdateTotalPoints();
         }
     }
+
+    // ─── UI GÜNCELLEME ────────────────────────────────────────────
 
     private void UpdateTilesRemaining()
     {
@@ -351,11 +362,8 @@ public class GameStateManager : MonoBehaviour
             TMPro.TextMeshProUGUI value = valueT.GetComponent<TMPro.TextMeshProUGUI>();
             if (value != null)
             {
-                int matched = GridManager.Instance != null
-                    ? GridManager.Instance.MatchedPairCount : 0;
-                int total = GridManager.Instance != null
-                    ? GridManager.Instance.TotalPairCount : 1;
-
+                int matched = GridManager.Instance != null ? GridManager.Instance.MatchedPairCount : 0;
+                int total = GridManager.Instance != null ? GridManager.Instance.TotalPairCount : 1;
                 int percent = Mathf.RoundToInt((float)matched / total * 100f);
                 value.text = $"%{percent}";
             }
@@ -380,10 +388,7 @@ public class GameStateManager : MonoBehaviour
 
     public bool IsPlaying => CurrentState == GameState.Playing;
 
-    private void SetState(GameState newState)
-    {
-        CurrentState = newState;
-    }
+    private void SetState(GameState newState) => CurrentState = newState;
 
     public void LoadMainMenu()
     {
@@ -414,7 +419,10 @@ public class GameStateManager : MonoBehaviour
     public void NextOrRetryWin()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("LevelSelect");
+        AdManager.Instance?.ShowInterstitialIfReady(() =>
+        {
+            SceneManager.LoadScene("LevelSelect");
+        });
     }
 }
 

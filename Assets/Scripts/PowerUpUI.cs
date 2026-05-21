@@ -47,9 +47,10 @@ public class PowerUpUI : MonoBehaviour
         if (txtHintCount) txtHintCount.text = hintCount.ToString();
         if (txtFreezeCount) txtFreezeCount.text = freezeCount.ToString();
 
-        if (btnReveal) btnReveal.interactable = revealCount > 0;
-        if (btnHint) btnHint.interactable = hintCount > 0;
-        if (btnFreeze) btnFreeze.interactable = freezeCount > 0;
+        // Butonlar her zaman aktif — count 0 olsa da reklam popup'ı için tıklanabilir
+        if (btnReveal) btnReveal.interactable = true;
+        if (btnHint) btnHint.interactable = true;
+        if (btnFreeze) btnFreeze.interactable = true;
     }
 
     public void ShowFreezeFeedback()
