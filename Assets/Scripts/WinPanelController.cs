@@ -25,8 +25,13 @@ public class WinPanelController : MonoBehaviour
     [Header("Power-up Ödül")]
     [SerializeField] private GameObject panelPowerUpReward;
     [SerializeField] private GameObject[] rewardIcons;
-    [SerializeField] private TextMeshProUGUI[] rewardIconTexts;
+    [SerializeField] private Image[] rewardIconImages; // ← Img_Icon'lar
     [SerializeField] private TextMeshProUGUI[] rewardCountTexts;
+
+    [Header("Power-up Sprite'ları")]
+    [SerializeField] private Sprite sprXRay;
+    [SerializeField] private Sprite sprMindFreeze;
+    [SerializeField] private Sprite sprTimeFreeze;
 
     [Header("Animasyon")]
     [SerializeField] private RectTransform txtYouWin;
@@ -93,9 +98,11 @@ public class WinPanelController : MonoBehaviour
         {
             var (type, amount) = pendingRewards[i];
 
-            if (rewardIconTexts != null && i < rewardIconTexts.Length && rewardIconTexts[i] != null)
-                rewardIconTexts[i].text = GetPowerUpIcon(type);
+            // Sprite güncelle
+            if (rewardIconImages != null && i < rewardIconImages.Length && rewardIconImages[i] != null)
+                rewardIconImages[i].sprite = GetPowerUpSprite(type);
 
+            // Adet metni
             if (rewardCountTexts != null && i < rewardCountTexts.Length && rewardCountTexts[i] != null)
                 rewardCountTexts[i].text = $"x{amount}";
         }
@@ -115,12 +122,12 @@ public class WinPanelController : MonoBehaviour
         pendingRewards.Clear();
     }
 
-    private string GetPowerUpIcon(PowerUpType type) => type switch
+    private Sprite GetPowerUpSprite(PowerUpType type) => type switch
     {
-        PowerUpType.XRay => "X",
-        PowerUpType.MindFreeze => "M",
-        PowerUpType.TimeFreeze => "F",
-        _ => "?"
+        PowerUpType.XRay => sprXRay,
+        PowerUpType.MindFreeze => sprMindFreeze,
+        PowerUpType.TimeFreeze => sprTimeFreeze,
+        _ => null
     };
 
     // ─── SKOR ─────────────────────────────────────────────────────
@@ -141,11 +148,9 @@ public class WinPanelController : MonoBehaviour
         {
             int usedMoves = MoveController.Instance?.MoveCount ?? 0;
 
-            // MoveLimit ikinci şans ile artmış olabilir, direkt MoveController'dan oku
             int moveLimit = MoveController.Instance?.MoveLimit ??
                 (isFree ? 30 : (LevelSelectManager.SelectedLevel?.moveLimit ?? 0));
 
-            // Yıldız hesabı için orijinal limiti kullan
             int originalLimit = GameStateManager.OriginalMoveLimit > 0
                 ? GameStateManager.OriginalMoveLimit
                 : moveLimit;

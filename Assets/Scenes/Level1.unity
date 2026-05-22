@@ -14396,14 +14396,17 @@ MonoBehaviour:
   - {fileID: 1388709488}
   - {fileID: 826810292}
   - {fileID: 1204419994}
-  rewardIconTexts:
-  - {fileID: 846660116}
-  - {fileID: 87220834}
-  - {fileID: 1844234448}
+  rewardIconImages:
+  - {fileID: 595724301}
+  - {fileID: 962920497}
+  - {fileID: 480512482}
   rewardCountTexts:
   - {fileID: 549766538}
   - {fileID: 244576710}
   - {fileID: 1034852274}
+  sprXRay: {fileID: 21300000, guid: 3692999c4322c6b439f1450fc2712770, type: 3}
+  sprMindFreeze: {fileID: 21300000, guid: e83f626a0ffa2a6489f30872a41a609d, type: 3}
+  sprTimeFreeze: {fileID: 21300000, guid: aadd04659d6836445a14a47d8b9d1e6f, type: 3}
   txtYouWin: {fileID: 1980103497}
   panelNewRecordRect: {fileID: 1396911755}
   txtTotalStars: {fileID: 1391802195}
