@@ -7,6 +7,9 @@ public class GameStateManager : MonoBehaviour
     public static GameStateManager Instance { get; private set; }
     public GameState CurrentState { get; private set; } = GameState.Initializing;
 
+    public static int OriginalMoveLimit { get; private set; }
+    public static float OriginalTimeLimit { get; private set; }
+
     [Header("UI Panelleri")]
     [SerializeField] private GameObject panelPause;
     [SerializeField] private GameObject panelWin;
@@ -31,8 +34,16 @@ public class GameStateManager : MonoBehaviour
     {
         if (TutorialManager.Instance != null &&
             TutorialManager.Instance.gameObject.activeInHierarchy &&
-            PlayerPrefs.GetInt("tutorial_done", 0) == 0)
+            PlayerPrefs.GetInt("tutorial_done", 0) == 0 &&
+            !DailyChallengeManager.IsDailyChallengeActive &&
+            !FreeModeManager.IsFreeModeActive)
             return;
+
+        // Orijinal limitleri kaydet
+        OriginalMoveLimit = LevelSelectManager.SelectedLevel?.moveLimit ??
+                             (MoveController.Instance?.MoveLimit ?? 0);
+        OriginalTimeLimit = LevelSelectManager.SelectedLevel?.timeLimit ??
+                             (TimerController.Instance?.TotalTime ?? 0f);
 
         SetState(GameState.Playing);
         GameEvents.RaiseGameStarted();
@@ -53,6 +64,7 @@ public class GameStateManager : MonoBehaviour
         SetState(GameState.Playing);
         Time.timeScale = 1f;
         GameEvents.RaiseGameResumed();
+        TimerController.Instance?.ResumeTimer(); // ← ekle
         if (panelPause != null) panelPause.SetActive(false);
     }
 
@@ -80,6 +92,7 @@ public class GameStateManager : MonoBehaviour
                 WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
                 winPanel?.ShowFreeModeResult(stars);
             }
+            FreeModeManager.ResetFreeModeState();
             yield break;
         }
 
@@ -225,6 +238,9 @@ public class GameStateManager : MonoBehaviour
         int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
+        // Mevcut leveli de her zaman unlock et ← ekle
+        LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID);
+
         if (!isLastLevel)
         {
             LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID + 1);
@@ -290,7 +306,6 @@ public class GameStateManager : MonoBehaviour
             return;
         }
 
-        // İkinci şans popup
         AdRewardPopup.Instance?.ShowForSecondChance(
             onSuccess: () => ApplySecondChance(),
             onDecline: () => ShowGameOverPanel()
@@ -299,6 +314,13 @@ public class GameStateManager : MonoBehaviour
 
     private void ApplySecondChance()
     {
+        StartCoroutine(ApplySecondChanceCoroutine());
+    }
+
+    private IEnumerator ApplySecondChanceCoroutine()
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+
         SetState(GameState.Playing);
         Time.timeScale = 1f;
 
@@ -306,7 +328,10 @@ public class GameStateManager : MonoBehaviour
         if (isMoveMode)
             MoveController.Instance?.AddMoves(10);
         else
+        {
+            TimerController.Instance?.ResumeTimer();
             TimerController.Instance?.AddTime(30f);
+        }
     }
 
     private void ShowGameOverPanel()

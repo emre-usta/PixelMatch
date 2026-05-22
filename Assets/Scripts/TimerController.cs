@@ -31,28 +31,22 @@ public class TimerController : MonoBehaviour
     {
         GameEvents.OnGameStarted += HandleGameStarted;
         GameEvents.OnGamePaused += HandleGamePaused;
-        GameEvents.OnGameResumed += HandleGameResumed;
         GameEvents.OnGameWon += HandleGameEnded;
-        GameEvents.OnGameLost += HandleGameEnded;
+        GameEvents.OnGameLost += HandleGameLost;
     }
 
     private void OnDisable()
     {
         GameEvents.OnGameStarted -= HandleGameStarted;
         GameEvents.OnGamePaused -= HandleGamePaused;
-        GameEvents.OnGameResumed -= HandleGameResumed;
         GameEvents.OnGameWon -= HandleGameEnded;
-        GameEvents.OnGameLost -= HandleGameEnded;
+        GameEvents.OnGameLost -= HandleGameLost;
     }
-
-    // ─── EVENT HANDLERS ───────────────────────────────────────────
 
     private void HandleGameStarted() { if (useTimer) StartTimer(); }
     private void HandleGamePaused() => PauseTimer();
-    private void HandleGameResumed() => ResumeTimer();
     private void HandleGameEnded() => StopTimer();
-
-    // ─── TIMER KONTROLÜ ───────────────────────────────────────────
+    private void HandleGameLost() => PauseTimer();
 
     public void StartTimer()
     {
@@ -65,7 +59,13 @@ public class TimerController : MonoBehaviour
     }
 
     public void PauseTimer() => isRunning = false;
-    public void ResumeTimer() => isRunning = true;
+
+    public void ResumeTimer()
+    {
+        isRunning = true;
+        if (timerCoroutine == null && remainingTime > 0)
+            timerCoroutine = StartCoroutine(TimerCoroutine());
+    }
 
     public void StopTimer()
     {
@@ -93,17 +93,19 @@ public class TimerController : MonoBehaviour
         remainingTime = Mathf.Max(0, remainingTime + delta);
         UpdateTimerUI();
         GameEvents.RaiseTimeChanged(remainingTime);
-    }
 
-    // ─── COROUTINE ────────────────────────────────────────────────
+        if (isRunning && timerCoroutine == null && remainingTime > 0)
+            timerCoroutine = StartCoroutine(TimerCoroutine());
+    }
 
     private IEnumerator TimerCoroutine()
     {
         while (remainingTime > 0)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSecondsRealtime(1f);
 
             if (!isRunning) continue;
+            if (Time.timeScale == 0f) continue;
 
             remainingTime = Mathf.Max(0, remainingTime - 1f);
             UpdateTimerUI();
@@ -111,14 +113,13 @@ public class TimerController : MonoBehaviour
 
             if (remainingTime <= 0)
             {
+                timerCoroutine = null;
                 GameEvents.RaiseTimeUp();
                 GameStateManager.Instance.LoseGame();
                 yield break;
             }
         }
     }
-
-    // ─── UI ───────────────────────────────────────────────────────
 
     private void UpdateTimerUI()
     {

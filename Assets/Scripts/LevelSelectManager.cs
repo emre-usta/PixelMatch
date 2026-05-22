@@ -118,15 +118,19 @@ public class LevelSelectManager : MonoBehaviour
                 ? LevelProgressManager.Instance.IsLevelUnlocked(selectedCategory.categoryID, i)
                 : i == 0;
 
-            // Reklam ile açılmış leveller de unlocked sayılır
             bool adUnlockedCheck = PlayerPrefs.GetInt(
                 $"ad_unlocked_{selectedCategory.categoryID}_{i}", 0) == 1;
             if (adUnlockedCheck) isUnlocked = true;
 
-            bool isNew = isUnlocked && i > 0 &&
+            bool isNew = isUnlocked &&
+                i > 0 &&
                 LevelProgressManager.Instance != null &&
                 LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i) == 0 &&
-                LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i - 1) > 0;
+                (
+                    LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i - 1) > 0 ||
+                    PlayerPrefs.GetInt($"ad_unlocked_{selectedCategory.categoryID}_{i - 1}", 0) == 1 ||
+                    adUnlockedCheck
+                );
 
             CreateLevelCard(level, i, isUnlocked, isNew);
         }

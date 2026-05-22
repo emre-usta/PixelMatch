@@ -140,11 +140,18 @@ public class WinPanelController : MonoBehaviour
         if (isMoveMode)
         {
             int usedMoves = MoveController.Instance?.MoveCount ?? 0;
-            int moveLimit = isFree
-                ? (MoveController.Instance?.MoveLimit ?? 30)
-                : (LevelSelectManager.SelectedLevel?.moveLimit ?? 0);
 
-            float ratio = moveLimit > 0 ? (float)Mathf.Max(0, moveLimit - usedMoves) / moveLimit : 0f;
+            // MoveLimit ikinci şans ile artmış olabilir, direkt MoveController'dan oku
+            int moveLimit = MoveController.Instance?.MoveLimit ??
+                (isFree ? 30 : (LevelSelectManager.SelectedLevel?.moveLimit ?? 0));
+
+            // Yıldız hesabı için orijinal limiti kullan
+            int originalLimit = GameStateManager.OriginalMoveLimit > 0
+                ? GameStateManager.OriginalMoveLimit
+                : moveLimit;
+
+            float ratio = originalLimit > 0
+                ? (float)Mathf.Max(0, originalLimit - usedMoves) / originalLimit : 0f;
 
             if (txtTimeBonusValue != null) txtTimeBonusValue.text = $"{usedMoves} / {moveLimit}";
             if (txtScoreValue != null) txtScoreValue.text = GetPerformanceLabel(ratio);
