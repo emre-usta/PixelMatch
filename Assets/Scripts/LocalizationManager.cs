@@ -149,7 +149,7 @@ public class LocalizationManager : MonoBehaviour
         strings["dc_title"] = "GÜNLÜK GÖREV";
         strings["dc_play"] = "OYNA";
         strings["dc_completed"] = "TAMAMLANDI";
-        strings["dc_failed"] = "Bugün başarısız oldun.\nYarın tekrar dene!";
+        strings["dc_failed"] = "Yarın tekrar dene!";
         strings["dc_play_hint"] = "Oynamak için tıkla!";
 
         // Zorluk
@@ -200,9 +200,14 @@ public class LocalizationManager : MonoBehaviour
         strings["tutorial_step1"] = "Kartları bulmak için\nüzerlerine dokun!";
         strings["tutorial_step2"] = "Aynı kartları eşleştirerek\ntüm çiftleri bul!";
         strings["tutorial_step3"] = "Art arda eşleştirerek\nCOMBO kazan ve bonus al!";
-        strings["tutorial_step4"] = "Süren veya hamlen bitmeden\ntüm çiftleri bul!";
-        strings["tutorial_skip"] = "ATLA";
+        strings["tutorial_step4"] = "Power-up'ları kullanarak\navantaj kazan!";
+        strings["tutorial_step5"] = "Kafatası kartı yanlış\neşleştirilirse ceza alırsın!";
+        strings["tutorial_step6"] = "Hızlı bitirirsen daha fazla\nyıldız ve ödül kazanırsın!";
+        strings["tutorial_step7"] = "KLASİK modda süreyle,\nHAMLE modunda sınırlı hamleyle oyna!";
+        strings["tutorial_step8"] = "Hazır mısın? Tüm çiftleri\nbul ve kazan!";
         strings["tutorial_start"] = "BAŞLA";
+        strings["tutorial_title"] = "NASIL OYNANIR";
+        strings["tutorial_next"] = "DEVAM";
         strings["tutorial_tap_hint"] = "DEVAM ETMEK İÇİN DOKUN";
 
         // Serbest Mod
@@ -307,7 +312,7 @@ public class LocalizationManager : MonoBehaviour
         strings["dc_title"] = "DAILY CHALLENGE";
         strings["dc_play"] = "PLAY";
         strings["dc_completed"] = "COMPLETED";
-        strings["dc_failed"] = "Failed today.\nTry again tomorrow!";
+        strings["dc_failed"] = "Try again tomorrow!";
         strings["dc_play_hint"] = "Tap to play!";
 
         // Zorluk
@@ -358,9 +363,14 @@ public class LocalizationManager : MonoBehaviour
         strings["tutorial_step1"] = "Tap on cards\nto find matches!";
         strings["tutorial_step2"] = "Match the same cards\nto find all pairs!";
         strings["tutorial_step3"] = "Match in a row\nto earn a COMBO bonus!";
-        strings["tutorial_step4"] = "Find all pairs before\nyour time or moves run out!";
-        strings["tutorial_skip"] = "SKIP";
+        strings["tutorial_step4"] = "Use power-ups\nto gain an advantage!";
+        strings["tutorial_step5"] = "Wrong match with skull card\nearns a penalty!";
+        strings["tutorial_step6"] = "Finish faster to earn\nmore stars and rewards!";
+        strings["tutorial_step7"] = "CLASSIC mode uses a timer,\nMOVE mode uses limited moves!";
+        strings["tutorial_step8"] = "Ready? Find all pairs\nand win!";
         strings["tutorial_start"] = "START";
+        strings["tutorial_title"] = "HOW TO PLAY";
+        strings["tutorial_next"] = "NEXT";
         strings["tutorial_tap_hint"] = "TAP TO CONTINUE";
 
         // Serbest Mod

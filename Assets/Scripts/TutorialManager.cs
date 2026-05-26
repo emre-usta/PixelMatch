@@ -15,8 +15,12 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private Button btnAction;
     [SerializeField] private TextMeshProUGUI txtStepIndicator;
 
+    [Header("Adım Görselleri")]
+    [SerializeField] private Image imgTutorialIcon;
+    [SerializeField] private Sprite[] tutorialSprites;
+
     private int currentStep = 0;
-    private readonly int totalSteps = 4;
+    private readonly int totalSteps = 8;
     private bool isActive = false;
 
     private readonly string[] stepKeys =
@@ -24,7 +28,11 @@ public class TutorialManager : MonoBehaviour
         "tutorial_step1",
         "tutorial_step2",
         "tutorial_step3",
-        "tutorial_step4"
+        "tutorial_step4",
+        "tutorial_step5",
+        "tutorial_step6",
+        "tutorial_step7",
+        "tutorial_step8"
     };
 
     private void Awake()
@@ -35,6 +43,14 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
+        if (DailyChallengeManager.IsDailyChallengeActive ||
+            FreeModeManager.IsFreeModeActive)
+        {
+            if (tutorialPanel != null) tutorialPanel.SetActive(false);
+            gameObject.SetActive(false);
+            return;
+        }
+
         bool isDone = PlayerPrefs.GetInt(KEY_TUTORIAL_DONE, 0) == 1;
         bool isFirstLevel = LevelSelectManager.SelectedLevel != null &&
                             LevelSelectManager.SelectedLevel.levelID == 0;
@@ -81,6 +97,15 @@ public class TutorialManager : MonoBehaviour
         if (txtTutorial != null)
             txtTutorial.text = LocalizationManager.Get(stepKeys[currentStep]);
 
+        // Görsel güncelle
+        if (imgTutorialIcon != null && tutorialSprites != null &&
+            currentStep < tutorialSprites.Length &&
+            tutorialSprites[currentStep] != null)
+        {
+            imgTutorialIcon.sprite = tutorialSprites[currentStep];
+            imgTutorialIcon.gameObject.SetActive(true);
+        }
+
         if (txtStepIndicator != null)
         {
             txtStepIndicator.gameObject.SetActive(currentStep < totalSteps - 1);
@@ -102,7 +127,6 @@ public class TutorialManager : MonoBehaviour
         PlayerPrefs.Save();
 
         if (tutorialPanel != null) tutorialPanel.SetActive(false);
-
         Time.timeScale = 1f;
         GameStateManager.Instance?.OnGridReady();
     }
