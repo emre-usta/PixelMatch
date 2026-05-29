@@ -149,8 +149,8 @@ public class LocalizationManager : MonoBehaviour
         strings["dc_title"] = "GÜNLÜK GÖREV";
         strings["dc_play"] = "OYNA";
         strings["dc_completed"] = "TAMAMLANDI";
-        strings["dc_failed"] = "Yarın tekrar dene!";
-        strings["dc_play_hint"] = "Oynamak için tıkla!";
+        strings["dc_failed"] = "Yarın \ntekrar dene!";
+        strings["dc_play_hint"] = "Oynamak için \ndokun!";
 
         // Zorluk
         strings["difficulty_easy"] = "KOLAY";
@@ -312,8 +312,8 @@ public class LocalizationManager : MonoBehaviour
         strings["dc_title"] = "DAILY CHALLENGE";
         strings["dc_play"] = "PLAY";
         strings["dc_completed"] = "COMPLETED";
-        strings["dc_failed"] = "Try again tomorrow!";
-        strings["dc_play_hint"] = "Tap to play!";
+        strings["dc_failed"] = "Try again \ntomorrow!";
+        strings["dc_play_hint"] = "Tap to \nplay!";
 
         // Zorluk
         strings["difficulty_easy"] = "EASY";

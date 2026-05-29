@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using GoogleMobileAds.Api;
+using GoogleMobileAds.Common;
 using System;
 
 public class AdManager : MonoBehaviour
@@ -7,31 +8,25 @@ public class AdManager : MonoBehaviour
     public static AdManager Instance { get; private set; }
 
 #if UNITY_ANDROID
-    // ─── TEST ID'LER ──────────────────────────────────────────────
-    // Yayında sadece bu iki satırı gerçek ID'lerle değiştir
-    private const string REWARDED_ID     = "ca-app-pub-3940256099942544/5224354917";
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
     private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
 #else
-    private const string REWARDED_ID = "unused";
+    private const string REWARDED_ID     = "unused";
     private const string INTERSTITIAL_ID = "unused";
 #endif
 
-    // ─── REKLAM OBJELERİ ──────────────────────────────────────────
     private RewardedAd rewardedAd;
     private InterstitialAd interstitialAd;
 
-    // ─── INTERSTITIAL SAYACI ──────────────────────────────────────
     private const string KEY_LEVEL_COUNT = "ad_level_count";
     private const int INTERSTITIAL_EVERY = 3;
     private const float MIN_INTERSTITIAL_INTERVAL = 180f;
     private float lastInterstitialTime = -999f;
 
-    // ─── CALLBACK'LER ─────────────────────────────────────────────
     private Action onRewardEarned;
     private Action onRewardFailed;
     private Action onInterstitialClosed;
 
-    // ─── PUBLIC ───────────────────────────────────────────────────
     public bool IsRewardedReady => rewardedAd != null && rewardedAd.CanShowAd();
     public bool IsInterstitialReady => interstitialAd != null && interstitialAd.CanShowAd();
 
@@ -53,8 +48,11 @@ public class AdManager : MonoBehaviour
     {
         MobileAds.Initialize(initStatus =>
         {
-            LoadRewarded();
-            LoadInterstitial();
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                LoadRewarded();
+                LoadInterstitial();
+            });
         });
     }
 
@@ -88,8 +86,11 @@ public class AdManager : MonoBehaviour
 
         rewardedAd.Show(reward =>
         {
-            onRewardEarned?.Invoke();
-            onRewardEarned = null;
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                onRewardEarned?.Invoke();
+                onRewardEarned = null;
+            });
         });
     }
 
