@@ -8,8 +8,8 @@ public class AdManager : MonoBehaviour
     public static AdManager Instance { get; private set; }
 
 #if UNITY_ANDROID
-    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
-    private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
+    private const string REWARDED_ID = "ca-app-pub-6613024242187744/7789293047";
+    private const string INTERSTITIAL_ID = "ca-app-pub-6613024242187744/2545089668";
 #else
     private const string REWARDED_ID     = "unused";
     private const string INTERSTITIAL_ID = "unused";
