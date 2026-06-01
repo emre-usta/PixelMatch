@@ -117,6 +117,7 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_nature"] = "DOĞA";
         strings["locked"] = "KİLİTLİ";
         strings["new_tag"] = "YENİ!";
+        strings["ad_unlock_hint"] = "Reklam ile Aç";
         strings["powerup_peek"] = "GÖZETLE";
         strings["powerup_hint"] = "İPUCU";
         strings["powerup_freeze"] = "DONDUR";
@@ -281,6 +282,7 @@ public class LocalizationManager : MonoBehaviour
         strings["btn_nature"] = "NATURE";
         strings["locked"] = "LOCKED";
         strings["new_tag"] = "NEW!";
+        strings["ad_unlock_hint"] = "Watch Ad";
         strings["powerup_peek"] = "PEEK";
         strings["powerup_hint"] = "HINT";
         strings["powerup_freeze"] = "FREEZE";

@@ -80,6 +80,19 @@ public class PowerUpManager : MonoBehaviour
 
     public void UseHint()
     {
+        // Peek aktifse hint kullanma
+        if (GridManager.Instance != null)
+        {
+            int openCount = 0;
+            foreach (var card in GridManager.Instance.AllCards)
+                if (card.State == CardState.Open)
+                    openCount++;
+
+            // Çok fazla kart açıksa (peek aktif) hint kullanma
+            if (openCount > 2)
+                return;
+        }
+
         if (!TryUsePowerUp(PowerUpType.MindFreeze)) return;
         StartCoroutine(HintCoroutine());
     }
@@ -98,6 +111,8 @@ public class PowerUpManager : MonoBehaviour
 
         GridManager.Instance.SetAllCardsInteractable(false);
 
+        CardController selectedCard = GridManager.Instance.FirstSelectedCard;
+
         foreach (var card in GridManager.Instance.AllCards)
             if (card.State == CardState.Closed)
                 card.RevealSilent();
@@ -105,8 +120,11 @@ public class PowerUpManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(2f);
 
         foreach (var card in GridManager.Instance.AllCards)
+        {
+            if (card == selectedCard) continue;
             if (card.State == CardState.Open)
                 card.Hide();
+        }
 
         yield return new WaitForSecondsRealtime(0.3f);
 
@@ -123,18 +141,38 @@ public class PowerUpManager : MonoBehaviour
         CardController hintA = null;
         CardController hintB = null;
 
-        for (int i = 0; i < cards.Count; i++)
+        // Açık kart varsa onun eşini bul
+        CardController selectedCard = GridManager.Instance.FirstSelectedCard;
+
+        if (selectedCard != null)
         {
-            if (cards[i].State != CardState.Closed) continue;
-            for (int j = i + 1; j < cards.Count; j++)
+            for (int i = 0; i < cards.Count; i++)
             {
-                if (cards[j].State != CardState.Closed) continue;
-                if (cards[i].CardID != cards[j].CardID) continue;
-                hintA = cards[i];
-                hintB = cards[j];
+                if (cards[i] == selectedCard) continue;
+                if (cards[i].State != CardState.Closed) continue;
+                if (cards[i].CardID != selectedCard.CardID) continue;
+                hintA = selectedCard;
+                hintB = cards[i];
                 break;
             }
-            if (hintA != null) break;
+        }
+
+        // Açık kart yoksa herhangi bir çift bul
+        if (hintA == null || hintB == null)
+        {
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (cards[i].State != CardState.Closed) continue;
+                for (int j = i + 1; j < cards.Count; j++)
+                {
+                    if (cards[j].State != CardState.Closed) continue;
+                    if (cards[i].CardID != cards[j].CardID) continue;
+                    hintA = cards[i];
+                    hintB = cards[j];
+                    break;
+                }
+                if (hintA != null) break;
+            }
         }
 
         if (hintA == null || hintB == null) yield break;
@@ -145,6 +183,7 @@ public class PowerUpManager : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.6f);
 
+        GridManager.Instance.ClearSelectedCard(); // ← firstSelectedCard sıfırla
         GameEvents.RaisePairMatched(hintA, hintB);
 
         yield return new WaitForSecondsRealtime(0.3f);

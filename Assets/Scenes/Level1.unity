@@ -7167,6 +7167,7 @@ MonoBehaviour:
   txtTutorial: {fileID: 651256304}
   txtActionButton: {fileID: 242555507}
   btnAction: {fileID: 794959089}
+  btnNext: {fileID: 262505170}
   txtStepIndicator: {fileID: 1746133717}
   imgTutorialIcon: {fileID: 88200424}
   tutorialSprites:

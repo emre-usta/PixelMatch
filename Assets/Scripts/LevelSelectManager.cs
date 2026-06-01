@@ -123,14 +123,14 @@ public class LevelSelectManager : MonoBehaviour
             if (adUnlockedCheck) isUnlocked = true;
 
             bool isNew = isUnlocked &&
-                i > 0 &&
                 LevelProgressManager.Instance != null &&
-                LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i) == 0 &&
-                (
-                    LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i - 1) > 0 ||
-                    PlayerPrefs.GetInt($"ad_unlocked_{selectedCategory.categoryID}_{i - 1}", 0) == 1 ||
-                    adUnlockedCheck
-                );
+            LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i) == 0 &&
+            (
+                i == 0 ||
+                LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, i - 1) > 0 ||
+                PlayerPrefs.GetInt($"ad_unlocked_{selectedCategory.categoryID}_{i - 1}", 0) == 1 ||
+                adUnlockedCheck
+            );
 
             CreateLevelCard(level, i, isUnlocked, isNew);
         }
@@ -309,6 +309,24 @@ public class LevelSelectManager : MonoBehaviour
             }
             tagNew.gameObject.SetActive(isNew);
             if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
+        }
+
+        // Tag_Ad
+        Transform tagAd = card.transform.Find("Img_LevelArt/Tag_Ad");
+        if (tagAd != null)
+        {
+            Transform textAd = tagAd.Find("Text_Ad");
+            if (textAd != null)
+            {
+                TextMeshProUGUI adTxt = textAd.GetComponent<TextMeshProUGUI>();
+                if (adTxt != null)
+                    adTxt.text = LocalizationManager.Get("ad_unlock_hint");
+            }
+
+            // Sadece reklam ile açılabilir levelda göster
+            bool canUnlockCheck = IsNextUnlockableLevel(selectedCategory, levelIndex);
+            tagAd.gameObject.SetActive(canUnlockCheck);
+            if (canUnlockCheck) StartCoroutine(AnimateNewTag(tagAd.gameObject));
         }
 
         // Panel_Stars

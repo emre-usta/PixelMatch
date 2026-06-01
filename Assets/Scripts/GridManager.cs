@@ -32,6 +32,7 @@ public class GridManager : MonoBehaviour
 
     private int matchedPairCount = 0;
     private int totalPairCount = 0;
+    public CardController FirstSelectedCard => firstSelectedCard;
 
     private void Awake()
     {
@@ -333,5 +334,10 @@ public class GridManager : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         GameStateManager.Instance.OnGridReady();
+    }
+
+    public void ClearSelectedCard()
+    {
+        firstSelectedCard = null;
     }
 }

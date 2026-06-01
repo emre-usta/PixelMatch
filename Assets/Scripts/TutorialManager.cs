@@ -13,6 +13,7 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtTutorial;
     [SerializeField] private TextMeshProUGUI txtActionButton;
     [SerializeField] private Button btnAction;
+    [SerializeField] private Button btnNext;
     [SerializeField] private TextMeshProUGUI txtStepIndicator;
 
     [Header("Adım Görselleri")]
@@ -97,7 +98,6 @@ public class TutorialManager : MonoBehaviour
         if (txtTutorial != null)
             txtTutorial.text = LocalizationManager.Get(stepKeys[currentStep]);
 
-        // Görsel güncelle
         if (imgTutorialIcon != null && tutorialSprites != null &&
             currentStep < tutorialSprites.Length &&
             tutorialSprites[currentStep] != null)
@@ -118,6 +118,9 @@ public class TutorialManager : MonoBehaviour
             if (txtActionButton != null)
                 txtActionButton.text = LocalizationManager.Get("tutorial_start");
         }
+
+        if (btnNext != null)
+            btnNext.gameObject.SetActive(currentStep < totalSteps - 1);
     }
 
     private void CompleteTutorial()

@@ -32,18 +32,22 @@ public class GameStateManager : MonoBehaviour
 
     public void OnGridReady()
     {
+        bool isAdUnlockedLevel = LevelSelectManager.SelectedLevel != null &&
+            PlayerPrefs.GetInt(
+                $"ad_unlocked_{LevelSelectManager.SelectedCategoryID}_{LevelSelectManager.SelectedLevel.levelID}", 0) == 1;
+
         if (TutorialManager.Instance != null &&
             TutorialManager.Instance.gameObject.activeInHierarchy &&
             PlayerPrefs.GetInt("tutorial_done", 0) == 0 &&
             !DailyChallengeManager.IsDailyChallengeActive &&
-            !FreeModeManager.IsFreeModeActive)
+            !FreeModeManager.IsFreeModeActive &&
+            !isAdUnlockedLevel) // ← ekle
             return;
 
-        // Orijinal limitleri kaydet
         OriginalMoveLimit = LevelSelectManager.SelectedLevel?.moveLimit ??
-                             (MoveController.Instance?.MoveLimit ?? 0);
+                            (MoveController.Instance?.MoveLimit ?? 0);
         OriginalTimeLimit = LevelSelectManager.SelectedLevel?.timeLimit ??
-                             (TimerController.Instance?.TotalTime ?? 0f);
+                            (TimerController.Instance?.TotalTime ?? 0f);
 
         SetState(GameState.Playing);
         GameEvents.RaiseGameStarted();
