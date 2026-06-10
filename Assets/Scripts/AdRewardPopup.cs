@@ -17,15 +17,16 @@ public class AdRewardPopup : MonoBehaviour
     [SerializeField] private Button btnWatch;
     [SerializeField] private Button btnDecline;
 
-    private const string KEY_SECOND_CHANCE = "second_chance";
-
     private System.Action onWatched;
     private System.Action onDeclined;
+
+    private bool secondChanceUsedThisSession = false;
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        secondChanceUsedThisSession = false;
 
         btnWatch?.onClick.AddListener(OnWatchClicked);
         btnDecline?.onClick.AddListener(OnDeclineClicked);
@@ -62,15 +63,8 @@ public class AdRewardPopup : MonoBehaviour
 
     public void ShowForSecondChance(System.Action onSuccess, System.Action onDecline)
     {
-        string today = System.DateTime.Now.ToString("yyyy-MM-dd");
-        int categoryID = LevelSelectManager.SelectedCategoryID;
-        int levelID = LevelSelectManager.SelectedLevel != null
-                           ? LevelSelectManager.SelectedLevel.levelID : 0;
-
-        string key = $"{KEY_SECOND_CHANCE}_{categoryID}_{levelID}_{today}";
-        string lastUsed = PlayerPrefs.GetString(key, "");
-
-        if (lastUsed == "used")
+        // Bu denemede zaten ikinci şans kullanıldıysa direkt game over
+        if (secondChanceUsedThisSession)
         {
             onDecline?.Invoke();
             return;
@@ -80,8 +74,7 @@ public class AdRewardPopup : MonoBehaviour
 
         onWatched = () =>
         {
-            PlayerPrefs.SetString(key, "used");
-            PlayerPrefs.Save();
+            secondChanceUsedThisSession = true;
             onSuccess?.Invoke();
         };
         onDeclined = onDecline;
@@ -161,7 +154,7 @@ public class AdRewardPopup : MonoBehaviour
     {
         Hide();
 
-        if (onWatched == null) return; // Info popup ise sadece kapat
+        if (onWatched == null) return;
 
         if (AdManager.Instance == null || !AdManager.Instance.IsRewardedReady)
         {

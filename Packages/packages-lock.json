@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.google.ads.mobile": {
-      "version": "11.1.0",
+      "version": "11.2.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {

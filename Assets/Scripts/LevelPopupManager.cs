@@ -21,6 +21,8 @@ public class LevelPopupManager : MonoBehaviour
     private LevelConfig pendingLevel;
     private int pendingLevelIndex;
 
+    public bool IsPopupOpen => popupPanel != null && popupPanel.activeSelf;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }

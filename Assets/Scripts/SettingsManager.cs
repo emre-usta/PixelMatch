@@ -11,6 +11,8 @@ public class SettingsManager : MonoBehaviour
     private const string KEY_BGM_MUTED = "settings_bgm_muted";
     private const string KEY_SFX_MUTED = "settings_sfx_muted";
 
+    private const string PRIVACY_POLICY_URL = "https://emre-usta.github.io/privacy-policy";
+
     [Header("UI")]
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Slider sfxSlider;
@@ -34,6 +36,11 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private Button btnTR;
     [SerializeField] private Button btnEN;
 
+    [Header("Gizlilik")]
+    [SerializeField] private Button btnPrivacy;
+    [SerializeField] private Button btnPrivacyPolicy;
+    [SerializeField] private GameObject panelPrivacy; // Layout Group parent
+
     private bool bgmMuted = false;
     private bool sfxMuted = false;
 
@@ -43,6 +50,8 @@ public class SettingsManager : MonoBehaviour
     private readonly Color colorLangInactive = new Color(0.04f, 0.04f, 0.08f);
     private readonly Color colorTextActive = new Color(0.96f, 0.65f, 0.14f);
     private readonly Color colorTextInactive = new Color(0.32f, 0.26f, 0.20f);
+
+    public bool IsSettingsOpen => settingsPanel != null && settingsPanel.activeSelf;
 
     private void Awake()
     {
@@ -73,6 +82,8 @@ public class SettingsManager : MonoBehaviour
         btnSFXMute?.onClick.AddListener(ToggleSFXMute);
         btnTR?.onClick.AddListener(() => SetLanguage(LocalizationManager.Language.TR));
         btnEN?.onClick.AddListener(() => SetLanguage(LocalizationManager.Language.EN));
+        btnPrivacy?.onClick.AddListener(OnPrivacySettingsClicked);
+        btnPrivacyPolicy?.onClick.AddListener(OnPrivacyPolicyClicked);
 
         ApplyBGM(bgm);
         ApplySFX(sfx);
@@ -80,6 +91,7 @@ public class SettingsManager : MonoBehaviour
         UpdateSFXText(sfx);
         UpdateMuteButtons();
         UpdateLanguageButtons();
+        UpdatePrivacyButton();
 
         if (settingsPanel != null) settingsPanel.SetActive(false);
     }
@@ -175,6 +187,34 @@ public class SettingsManager : MonoBehaviour
     private void UpdateSFXText(float value)
     {
         if (sfxValueText != null) sfxValueText.text = $"{Mathf.RoundToInt(value * 100)}%";
+    }
+
+    // ─── GİZLİLİK ────────────────────────────────────────────────
+
+    public void OnPrivacySettingsClicked()
+    {
+        AdManager.Instance?.ShowPrivacyOptionsForm();
+    }
+
+    public void OnPrivacyPolicyClicked()
+    {
+        Application.OpenURL(PRIVACY_POLICY_URL);
+    }
+
+    private void UpdatePrivacyButton()
+    {
+        if (btnPrivacy == null) return;
+
+        bool isRequired = GoogleMobileAds.Ump.Api.ConsentInformation
+            .PrivacyOptionsRequirementStatus ==
+            GoogleMobileAds.Ump.Api.PrivacyOptionsRequirementStatus.Required;
+
+        btnPrivacy.gameObject.SetActive(isRequired);
+
+        // Layout Group parent'ı her zaman görünür bırak
+        // İçindeki butonlar kendi görünürlüğünü yönetir
+        if (panelPrivacy != null)
+            panelPrivacy.SetActive(true);
     }
 
     // ─── PANEL ────────────────────────────────────────────────────

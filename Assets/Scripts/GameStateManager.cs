@@ -25,6 +25,34 @@ public class GameStateManager : MonoBehaviour
         SetState(GameState.Initializing);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Ayarlar açıksa kapat
+            if (SettingsManager.Instance != null &&
+                SettingsManager.Instance.IsSettingsOpen)
+            {
+                SettingsManager.Instance.CloseSettings();
+                return;
+            }
+
+            // Playing ise Pause
+            if (CurrentState == GameState.Playing)
+            {
+                PauseGame();
+                return;
+            }
+
+            // Paused ise Resume
+            if (CurrentState == GameState.Paused)
+            {
+                ResumeGame();
+                return;
+            }
+        }
+    }
+
     private void OnDestroy()
     {
         GameEvents.ClearAllEvents();
@@ -41,7 +69,7 @@ public class GameStateManager : MonoBehaviour
             PlayerPrefs.GetInt("tutorial_done", 0) == 0 &&
             !DailyChallengeManager.IsDailyChallengeActive &&
             !FreeModeManager.IsFreeModeActive &&
-            !isAdUnlockedLevel) // ← ekle
+            !isAdUnlockedLevel)
             return;
 
         OriginalMoveLimit = LevelSelectManager.SelectedLevel?.moveLimit ??
@@ -68,7 +96,7 @@ public class GameStateManager : MonoBehaviour
         SetState(GameState.Playing);
         Time.timeScale = 1f;
         GameEvents.RaiseGameResumed();
-        TimerController.Instance?.ResumeTimer(); // ← ekle
+        TimerController.Instance?.ResumeTimer();
         if (panelPause != null) panelPause.SetActive(false);
     }
 
@@ -102,9 +130,13 @@ public class GameStateManager : MonoBehaviour
 
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
-            int stars = 3;
+            int stars = CalculateStars();
             DailyChallengeManager.Instance.MarkPlayedToday(stars);
             DailyChallengeManager.SetInactive();
+
+            // PowerUpManager hazır olana kadar bekle
+            yield return new WaitUntil(() => PowerUpManager.Instance != null);
+
             GiveDailyChallengeReward(stars);
 
             if (panelWin != null)
@@ -142,9 +174,28 @@ public class GameStateManager : MonoBehaviour
 
     private void GiveDailyChallengeReward(int stars)
     {
+        Debug.Log($"GiveDCReward - stars:{stars}, PM:{PowerUpManager.Instance}");
         if (PowerUpManager.Instance == null) return;
-        PowerUpManager.Instance.AddPowerUp(PowerUpType.MindFreeze);
-        PowerUpManager.Instance.AddPowerUp(PowerUpType.TimeFreeze);
+
+        if (stars == 1)
+        {
+            PowerUpManager.Instance.AddPowerUp(PowerUpType.TimeFreeze);
+            NotifyWinPanel(PowerUpType.TimeFreeze);
+        }
+        else if (stars == 2)
+        {
+            PowerUpManager.Instance.AddPowerUp(PowerUpType.TimeFreeze);
+            NotifyWinPanel(PowerUpType.TimeFreeze);
+            PowerUpManager.Instance.AddPowerUp(PowerUpType.XRay);
+            NotifyWinPanel(PowerUpType.XRay);
+        }
+        else if (stars == 3)
+        {
+            PowerUpManager.Instance.AddPowerUp(PowerUpType.XRay);
+            NotifyWinPanel(PowerUpType.XRay);
+            PowerUpManager.Instance.AddPowerUp(PowerUpType.MindFreeze);
+            NotifyWinPanel(PowerUpType.MindFreeze);
+        }
     }
 
     private int CalculateStars()
@@ -155,7 +206,12 @@ public class GameStateManager : MonoBehaviour
         float timeLimit = 0f;
         int moveLimit = 0;
 
-        if (isFree)
+        if (DailyChallengeManager.IsDailyChallengeActive)
+        {
+            timeLimit = TimerController.Instance != null ? TimerController.Instance.TotalTime : 120f;
+            moveLimit = MoveController.Instance != null ? MoveController.Instance.MoveLimit : 30;
+        }
+        else if (isFree)
         {
             timeLimit = TimerController.Instance != null ? TimerController.Instance.TotalTime : 120f;
             moveLimit = MoveController.Instance != null ? MoveController.Instance.MoveLimit : 30;
@@ -242,7 +298,6 @@ public class GameStateManager : MonoBehaviour
         int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
-        // Mevcut leveli de her zaman unlock et ← ekle
         LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID);
 
         if (!isLastLevel)
@@ -257,15 +312,31 @@ public class GameStateManager : MonoBehaviour
                 LevelProgressManager.Instance.UnlockCategory(nextCategoryID);
         }
 
+        if (stars == 1)
+        {
+            if (Random.value <= 0.4f)
+            {
+                PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
+                NotifyWinPanel(PowerUpType.TimeFreeze);
+            }
+        }
+
         if (stars == 2)
         {
-            PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
-            NotifyWinPanel(PowerUpType.XRay);
+            PowerUpType reward = Random.value <= 0.7f
+                ? PowerUpType.TimeFreeze
+                : PowerUpType.XRay;
+            PowerUpManager.Instance?.AddPowerUp(reward);
+            NotifyWinPanel(reward);
         }
 
         if (stars == 3)
         {
-            PowerUpType reward = Random.value > 0.5f ? PowerUpType.MindFreeze : PowerUpType.TimeFreeze;
+            float roll = Random.value;
+            PowerUpType reward =
+                roll <= 0.25f ? PowerUpType.TimeFreeze :
+                roll <= 0.70f ? PowerUpType.XRay :
+                PowerUpType.MindFreeze;
             PowerUpManager.Instance?.AddPowerUp(reward);
             NotifyWinPanel(reward);
         }
@@ -284,29 +355,16 @@ public class GameStateManager : MonoBehaviour
         {
             DailyChallengeManager.Instance?.AddAttempt();
             bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
-            if (!hasAttempts) DailyChallengeManager.SetInactive();
 
-            if (panelGameOver != null)
-            {
-                panelGameOver.SetActive(true);
-                UpdateGameOverReason();
-                UpdateTilesRemaining();
-                UpdateTotalPoints();
-
-                var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>();
-                foreach (var btn in buttons)
+            // Second Chance popup göster
+            AdRewardPopup.Instance?.ShowForSecondChance(
+                onSuccess: () => ApplySecondChance(),
+                onDecline: () =>
                 {
-                    if (btn.gameObject.name == "Btn_Retry")
-                    {
-                        btn.interactable = hasAttempts;
-                        TMPro.TextMeshProUGUI txt = btn.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                        if (txt != null)
-                            txt.text = hasAttempts
-                                ? LocalizationManager.Get("btn_retry")
-                                : LocalizationManager.Get("dc_no_attempts");
-                    }
+                    if (!hasAttempts) DailyChallengeManager.SetInactive();
+                    ShowDCGameOverPanel();
                 }
-            }
+            );
             return;
         }
 
@@ -346,6 +404,23 @@ public class GameStateManager : MonoBehaviour
             UpdateGameOverReason();
             UpdateTilesRemaining();
             UpdateTotalPoints();
+        }
+    }
+
+    private void ShowDCGameOverPanel()
+    {
+        if (panelGameOver != null)
+        {
+            panelGameOver.SetActive(true);
+            UpdateGameOverReason();
+            UpdateTilesRemaining();
+            UpdateTotalPoints();
+
+            // Retry butonunu gizle
+            var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>(true);
+            foreach (var btn in buttons)
+                if (btn.gameObject.name == "Btn_Retry")
+                    btn.gameObject.SetActive(false);
         }
     }
 

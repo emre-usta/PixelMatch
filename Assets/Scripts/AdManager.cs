@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Common;
+using GoogleMobileAds.Ump.Api;
 using System;
+using System.Collections.Generic;
 
 public class AdManager : MonoBehaviour
 {
@@ -17,6 +19,7 @@ public class AdManager : MonoBehaviour
 
     private RewardedAd rewardedAd;
     private InterstitialAd interstitialAd;
+    private bool isInitialized = false;
 
     private const string KEY_LEVEL_COUNT = "ad_level_count";
     private const int INTERSTITIAL_EVERY = 3;
@@ -39,13 +42,60 @@ public class AdManager : MonoBehaviour
 
     private void Start()
     {
-        Initialize();
+        RequestConsentInfoUpdate();
+    }
+
+    // ─── UMP / GDPR ───────────────────────────────────────────────
+
+    private void RequestConsentInfoUpdate()
+    {
+        ConsentRequestParameters requestParameters = new ConsentRequestParameters();
+
+        ConsentInformation.Update(requestParameters, (FormError updateError) =>
+        {
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                if (updateError != null)
+                {
+                    Debug.LogError("Consent update error: " + updateError.Message);
+                    Initialize();
+                    return;
+                }
+
+                if (ConsentInformation.CanRequestAds())
+                    Initialize();
+
+                ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) =>
+                {
+                    MobileAdsEventExecutor.ExecuteInUpdate(() =>
+                    {
+                        if (showError != null)
+                            Debug.LogError("Consent form error: " + showError.Message);
+
+                        if (ConsentInformation.CanRequestAds())
+                            Initialize();
+                    });
+                });
+            });
+        });
+    }
+
+    public void ShowPrivacyOptionsForm()
+    {
+        ConsentForm.ShowPrivacyOptionsForm((FormError showError) =>
+        {
+            if (showError != null)
+                Debug.LogError("Privacy form error: " + showError.Message);
+        });
     }
 
     // ─── BAŞLATMA ─────────────────────────────────────────────────
 
     private void Initialize()
     {
+        if (isInitialized) return;
+        isInitialized = true;
+
         MobileAds.Initialize(initStatus =>
         {
             MobileAdsEventExecutor.ExecuteInUpdate(() =>
@@ -86,11 +136,8 @@ public class AdManager : MonoBehaviour
 
         rewardedAd.Show(reward =>
         {
-            MobileAdsEventExecutor.ExecuteInUpdate(() =>
-            {
-                onRewardEarned?.Invoke();
-                onRewardEarned = null;
-            });
+            onRewardEarned?.Invoke();
+            onRewardEarned = null;
         });
     }
 

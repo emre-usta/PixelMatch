@@ -107,6 +107,8 @@ public class LocalizationManager : MonoBehaviour
         strings["settings_sfx"] = "SES EFEKTİ";
         strings["settings_language"] = "DİL";
         strings["btn_close"] = "KAPAT";
+        strings["btn_privacy"] = "Gizlilik Ayarları";
+        strings["btn_privacypolicy"] = "Gizlilik Politikası";
 
         // Level Select
         strings["level_select_title"] = "SEVİYE SEÇ";
@@ -185,6 +187,8 @@ public class LocalizationManager : MonoBehaviour
         strings["stat_moves_used"] = "KULLANILAN HAMLE";
         strings["stat_time_remaining"] = "KALAN SÜRE";
         strings["stat_performance"] = "PERFORMANS";
+        strings["btn_double_reward"] = "2x ÖDÜL";
+        strings["btn_double_used"] = "Alındı";
         strings["total_stars"] = "TOPLAM";
 
         // Game Over
@@ -272,6 +276,8 @@ public class LocalizationManager : MonoBehaviour
         strings["settings_sfx"] = "SFX";
         strings["settings_language"] = "LANGUAGE";
         strings["btn_close"] = "CLOSE";
+        strings["btn_privacy"] = "Privacy Settings";
+        strings["btn_privacypolicy"] = "Privacy Policy";
 
         // Level Select
         strings["level_select_title"] = "SELECT LEVEL";
@@ -349,6 +355,8 @@ public class LocalizationManager : MonoBehaviour
         strings["stat_moves_used"] = "MOVES USED";
         strings["stat_time_remaining"] = "TIME LEFT";
         strings["stat_performance"] = "PERFORMANCE";
+        strings["btn_double_reward"] = "2x REWARD";
+        strings["btn_double_used"] = "Claimed";
         strings["total_stars"] = "TOTAL";
 
         // Game Over

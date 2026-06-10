@@ -25,13 +25,18 @@ public class WinPanelController : MonoBehaviour
     [Header("Power-up Ödül")]
     [SerializeField] private GameObject panelPowerUpReward;
     [SerializeField] private GameObject[] rewardIcons;
-    [SerializeField] private Image[] rewardIconImages; // ← Img_Icon'lar
+    [SerializeField] private Image[] rewardIconImages;
     [SerializeField] private TextMeshProUGUI[] rewardCountTexts;
 
     [Header("Power-up Sprite'ları")]
     [SerializeField] private Sprite sprXRay;
     [SerializeField] private Sprite sprMindFreeze;
     [SerializeField] private Sprite sprTimeFreeze;
+
+    [Header("2x Ödül")]
+    [SerializeField] private GameObject btnDoubleReward;
+    [SerializeField] private Color btnDoubleActiveColor = new Color(0.96f, 0.65f, 0.14f);
+    [SerializeField] private Color btnDoubleUsedColor = new Color(0.3f, 0.3f, 0.3f);
 
     [Header("Animasyon")]
     [SerializeField] private RectTransform txtYouWin;
@@ -41,14 +46,24 @@ public class WinPanelController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtTotalStars;
 
     private List<(PowerUpType type, int amount)> pendingRewards = new();
+    private List<(PowerUpType type, int amount)> displayedRewards = new();
+    private bool doubleRewardUsed = false;
 
     // ─── PUBLIC ───────────────────────────────────────────────────
 
-    public void AddPendingReward(PowerUpType type, int amount = 1) => pendingRewards.Add((type, amount));
+    public void AddPendingReward(PowerUpType type, int amount = 1)
+        => pendingRewards.Add((type, amount));
+
     public void ClearPendingRewards() => pendingRewards.Clear();
 
     public void ShowResult(int stars)
     {
+        doubleRewardUsed = false;
+        displayedRewards.Clear();
+
+        if (btnDoubleReward != null)
+            btnDoubleReward.SetActive(false);
+
         ResetStars();
         UpdateScore();
         CheckNewRecord();
@@ -64,6 +79,12 @@ public class WinPanelController : MonoBehaviour
 
     public void ShowFreeModeResult(int stars)
     {
+        doubleRewardUsed = false;
+        displayedRewards.Clear();
+
+        if (btnDoubleReward != null)
+            btnDoubleReward.SetActive(false);
+
         ResetStars();
 
         if (txtTimeBonusValue != null) txtTimeBonusValue.text = "+0";
@@ -83,11 +104,146 @@ public class WinPanelController : MonoBehaviour
         if (star3) star3.color = starInactiveColor;
     }
 
+    // ─── 2X ÖDÜL ──────────────────────────────────────────────────
+
+    public void OnDoubleRewardClicked()
+    {
+        Debug.Log($"Clicked - doubleRewardUsed:{doubleRewardUsed} - displayedRewards:{displayedRewards.Count}");
+        if (doubleRewardUsed) return;
+
+        AdManager.Instance?.ShowRewarded(
+            onSuccess: () =>
+            {
+                Debug.Log("onSuccess çalıştı!");
+                doubleRewardUsed = true;
+
+                foreach (var (type, amount) in displayedRewards)
+                    PowerUpManager.Instance?.AddPowerUp(type, amount);
+
+                // Count textleri güncelle
+                for (int i = 0; i < displayedRewards.Count && i < rewardCountTexts.Length; i++)
+                {
+                    if (rewardCountTexts[i] != null)
+                        rewardCountTexts[i].text = $"x{displayedRewards[i].amount * 2}";
+                }
+
+                // Time.timeScale sıfırla ki coroutine çalışsın
+                Time.timeScale = 0f;
+                StartCoroutine(DeactivateDoubleRewardButton());
+            }
+        );
+    }
+
+    private IEnumerator ShowDoubleRewardButton()
+    {
+        if (btnDoubleReward == null) yield break;
+
+        // Rengi aktif renge ayarla
+        Image btnImage = btnDoubleReward.GetComponent<Image>();
+        if (btnImage != null) btnImage.color = btnDoubleActiveColor;
+
+        // Tıklanabilir yap
+        Button btn = btnDoubleReward.GetComponent<Button>();
+        if (btn != null) btn.interactable = true;
+
+        // CanvasGroup ile smooth giriş
+        CanvasGroup cg = btnDoubleReward.GetComponent<CanvasGroup>();
+        if (cg == null) cg = btnDoubleReward.AddComponent<CanvasGroup>();
+
+        cg.alpha = 0f;
+        btnDoubleReward.transform.localScale = Vector3.one * 0.8f;
+        btnDoubleReward.SetActive(true);
+
+        float duration = 0.4f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            cg.alpha = Mathf.Lerp(0f, 1f, t);
+            btnDoubleReward.transform.localScale = Vector3.one * Mathf.Lerp(0.8f, 1f, t);
+            yield return null;
+        }
+
+        cg.alpha = 1f;
+        btnDoubleReward.transform.localScale = Vector3.one;
+
+        // Pulse efekti başlat
+        StartCoroutine(PulseDoubleRewardButton());
+    }
+
+    private IEnumerator PulseDoubleRewardButton()
+    {
+        if (btnDoubleReward == null) yield break;
+
+        while (!doubleRewardUsed)
+        {
+            float elapsed = 0f;
+            float half = 0.5f;
+
+            while (elapsed < half && !doubleRewardUsed)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                btnDoubleReward.transform.localScale =
+                    Vector3.one * Mathf.Lerp(1f, 1.06f, elapsed / half);
+                yield return null;
+            }
+
+            elapsed = 0f;
+            while (elapsed < half && !doubleRewardUsed)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                btnDoubleReward.transform.localScale =
+                    Vector3.one * Mathf.Lerp(1.06f, 1f, elapsed / half);
+                yield return null;
+            }
+        }
+
+        btnDoubleReward.transform.localScale = Vector3.one;
+    }
+
+    private IEnumerator DeactivateDoubleRewardButton()
+    {
+        if (btnDoubleReward == null) yield break;
+
+        // Tıklanamaz yap
+        Button btn = btnDoubleReward.GetComponent<Button>();
+        if (btn != null) btn.interactable = false;
+
+        // Renk değiştir
+        Image btnImage = btnDoubleReward.GetComponent<Image>();
+        if (btnImage != null) btnImage.color = btnDoubleUsedColor;
+
+        // Metni güncelle
+        TextMeshProUGUI txt = btnDoubleReward.GetComponentInChildren<TextMeshProUGUI>();
+        if (txt != null)
+            txt.text = LocalizationManager.Get("btn_double_used");
+
+        // Soluklaştır
+        CanvasGroup cg = btnDoubleReward.GetComponent<CanvasGroup>();
+        if (cg == null) cg = btnDoubleReward.AddComponent<CanvasGroup>();
+
+        float duration = 0.3f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            cg.alpha = Mathf.Lerp(1f, 0.5f, elapsed / duration);
+            yield return null;
+        }
+        cg.alpha = 0.5f;
+    }
+
     // ─── POWER-UP ÖDÜL ────────────────────────────────────────────
 
     private IEnumerator ShowPowerUpRewards()
     {
-        if (panelPowerUpReward == null || pendingRewards.Count == 0) yield break;
+        if (panelPowerUpReward == null || pendingRewards.Count == 0)
+        {
+            if (btnDoubleReward != null)
+                btnDoubleReward.SetActive(false);
+            yield break;
+        }
 
         yield return new WaitForSecondsRealtime(1.6f);
 
@@ -98,11 +254,9 @@ public class WinPanelController : MonoBehaviour
         {
             var (type, amount) = pendingRewards[i];
 
-            // Sprite güncelle
             if (rewardIconImages != null && i < rewardIconImages.Length && rewardIconImages[i] != null)
                 rewardIconImages[i].sprite = GetPowerUpSprite(type);
 
-            // Adet metni
             if (rewardCountTexts != null && i < rewardCountTexts.Length && rewardCountTexts[i] != null)
                 rewardCountTexts[i].text = $"x{amount}";
         }
@@ -119,7 +273,13 @@ public class WinPanelController : MonoBehaviour
             }
         }
 
+        // displayedRewards'a kopyala
+        displayedRewards = new List<(PowerUpType, int)>(pendingRewards);
         pendingRewards.Clear();
+
+        // 2x butonu smooth göster
+        if (!doubleRewardUsed)
+            StartCoroutine(ShowDoubleRewardButton());
     }
 
     private Sprite GetPowerUpSprite(PowerUpType type) => type switch
@@ -147,14 +307,10 @@ public class WinPanelController : MonoBehaviour
         if (isMoveMode)
         {
             int usedMoves = MoveController.Instance?.MoveCount ?? 0;
-
             int moveLimit = MoveController.Instance?.MoveLimit ??
                 (isFree ? 30 : (LevelSelectManager.SelectedLevel?.moveLimit ?? 0));
-
             int originalLimit = GameStateManager.OriginalMoveLimit > 0
-                ? GameStateManager.OriginalMoveLimit
-                : moveLimit;
-
+                ? GameStateManager.OriginalMoveLimit : moveLimit;
             float ratio = originalLimit > 0
                 ? (float)Mathf.Max(0, originalLimit - usedMoves) / originalLimit : 0f;
 
@@ -167,7 +323,6 @@ public class WinPanelController : MonoBehaviour
             float timeLimit = isFree
                 ? (TimerController.Instance?.TotalTime ?? 120f)
                 : (LevelSelectManager.SelectedLevel?.timeLimit ?? 0f);
-
             float ratio = timeLimit > 0 ? remainingTime / timeLimit : 0f;
             int minutes = Mathf.FloorToInt(remainingTime / 60);
             int seconds = Mathf.FloorToInt(remainingTime % 60);

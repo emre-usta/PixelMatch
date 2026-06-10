@@ -20,7 +20,7 @@ MonoBehaviour:
   useTimer: 1
   timeLimit: 75
   useMoveLimit: 0
-  moveLimit: 24
+  moveLimit: 22
   cardSprites:
   - {fileID: 21300000, guid: 11e33a8c1bd1db44196b27e28a537562, type: 3}
   - {fileID: 21300000, guid: d2618fa4835de974c81c7ab78bceb0f1, type: 3}

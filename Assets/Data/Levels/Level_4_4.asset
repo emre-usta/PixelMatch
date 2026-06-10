@@ -18,9 +18,9 @@ MonoBehaviour:
   columns: 4
   rows: 5
   useTimer: 1
-  timeLimit: 85
+  timeLimit: 82
   useMoveLimit: 0
-  moveLimit: 26
+  moveLimit: 23
   cardSprites:
   - {fileID: 21300000, guid: 568a8dae6f066ee418f71806e1acd132, type: 3}
   - {fileID: 21300000, guid: c89720a1b8f30c148b5149d7833fb0a9, type: 3}

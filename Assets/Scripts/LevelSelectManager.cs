@@ -59,6 +59,23 @@ public class LevelSelectManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Level popup açıksa kapat
+            if (LevelPopupManager.Instance != null &&
+                LevelPopupManager.Instance.IsPopupOpen)
+            {
+                LevelPopupManager.Instance.OnCloseClicked();
+                return;
+            }
+
+            // Popup kapalıysa Ana Menü'ye dön
+            OnBackClicked();
+        }
+    }
+
     private void Start()
     {
         if (categories == null || categories.Length == 0) return;

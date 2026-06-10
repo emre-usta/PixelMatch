@@ -67,6 +67,12 @@ public class FreeModeManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            OnBackClicked();
+    }
+
     private void Start()
     {
         SelectedColumns = 4;

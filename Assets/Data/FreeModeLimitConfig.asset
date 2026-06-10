@@ -16,60 +16,60 @@ MonoBehaviour:
   - columns: 4
     rows: 4
     difficulty: 0
-    timeLimit: 150
-    moveLimit: 35
+    timeLimit: 60
+    moveLimit: 16
   - columns: 4
     rows: 5
     difficulty: 0
-    timeLimit: 130
-    moveLimit: 30
+    timeLimit: 75
+    moveLimit: 20
   - columns: 5
     rows: 4
     difficulty: 0
-    timeLimit: 130
-    moveLimit: 30
+    timeLimit: 75
+    moveLimit: 20
   - columns: 6
     rows: 6
     difficulty: 0
-    timeLimit: 180
-    moveLimit: 45
+    timeLimit: 135
+    moveLimit: 36
   - columns: 4
     rows: 4
     difficulty: 1
-    timeLimit: 120
+    timeLimit: 43
+    moveLimit: 13
+  - columns: 4
+    rows: 5
+    difficulty: 1
+    timeLimit: 54
+    moveLimit: 16
+  - columns: 5
+    rows: 4
+    difficulty: 1
+    timeLimit: 54
+    moveLimit: 16
+  - columns: 6
+    rows: 6
+    difficulty: 1
+    timeLimit: 97
     moveLimit: 28
   - columns: 4
-    rows: 5
-    difficulty: 1
-    timeLimit: 100
-    moveLimit: 24
-  - columns: 5
-    rows: 4
-    difficulty: 1
-    timeLimit: 100
-    moveLimit: 24
-  - columns: 6
-    rows: 6
-    difficulty: 1
-    timeLimit: 150
-    moveLimit: 38
-  - columns: 4
     rows: 4
     difficulty: 2
-    timeLimit: 90
-    moveLimit: 22
+    timeLimit: 34
+    moveLimit: 10
   - columns: 4
     rows: 5
     difficulty: 2
-    timeLimit: 80
-    moveLimit: 20
+    timeLimit: 42
+    moveLimit: 12
   - columns: 5
     rows: 4
     difficulty: 2
-    timeLimit: 80
-    moveLimit: 20
+    timeLimit: 42
+    moveLimit: 12
   - columns: 6
     rows: 6
     difficulty: 2
-    timeLimit: 120
-    moveLimit: 30
+    timeLimit: 76
+    moveLimit: 20
