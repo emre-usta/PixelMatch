@@ -53,29 +53,21 @@ public class AdManager : MonoBehaviour
 
         ConsentInformation.Update(requestParameters, (FormError updateError) =>
         {
-            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            if (updateError != null)
             {
-                if (updateError != null)
-                {
-                    Debug.LogError("Consent update error: " + updateError.Message);
-                    Initialize();
-                    return;
-                }
+                Debug.LogError("Consent update error: " + updateError.Message);
+                Initialize();
+                return;
+            }
 
-                if (ConsentInformation.CanRequestAds())
-                    Initialize();
+            Initialize();
 
-                ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) =>
-                {
-                    MobileAdsEventExecutor.ExecuteInUpdate(() =>
-                    {
-                        if (showError != null)
-                            Debug.LogError("Consent form error: " + showError.Message);
+            ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) =>
+            {
+                if (showError != null)
+                    Debug.LogError("Consent form error: " + showError.Message);
 
-                        if (ConsentInformation.CanRequestAds())
-                            Initialize();
-                    });
-                });
+                Initialize();
             });
         });
     }
