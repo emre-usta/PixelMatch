@@ -174,7 +174,6 @@ public class GameStateManager : MonoBehaviour
 
     private void GiveDailyChallengeReward(int stars)
     {
-        Debug.Log($"GiveDCReward - stars:{stars}, PM:{PowerUpManager.Instance}");
         if (PowerUpManager.Instance == null) return;
 
         if (stars == 1)

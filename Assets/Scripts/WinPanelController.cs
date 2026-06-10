@@ -108,13 +108,11 @@ public class WinPanelController : MonoBehaviour
 
     public void OnDoubleRewardClicked()
     {
-        Debug.Log($"Clicked - doubleRewardUsed:{doubleRewardUsed} - displayedRewards:{displayedRewards.Count}");
         if (doubleRewardUsed) return;
 
         AdManager.Instance?.ShowRewarded(
             onSuccess: () =>
             {
-                Debug.Log("onSuccess çalıştı!");
                 doubleRewardUsed = true;
 
                 foreach (var (type, amount) in displayedRewards)
@@ -138,15 +136,12 @@ public class WinPanelController : MonoBehaviour
     {
         if (btnDoubleReward == null) yield break;
 
-        // Rengi aktif renge ayarla
         Image btnImage = btnDoubleReward.GetComponent<Image>();
         if (btnImage != null) btnImage.color = btnDoubleActiveColor;
 
-        // Tıklanabilir yap
         Button btn = btnDoubleReward.GetComponent<Button>();
-        if (btn != null) btn.interactable = true;
+        if (btn != null) btn.interactable = false; // ← animasyon süresince kapalı
 
-        // CanvasGroup ile smooth giriş
         CanvasGroup cg = btnDoubleReward.GetComponent<CanvasGroup>();
         if (cg == null) cg = btnDoubleReward.AddComponent<CanvasGroup>();
 
@@ -168,7 +163,8 @@ public class WinPanelController : MonoBehaviour
         cg.alpha = 1f;
         btnDoubleReward.transform.localScale = Vector3.one;
 
-        // Pulse efekti başlat
+        if (btn != null) btn.interactable = true; // ← animasyon bitti, aktif et
+
         StartCoroutine(PulseDoubleRewardButton());
     }
 
