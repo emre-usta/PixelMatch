@@ -1,12 +1,13 @@
-﻿using UnityEngine;
-using Firebase;
+﻿using Firebase;
 using Firebase.Analytics;
 using Firebase.Crashlytics;
+using Firebase.Extensions;
+using System.Threading.Tasks;
+using UnityEngine;
 
 public class FirebaseManager : MonoBehaviour
 {
     public static FirebaseManager Instance { get; private set; }
-
     private bool isInitialized = false;
 
     private void Awake()
@@ -23,7 +24,7 @@ public class FirebaseManager : MonoBehaviour
 
     private void InitializeFirebase()
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             var dependencyStatus = task.Result;
             if (dependencyStatus == DependencyStatus.Available)

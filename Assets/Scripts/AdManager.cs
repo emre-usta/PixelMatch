@@ -3,7 +3,6 @@ using GoogleMobileAds.Api;
 using GoogleMobileAds.Common;
 using GoogleMobileAds.Ump.Api;
 using System;
-using System.Collections.Generic;
 
 public class AdManager : MonoBehaviour
 {
@@ -26,8 +25,6 @@ public class AdManager : MonoBehaviour
     private const float MIN_INTERSTITIAL_INTERVAL = 180f;
     private float lastInterstitialTime = -999f;
 
-    private Action onRewardEarned;
-    private Action onRewardFailed;
     private Action onInterstitialClosed;
 
     public bool IsRewardedReady => rewardedAd != null && rewardedAd.CanShowAd();
@@ -53,29 +50,21 @@ public class AdManager : MonoBehaviour
 
         ConsentInformation.Update(requestParameters, (FormError updateError) =>
         {
-            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            if (updateError != null)
             {
-                if (updateError != null)
-                {
-                    Debug.LogError("Consent update error: " + updateError.Message);
-                    Initialize();
-                    return;
-                }
+                Debug.LogError("Consent update error: " + updateError.Message);
+                Initialize();
+                return;
+            }
 
-                if (ConsentInformation.CanRequestAds())
-                    Initialize();
+            Initialize();
 
-                ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) =>
-                {
-                    MobileAdsEventExecutor.ExecuteInUpdate(() =>
-                    {
-                        if (showError != null)
-                            Debug.LogError("Consent form error: " + showError.Message);
+            ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) =>
+            {
+                if (showError != null)
+                    Debug.LogError("Consent form error: " + showError.Message);
 
-                        if (ConsentInformation.CanRequestAds())
-                            Initialize();
-                    });
-                });
+                Initialize();
             });
         });
     }
@@ -128,33 +117,34 @@ public class AdManager : MonoBehaviour
             return;
         }
 
-        onRewardEarned = onSuccess;
-        onRewardFailed = onFail;
+        // Local capture → global state sorunu yok
+        Action localSuccess = onSuccess;
+        Action localFail = onFail;
 
-        rewardedAd.OnAdFullScreenContentClosed += OnRewardedClosed;
-        rewardedAd.OnAdFullScreenContentFailed += OnRewardedFailed;
+        void OnClosed()
+        {
+            rewardedAd.OnAdFullScreenContentClosed -= OnClosed;
+            rewardedAd.OnAdFullScreenContentFailed -= OnFailed;
+            LoadRewarded();
+        }
+
+        void OnFailed(AdError error)
+        {
+            rewardedAd.OnAdFullScreenContentClosed -= OnClosed;
+            rewardedAd.OnAdFullScreenContentFailed -= OnFailed;
+            localFail?.Invoke();
+            localFail = null;
+            LoadRewarded();
+        }
+
+        rewardedAd.OnAdFullScreenContentClosed += OnClosed;
+        rewardedAd.OnAdFullScreenContentFailed += OnFailed;
 
         rewardedAd.Show(reward =>
         {
-            onRewardEarned?.Invoke();
-            onRewardEarned = null;
+            localSuccess?.Invoke();
+            localSuccess = null;
         });
-    }
-
-    private void OnRewardedClosed()
-    {
-        rewardedAd.OnAdFullScreenContentClosed -= OnRewardedClosed;
-        rewardedAd.OnAdFullScreenContentFailed -= OnRewardedFailed;
-        LoadRewarded();
-    }
-
-    private void OnRewardedFailed(AdError error)
-    {
-        rewardedAd.OnAdFullScreenContentClosed -= OnRewardedClosed;
-        rewardedAd.OnAdFullScreenContentFailed -= OnRewardedFailed;
-        onRewardFailed?.Invoke();
-        onRewardFailed = null;
-        LoadRewarded();
     }
 
     // ─── INTERSTITIAL ─────────────────────────────────────────────

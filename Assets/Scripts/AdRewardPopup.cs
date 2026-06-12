@@ -162,8 +162,9 @@ public class AdRewardPopup : MonoBehaviour
 
         if (AdManager.Instance == null || !AdManager.Instance.IsRewardedReady)
         {
-            onWatched?.Invoke();
-            onWatched = null;
+            // Reklam hazır değil, ödül verme!
+            onDeclined?.Invoke();
+            onDeclined = null;
             return;
         }
 
@@ -172,7 +173,6 @@ public class AdRewardPopup : MonoBehaviour
         AdManager.Instance.ShowRewarded(
             onSuccess: () =>
             {
-                // Firebase: Reklam izlendi
                 FirebaseManager.Instance?.LogAdWatched(adType);
                 onWatched?.Invoke();
                 onWatched = null;
