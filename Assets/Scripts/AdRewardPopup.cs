@@ -19,6 +19,7 @@ public class AdRewardPopup : MonoBehaviour
 
     private System.Action onWatched;
     private System.Action onDeclined;
+    private string currentAdType = "";
 
     private bool secondChanceUsedThisSession = false;
 
@@ -46,6 +47,7 @@ public class AdRewardPopup : MonoBehaviour
             _ => "?"
         };
 
+        currentAdType = "powerup";
         onWatched = onSuccess;
         onDeclined = null;
 
@@ -63,7 +65,6 @@ public class AdRewardPopup : MonoBehaviour
 
     public void ShowForSecondChance(System.Action onSuccess, System.Action onDecline)
     {
-        // Bu denemede zaten ikinci şans kullanıldıysa direkt game over
         if (secondChanceUsedThisSession)
         {
             onDecline?.Invoke();
@@ -72,6 +73,7 @@ public class AdRewardPopup : MonoBehaviour
 
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
+        currentAdType = "second_chance";
         onWatched = () =>
         {
             secondChanceUsedThisSession = true;
@@ -95,6 +97,7 @@ public class AdRewardPopup : MonoBehaviour
 
     public void ShowForLockedLevel(int categoryID, int levelID, System.Action onSuccess)
     {
+        currentAdType = "unlock_level";
         onWatched = () =>
         {
             PlayerPrefs.SetInt($"ad_unlocked_{categoryID}_{levelID}", 1);
@@ -117,6 +120,7 @@ public class AdRewardPopup : MonoBehaviour
 
     public void ShowInfo(string title, string description)
     {
+        currentAdType = "";
         onWatched = null;
         onDeclined = null;
 
@@ -163,9 +167,21 @@ public class AdRewardPopup : MonoBehaviour
             return;
         }
 
+        string adType = currentAdType;
+
         AdManager.Instance.ShowRewarded(
-            onSuccess: () => { onWatched?.Invoke(); onWatched = null; },
-            onFail: () => { onDeclined?.Invoke(); onDeclined = null; }
+            onSuccess: () =>
+            {
+                // Firebase: Reklam izlendi
+                FirebaseManager.Instance?.LogAdWatched(adType);
+                onWatched?.Invoke();
+                onWatched = null;
+            },
+            onFail: () =>
+            {
+                onDeclined?.Invoke();
+                onDeclined = null;
+            }
         );
     }
 

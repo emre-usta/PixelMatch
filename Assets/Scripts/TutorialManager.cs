@@ -129,6 +129,9 @@ public class TutorialManager : MonoBehaviour
         PlayerPrefs.SetInt(KEY_TUTORIAL_DONE, 1);
         PlayerPrefs.Save();
 
+        // Firebase: Tutorial tamamlandı
+        FirebaseManager.Instance?.LogTutorialComplete();
+
         if (tutorialPanel != null) tutorialPanel.SetActive(false);
         Time.timeScale = 1f;
         GameStateManager.Instance?.OnGridReady();
