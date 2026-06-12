@@ -29,7 +29,6 @@ public class GameStateManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Ayarlar açıksa kapat
             if (SettingsManager.Instance != null &&
                 SettingsManager.Instance.IsSettingsOpen)
             {
@@ -37,14 +36,12 @@ public class GameStateManager : MonoBehaviour
                 return;
             }
 
-            // Playing ise Pause
             if (CurrentState == GameState.Playing)
             {
                 PauseGame();
                 return;
             }
 
-            // Paused ise Resume
             if (CurrentState == GameState.Paused)
             {
                 ResumeGame();
@@ -79,6 +76,12 @@ public class GameStateManager : MonoBehaviour
 
         SetState(GameState.Playing);
         GameEvents.RaiseGameStarted();
+
+        // Firebase: Level başlangıcı
+        if (!DailyChallengeManager.IsDailyChallengeActive && !FreeModeManager.IsFreeModeActive)
+            FirebaseManager.Instance?.LogLevelStart(
+                LevelSelectManager.SelectedCategoryID,
+                LevelSelectManager.SelectedLevel?.levelID ?? 0);
     }
 
     public void PauseGame()
@@ -134,7 +137,6 @@ public class GameStateManager : MonoBehaviour
             DailyChallengeManager.Instance.MarkPlayedToday(stars);
             DailyChallengeManager.SetInactive();
 
-            // PowerUpManager hazır olana kadar bekle
             yield return new WaitUntil(() => PowerUpManager.Instance != null);
 
             GiveDailyChallengeReward(stars);
@@ -174,6 +176,9 @@ public class GameStateManager : MonoBehaviour
 
     private void GiveDailyChallengeReward(int stars)
     {
+        // Firebase: DC tamamlanma
+        FirebaseManager.Instance?.LogDailyChallengeComplete(stars);
+
         if (PowerUpManager.Instance == null) return;
 
         if (stars == 1)
@@ -297,6 +302,9 @@ public class GameStateManager : MonoBehaviour
         int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
+        // Firebase: Level tamamlanma
+        FirebaseManager.Instance?.LogLevelComplete(categoryID, currentLevelID, stars);
+
         LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID);
 
         if (!isLastLevel)
@@ -350,12 +358,17 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameLost();
 
+        // Firebase: Level başarısızlık
+        if (!DailyChallengeManager.IsDailyChallengeActive && !FreeModeManager.IsFreeModeActive)
+            FirebaseManager.Instance?.LogLevelFail(
+                LevelSelectManager.SelectedCategoryID,
+                LevelSelectManager.SelectedLevel?.levelID ?? 0);
+
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
             DailyChallengeManager.Instance?.AddAttempt();
             bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
 
-            // Second Chance popup göster
             AdRewardPopup.Instance?.ShowForSecondChance(
                 onSuccess: () => ApplySecondChance(),
                 onDecline: () =>
@@ -415,7 +428,6 @@ public class GameStateManager : MonoBehaviour
             UpdateTilesRemaining();
             UpdateTotalPoints();
 
-            // Retry butonunu gizle
             var buttons = panelGameOver.GetComponentsInChildren<UnityEngine.UI.Button>(true);
             foreach (var btn in buttons)
                 if (btn.gameObject.name == "Btn_Retry")

@@ -20,6 +20,8 @@ public class PowerUpUI : MonoBehaviour
 
     [Header("Freeze Feedback")]
     [SerializeField] private GameObject freezeFeedbackPanel;
+    [SerializeField] private TextMeshProUGUI txtFreezeTitle;
+    [SerializeField] private TextMeshProUGUI txtFreezeSub;
 
     private void Awake()
     {
@@ -47,7 +49,6 @@ public class PowerUpUI : MonoBehaviour
         if (txtHintCount) txtHintCount.text = hintCount.ToString();
         if (txtFreezeCount) txtFreezeCount.text = freezeCount.ToString();
 
-        // Butonlar her zaman aktif — count 0 olsa da reklam popup'ı için tıklanabilir
         if (btnReveal) btnReveal.interactable = true;
         if (btnHint) btnHint.interactable = true;
         if (btnFreeze) btnFreeze.interactable = true;
@@ -56,7 +57,19 @@ public class PowerUpUI : MonoBehaviour
     public void ShowFreezeFeedback()
     {
         if (freezeFeedbackPanel != null) freezeFeedbackPanel.SetActive(true);
-        Invoke(nameof(HideFreezeFeedback), 5f);
+
+        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+
+        if (txtFreezeTitle != null)
+            txtFreezeTitle.text = LocalizationManager.Get("freeze_title");
+
+        if (txtFreezeSub != null)
+            txtFreezeSub.text = isMoveMode
+                ? LocalizationManager.Get("freeze_moves_feedback")
+                : LocalizationManager.Get("freeze_time_feedback");
+
+        if (!isMoveMode)
+            Invoke(nameof(HideFreezeFeedback), 5f);
     }
 
     public void HideFreezeFeedback()

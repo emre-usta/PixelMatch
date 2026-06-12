@@ -37,11 +37,9 @@ public class PowerUpManager : MonoBehaviour
 
         if (current <= 0)
         {
-            Debug.Log($"AdRewardPopup instance: {AdRewardPopup.Instance}");
             AdRewardPopup.Instance?.ShowForPowerUp(type, () =>
             {
                 AddPowerUp(type, 1);
-                //UseAfterAd(type);
             });
             return false;
         }
@@ -51,16 +49,6 @@ public class PowerUpManager : MonoBehaviour
         PowerUpUI.Instance?.UpdateUI();
         return true;
     }
-
-    /*private void UseAfterAd(PowerUpType type)
-    {
-        switch (type)
-        {
-            case PowerUpType.XRay: StartCoroutine(XRayCoroutine()); break;
-            case PowerUpType.MindFreeze: StartCoroutine(HintCoroutine()); break;
-            case PowerUpType.TimeFreeze: StartCoroutine(TimeFreezeCoroutine()); break;
-        }
-    }*/
 
     private string GetKey(PowerUpType type) => type switch
     {
@@ -75,12 +63,12 @@ public class PowerUpManager : MonoBehaviour
     public void UseXRay()
     {
         if (!TryUsePowerUp(PowerUpType.XRay)) return;
+        FirebaseManager.Instance?.LogPowerUpUsed("xray");
         StartCoroutine(XRayCoroutine());
     }
 
     public void UseHint()
     {
-        // Peek aktifse hint kullanma
         if (GridManager.Instance != null)
         {
             int openCount = 0;
@@ -88,18 +76,19 @@ public class PowerUpManager : MonoBehaviour
                 if (card.State == CardState.Open)
                     openCount++;
 
-            // Çok fazla kart açıksa (peek aktif) hint kullanma
             if (openCount > 2)
                 return;
         }
 
         if (!TryUsePowerUp(PowerUpType.MindFreeze)) return;
+        FirebaseManager.Instance?.LogPowerUpUsed("hint");
         StartCoroutine(HintCoroutine());
     }
 
     public void UseTimeFreeze()
     {
         if (!TryUsePowerUp(PowerUpType.TimeFreeze)) return;
+        FirebaseManager.Instance?.LogPowerUpUsed("freeze");
         StartCoroutine(TimeFreezeCoroutine());
     }
 
@@ -141,7 +130,6 @@ public class PowerUpManager : MonoBehaviour
         CardController hintA = null;
         CardController hintB = null;
 
-        // Açık kart varsa onun eşini bul
         CardController selectedCard = GridManager.Instance.FirstSelectedCard;
 
         if (selectedCard != null)
@@ -157,7 +145,6 @@ public class PowerUpManager : MonoBehaviour
             }
         }
 
-        // Açık kart yoksa herhangi bir çift bul
         if (hintA == null || hintB == null)
         {
             for (int i = 0; i < cards.Count; i++)
@@ -183,7 +170,7 @@ public class PowerUpManager : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.6f);
 
-        GridManager.Instance.ClearSelectedCard(); // ← firstSelectedCard sıfırla
+        GridManager.Instance.ClearSelectedCard();
         GameEvents.RaisePairMatched(hintA, hintB);
 
         yield return new WaitForSecondsRealtime(0.3f);
