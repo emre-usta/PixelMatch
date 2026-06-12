@@ -246,6 +246,10 @@ public class LocalizationManager : MonoBehaviour
         strings["banner_move_thief"] = "HAMLE HIRSIZI!";
         strings["combo_moves"] = "HAMLE";
         strings["combo_seconds"] = "SN";
+        strings["freeze_title"] = "DONDURULDU!";
+        strings["freeze_time_feedback"] = "Süre 5 saniye donduruldu!";
+        strings["freeze_moves_feedback"] = "Sonraki 3 hamle ücretsiz!";
+
 
         // Badge
         strings["badge_rookie"] = "ÇAYLAK";
@@ -414,6 +418,9 @@ public class LocalizationManager : MonoBehaviour
         strings["banner_move_thief"] = "MOVE THIEF!";
         strings["combo_moves"] = "MOVES";
         strings["combo_seconds"] = "SEC";
+        strings["freeze_title"] = "❄️ FROZEN!";
+        strings["freeze_time_feedback"] = "Time frozen for 5 seconds!";
+        strings["freeze_moves_feedback"] = "Next 3 moves are free!";
 
         // Badge
         strings["badge_rookie"] = "ROOKIE";

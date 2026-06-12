@@ -63,13 +63,16 @@ public class MoveController : MonoBehaviour
         {
             frozenMoves--;
             UpdateUI();
+
+            if (frozenMoves == 0)
+                PowerUpUI.Instance?.HideFreezeFeedback();
+
             return;
         }
 
         moveCount++;
         UpdateUI();
         GameEvents.RaiseMoveUsed(useMoveLimit ? moveLimit - moveCount : moveCount);
-
         if (useMoveLimit && moveCount >= moveLimit)
             GameStateManager.Instance.LoseGame();
     }
