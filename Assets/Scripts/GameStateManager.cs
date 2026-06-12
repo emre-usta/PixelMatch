@@ -534,10 +534,20 @@ public class GameStateManager : MonoBehaviour
     public void NextOrRetryWin()
     {
         Time.timeScale = 1f;
-        AdManager.Instance?.ShowInterstitialIfReady(() =>
-        {
-            SceneManager.LoadScene("LevelSelect");
-        });
+
+        AdManager.Instance?.ShowRewardedInterstitialIfReady(
+            onSuccess: () =>
+            {
+                PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
+                AdManager.Instance?.ShowInterstitialIfReady(() =>
+                    SceneManager.LoadScene("LevelSelect"));
+            },
+            onSkipped: () =>
+            {
+                AdManager.Instance?.ShowInterstitialIfReady(() =>
+                    SceneManager.LoadScene("LevelSelect"));
+            }
+        );
     }
 }
 

@@ -150,6 +150,21 @@ public class DailyChallengeManager : MonoBehaviour
     {
         if (IsPlayedToday()) return;
 
+        AdManager.Instance?.ShowRewardedInterstitialIfReady(
+            onSuccess: () =>
+            {
+                PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
+                LaunchDailyChallenge();
+            },
+            onSkipped: () =>
+            {
+                LaunchDailyChallenge();
+            }
+        );
+    }
+
+    private void LaunchDailyChallenge()
+    {
         IsDailyChallengeActive = true;
         LevelSelectManager.SelectedMode = LevelSelectManager.GameMode.Classic;
         SceneManager.LoadScene("Level1");
