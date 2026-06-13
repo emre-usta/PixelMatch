@@ -150,10 +150,8 @@ public class AdManager : MonoBehaviour
         rewardedAd.OnAdFullScreenContentClosed += OnClosed;
         rewardedAd.OnAdFullScreenContentFailed += OnFailed;
 
-        Debug.Log("[AdManager] Rewarded gösteriliyor");
         rewardedAd.Show(reward =>
         {
-            Debug.Log("[AdManager] Rewarded ödül kazanıldı!");
             localSuccess?.Invoke();
             localSuccess = null;
         });
@@ -193,7 +191,6 @@ public class AdManager : MonoBehaviour
         interstitialAd.OnAdFullScreenContentFailed += OnInterstitialFailed;
 
         lastInterstitialTime = Time.realtimeSinceStartup;
-        Debug.Log("[AdManager] Interstitial gösteriliyor");
         interstitialAd.Show();
     }
 
@@ -238,12 +235,9 @@ public class AdManager : MonoBehaviour
 
         if (!countReady || !timeReady || !IsRewardedInterstitialReady)
         {
-            Debug.Log("[AdManager] Rewarded Interstitial atlandı");
             onSkipped?.Invoke();
             return;
         }
-        Debug.Log("[AdManager] Rewarded Interstitial gösteriliyor");
-
 
         PlayerPrefs.SetFloat(KEY_LAST_REWARDED_INT, Time.realtimeSinceStartup);
         PlayerPrefs.Save();
