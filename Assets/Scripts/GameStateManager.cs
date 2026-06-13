@@ -321,7 +321,7 @@ public class GameStateManager : MonoBehaviour
 
         if (stars == 1)
         {
-            if (Random.value <= 0.4f)
+            if (Random.value <= 0.20f)  // 0.4f → 0.20f
             {
                 PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
                 NotifyWinPanel(PowerUpType.TimeFreeze);
@@ -330,22 +330,34 @@ public class GameStateManager : MonoBehaviour
 
         if (stars == 2)
         {
-            PowerUpType reward = Random.value <= 0.7f
-                ? PowerUpType.TimeFreeze
-                : PowerUpType.XRay;
-            PowerUpManager.Instance?.AddPowerUp(reward);
-            NotifyWinPanel(reward);
+            float roll = Random.value;
+            if (roll <= 0.50f)          // 0.7f → 0.50f
+            {
+                PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
+                NotifyWinPanel(PowerUpType.TimeFreeze);
+            }
+            else if (roll <= 0.70f)     // 0.50 + 0.20 = 0.70
+            {
+                PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
+                NotifyWinPanel(PowerUpType.XRay);
+            }
+            // %30 ihtimalle hiç ödül yok
         }
 
         if (stars == 3)
         {
             float roll = Random.value;
             PowerUpType reward =
-                roll <= 0.25f ? PowerUpType.TimeFreeze :
-                roll <= 0.70f ? PowerUpType.XRay :
-                PowerUpType.MindFreeze;
-            PowerUpManager.Instance?.AddPowerUp(reward);
-            NotifyWinPanel(reward);
+                roll <= 0.20f ? PowerUpType.TimeFreeze :
+                roll <= 0.55f ? PowerUpType.XRay :      // 0.20 + 0.35
+                roll <= 0.75f ? PowerUpType.MindFreeze : // 0.55 + 0.20
+                PowerUpType.TimeFreeze;                   // bu satıra düşmez
+
+            if (roll <= 0.75f)  // %75 ihtimalle ödül, %25 yok
+            {
+                PowerUpManager.Instance?.AddPowerUp(reward);
+                NotifyWinPanel(reward);
+            }
         }
     }
 

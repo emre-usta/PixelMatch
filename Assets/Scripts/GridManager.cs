@@ -32,6 +32,7 @@ public class GridManager : MonoBehaviour
 
     private int matchedPairCount = 0;
     private int totalPairCount = 0;
+
     public CardController FirstSelectedCard => firstSelectedCard;
 
     private void Awake()
@@ -148,7 +149,6 @@ public class GridManager : MonoBehaviour
         }
 
         Shuffle(cardIDs);
-        AdjustGridLayout();
 
         int timeThiefIndex1 = -1;
         int timeThiefIndex2 = -1;
@@ -168,6 +168,16 @@ public class GridManager : MonoBehaviour
                 timeThiefIndex2 = pairIndices[1];
             }
         }
+
+        StartCoroutine(GenerateGridDelayed(cardIDs, timeThiefIndex1, timeThiefIndex2, totalCards));
+    }
+
+    private IEnumerator GenerateGridDelayed(List<int> cardIDs, int timeThiefIndex1, int timeThiefIndex2, int totalCards)
+    {
+        // Canvas layout'un hesaplanmasını bekle
+        yield return null;
+
+        AdjustGridLayout();
 
         for (int i = 0; i < totalCards; i++)
         {
@@ -209,14 +219,16 @@ public class GridManager : MonoBehaviour
         float spacingX = 5f;
         float spacingY = 5f;
 
+        // Genişlik ve yüksekliği ayrı hesapla
         float cellWidth = (containerWidth - (spacingX * (columns + 1))) / columns;
         float cellHeight = (containerHeight - (spacingY * (rows + 1))) / rows;
-        float cellSize = Mathf.Min(cellWidth, cellHeight);
 
-        layout.cellSize = new Vector2(cellSize, cellSize);
+        // Kare yerine dikdörtgen kullan
+        layout.cellSize = new Vector2(cellWidth, cellHeight);
         layout.spacing = new Vector2(spacingX, spacingY);
         layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         layout.constraintCount = columns;
+        layout.childAlignment = TextAnchor.MiddleCenter;
     }
 
     // ─── KART SEÇİMİ & EŞLEŞME KONTROLÜ ─────────────────────────
