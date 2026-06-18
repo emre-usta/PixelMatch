@@ -17,6 +17,26 @@ MonoBehaviour:
   categoryDescription: Match the music instruments!
   categoryIcon: {fileID: 0}
   categoryColor: {r: 1, g: 1, b: 1, a: 1}
+  cardSprites:
+  - {fileID: 21300000, guid: 5d79b426e99f6f1498452f028dae18fd, type: 3}
+  - {fileID: 21300000, guid: 0696da867b70cd54c9b7eef11c492f22, type: 3}
+  - {fileID: 21300000, guid: 3d5c2480676478e4f967628f649fd8fc, type: 3}
+  - {fileID: 21300000, guid: 2d52ee9a86880014986c97e00c8e2611, type: 3}
+  - {fileID: 21300000, guid: 12f4987e5db764644986ffa43543bae7, type: 3}
+  - {fileID: 21300000, guid: ab31eb5d0f0f81e40b4ff43e34b217c3, type: 3}
+  - {fileID: 21300000, guid: e0b3ef8e0bef40047a784331ccad12bf, type: 3}
+  - {fileID: 21300000, guid: 40fba7569c24e4d47b94b758466f5fbf, type: 3}
+  - {fileID: 21300000, guid: a023eb86db7fe4a4cb848ad60a097850, type: 3}
+  - {fileID: 21300000, guid: 9ae45787b5162ad4dbda57c8acce2b0b, type: 3}
+  - {fileID: 21300000, guid: bda77a6ca041c1f4f8bc527a5a432a70, type: 3}
+  - {fileID: 21300000, guid: 64c587087692fff409e1f0ec6a27eb88, type: 3}
+  - {fileID: 21300000, guid: c4084ad10f887e84e9ca7e98ee5aa056, type: 3}
+  - {fileID: 21300000, guid: da93d50ac7ea9914684ac169437b305a, type: 3}
+  - {fileID: 21300000, guid: c376b2a5d2493c0439baf6b11e5357f8, type: 3}
+  - {fileID: 21300000, guid: c55b326fb783c0f48bece44db4335352, type: 3}
+  - {fileID: 21300000, guid: 6f816c02458a0254ea838dd9f9dd217e, type: 3}
+  - {fileID: 21300000, guid: 087077ad57a90e84d93f483782d88c8f, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: 8c0357a723bf2d44bb504dfef1daeb2f, type: 3}
   levels:
   - {fileID: 11400000, guid: e4b27ef2826bcc84d9eb3f193c29234d, type: 2}
   - {fileID: 11400000, guid: da9e308b351c835438b1c9067b207e67, type: 2}

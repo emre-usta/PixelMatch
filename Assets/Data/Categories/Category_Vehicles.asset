@@ -17,6 +17,26 @@ MonoBehaviour:
   categoryDescription: Match the vehicles!
   categoryIcon: {fileID: 0}
   categoryColor: {r: 1, g: 1, b: 1, a: 1}
+  cardSprites:
+  - {fileID: 21300000, guid: 18ef819024b40e44cb6c3202138a6f8b, type: 3}
+  - {fileID: 21300000, guid: 85a69118f3ab30b4a9a275253c0c5458, type: 3}
+  - {fileID: 21300000, guid: 57309d9632e73e744b33f42859d1b004, type: 3}
+  - {fileID: 21300000, guid: b56315f0a4fed6f428b038ac1b00bee2, type: 3}
+  - {fileID: 21300000, guid: e9bc3e5af6148464b9a6d1adfe910608, type: 3}
+  - {fileID: 21300000, guid: 8da46132bc9cea64f8ea39cadeed9767, type: 3}
+  - {fileID: 21300000, guid: 9d4e233cc975ddb42aa985c9f9f00abd, type: 3}
+  - {fileID: 21300000, guid: 8bbaa367eab0b6f4cb259f7a4b9bbadd, type: 3}
+  - {fileID: 21300000, guid: 3cbf7f2c11999a74093703499b84d243, type: 3}
+  - {fileID: 21300000, guid: 2e264311085b79e4da41b46cc319166b, type: 3}
+  - {fileID: 21300000, guid: f64490df3cb88514dae429df8cb0a897, type: 3}
+  - {fileID: 21300000, guid: 3fb36ab5e44c2a84880076a9996ac291, type: 3}
+  - {fileID: 21300000, guid: a99db65095cf47544a4a469a76ccf2b9, type: 3}
+  - {fileID: 21300000, guid: 711225a76dda7ef4eaebe883b88168e9, type: 3}
+  - {fileID: 21300000, guid: 16c029a484d47ed48af718b6e5204575, type: 3}
+  - {fileID: 21300000, guid: f85a6bcf25facac48a7bfda2579a4d90, type: 3}
+  - {fileID: 21300000, guid: 58392c55aad86144e8aeb4b0e47a8618, type: 3}
+  - {fileID: 21300000, guid: 0182af2f21fd65048ae9633b9e1a3d80, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: 96d894abcf425574782794976f746fdc, type: 3}
   levels:
   - {fileID: 11400000, guid: b46e6fe6ed1a5d9449b5d23f0fa63c73, type: 2}
   - {fileID: 11400000, guid: 31805fca8caee1441919db2be9b5f3e8, type: 2}

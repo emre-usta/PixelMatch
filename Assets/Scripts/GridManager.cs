@@ -72,12 +72,12 @@ public class GridManager : MonoBehaviour
         columns = DailyChallengeManager.DCColumns;
         rows = DailyChallengeManager.DCRows;
 
+        // Sprite'ları CategoryConfig'den al
         CategoryConfig cat = DailyChallengeManager.DCCategory;
-        if (cat != null && cat.levels.Length > 0)
+        if (cat != null)
         {
-            LevelConfig biggestLevel = cat.levels[cat.levels.Length - 1];
-            cardSprites = biggestLevel.cardSprites;
-            cardBackSprite = biggestLevel.cardBackSprite;
+            cardSprites = cat.cardSprites;
+            cardBackSprite = cat.cardBackSprite;
         }
 
         if (freeModeLimitConfig != null)
@@ -95,12 +95,12 @@ public class GridManager : MonoBehaviour
         columns = FreeModeManager.SelectedColumns;
         rows = FreeModeManager.SelectedRows;
 
+        // Sprite'ları CategoryConfig'den al
         CategoryConfig cat = FreeModeManager.SelectedCategory;
-        if (cat != null && cat.levels.Length > 0)
+        if (cat != null)
         {
-            LevelConfig biggestLevel = cat.levels[cat.levels.Length - 1];
-            cardSprites = biggestLevel.cardSprites;
-            cardBackSprite = biggestLevel.cardBackSprite;
+            cardSprites = cat.cardSprites;
+            cardBackSprite = cat.cardBackSprite;
         }
 
         bool isMoveMode = FreeModeManager.SelectedMode == LevelSelectManager.GameMode.Move;
@@ -122,10 +122,14 @@ public class GridManager : MonoBehaviour
         {
             columns = levelConfig.columns;
             rows = levelConfig.rows;
-            cardBackSprite = levelConfig.cardBackSprite;
 
-            if (levelConfig.cardSprites != null && levelConfig.cardSprites.Length > 0)
-                cardSprites = levelConfig.cardSprites;
+            // Sprite'ları CategoryConfig'den al
+            CategoryConfig cat = LevelSelectManager.SelectedCategory;
+            if (cat != null)
+            {
+                cardSprites = cat.cardSprites;
+                cardBackSprite = cat.cardBackSprite;
+            }
 
             bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
             TimerController.Instance?.SetConfig(!isMoveMode, levelConfig.timeLimit);
@@ -141,7 +145,7 @@ public class GridManager : MonoBehaviour
             return;
         }
 
-        // Tüm mevcut sprite ID'lerini listeye ekle
+        // Tüm sprite ID'lerini listeye ekle
         List<int> availableIDs = new List<int>();
         for (int i = 0; i < cardSprites.Length; i++)
             availableIDs.Add(i);
@@ -149,7 +153,7 @@ public class GridManager : MonoBehaviour
         // Rastgele karıştır
         Shuffle(availableIDs);
 
-        // Sadece ihtiyaç kadar seç (totalPairCount adet)
+        // İhtiyaç kadar seç
         List<int> selectedIDs = availableIDs.GetRange(0, totalPairCount);
 
         // Çiftleri oluştur
@@ -186,7 +190,6 @@ public class GridManager : MonoBehaviour
 
     private IEnumerator GenerateGridDelayed(List<int> cardIDs, int timeThiefIndex1, int timeThiefIndex2, int totalCards)
     {
-        // Canvas layout'un hesaplanmasını bekle
         yield return null;
 
         AdjustGridLayout();
@@ -231,11 +234,9 @@ public class GridManager : MonoBehaviour
         float spacingX = 5f;
         float spacingY = 5f;
 
-        // Genişlik ve yüksekliği ayrı hesapla
         float cellWidth = (containerWidth - (spacingX * (columns + 1))) / columns;
         float cellHeight = (containerHeight - (spacingY * (rows + 1))) / rows;
 
-        // Kare yerine dikdörtgen kullan
         layout.cellSize = new Vector2(cellWidth, cellHeight);
         layout.spacing = new Vector2(spacingX, spacingY);
         layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;

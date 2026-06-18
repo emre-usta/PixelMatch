@@ -18,10 +18,6 @@ public class LevelConfig : ScriptableObject
     public bool useMoveLimit = false;
     public int moveLimit = 30;
 
-    [Header("Kart Ayarları")]
-    public Sprite[] cardSprites;
-    public Sprite cardBackSprite;
-
     [Header("Zorluk")]
     public DifficultyLevel difficulty = DifficultyLevel.Easy;
 
@@ -33,7 +29,6 @@ public class LevelConfig : ScriptableObject
 
     public int TotalCards => columns * rows;
     public int TotalPairs => TotalCards / 2;
-    public bool IsValid => cardSprites != null && cardSprites.Length >= TotalPairs;
 }
 
 public enum DifficultyLevel

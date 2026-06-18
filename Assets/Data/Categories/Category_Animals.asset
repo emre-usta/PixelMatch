@@ -17,6 +17,26 @@ MonoBehaviour:
   categoryDescription: Match the cute pixel animals!
   categoryIcon: {fileID: 21300000, guid: 39fa4f43bf877c8489faf445f8b7933a, type: 3}
   categoryColor: {r: 0.17011857, g: 1, b: 0, a: 1}
+  cardSprites:
+  - {fileID: 21300000, guid: 906e9a74fe9b74649a1036816f5af9c1, type: 3}
+  - {fileID: 21300000, guid: 0bb03cdac0204ed46a7d1220cc573f9d, type: 3}
+  - {fileID: 21300000, guid: 75ad15b271ded16428aba45d7f55f9bd, type: 3}
+  - {fileID: 21300000, guid: 57ca3af5e9af97742af2b8224bf3032f, type: 3}
+  - {fileID: 21300000, guid: 0f5339e545a77e4428cc1f76261bbd28, type: 3}
+  - {fileID: 21300000, guid: fd00c87ddb96d0a40867601cb083a31c, type: 3}
+  - {fileID: 21300000, guid: 6a4ff1fcf6573f4468c8572aeeb60a5e, type: 3}
+  - {fileID: 21300000, guid: 7de77d31a1178c14cbb769e2b1dd241d, type: 3}
+  - {fileID: 21300000, guid: 404af7658a1eac647a1d623052c58f3e, type: 3}
+  - {fileID: 21300000, guid: 3a889b39d54543d4290559c3bd17dce1, type: 3}
+  - {fileID: 21300000, guid: f4e64224ace995548affb5840b7b6461, type: 3}
+  - {fileID: 21300000, guid: 7f4754652d7d2fc499c223cdd7e8defd, type: 3}
+  - {fileID: 21300000, guid: 6d01f5f084f86524e8dc0e6aedaf9ae9, type: 3}
+  - {fileID: 21300000, guid: d482dc0f82d2d4348802b889230e58ca, type: 3}
+  - {fileID: 21300000, guid: 61ea7509140b2da4685f41f5d95bd17e, type: 3}
+  - {fileID: 21300000, guid: 73e04883e2c3f1a4580be7c0021fd7f3, type: 3}
+  - {fileID: 21300000, guid: aceb94b26159ca44c8aac39d9fe0a129, type: 3}
+  - {fileID: 21300000, guid: 21a02b336e6c6474d85985f2eb1e2862, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: 2533eedbcfd0e8e43bd8db3fc92b3b5b, type: 3}
   levels:
   - {fileID: 11400000, guid: 69412c09362fecf4988c43b956eff350, type: 2}
   - {fileID: 11400000, guid: ff6eb1fc3676c7942825ce677dc5b843, type: 2}

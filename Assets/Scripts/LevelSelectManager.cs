@@ -41,6 +41,8 @@ public class LevelSelectManager : MonoBehaviour
     public static LevelConfig SelectedLevel { get; private set; }
     public static int SelectedCategoryID { get; private set; }
     public static int SelectedCategoryLevelCount { get; private set; }
+
+    public static CategoryConfig SelectedCategory { get; private set; }
     public static int TotalCategoryCount =>
         Instance != null && Instance.categories != null ? Instance.categories.Length : 0;
 
@@ -51,6 +53,7 @@ public class LevelSelectManager : MonoBehaviour
         SelectedCategoryID = 0;
         SelectedCategoryLevelCount = 0;
         SelectedMode = GameMode.Classic;
+        SelectedCategory = null;
     }
 
     private void Awake()
@@ -300,7 +303,7 @@ public class LevelSelectManager : MonoBehaviour
                 Image img = artImg.GetComponent<Image>();
                 if (img != null)
                 {
-                    if (isUnlocked && level.cardBackSprite != null)
+                    if (isUnlocked && level.previewSprite != null)
                     {
                         img.sprite = level.previewSprite;
                         img.gameObject.SetActive(true);
@@ -563,6 +566,7 @@ public class LevelSelectManager : MonoBehaviour
         SelectedLevel = level;
         SelectedCategoryID = Instance.selectedCategory.categoryID;
         SelectedCategoryLevelCount = Instance.selectedCategory.levels.Length;
+        SelectedCategory = Instance.selectedCategory;
     }
 
     public static bool IsLastLevelInCategory(int levelID)

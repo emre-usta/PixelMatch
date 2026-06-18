@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "CategoryConfig", menuName = "PixelMatch/Category Config")]
 public class CategoryConfig : ScriptableObject
@@ -9,6 +9,10 @@ public class CategoryConfig : ScriptableObject
     public string categoryDescription;
     public Sprite categoryIcon;
     public Color categoryColor = Color.white;
+
+    [Header("Kart Görselleri")]
+    public Sprite[] cardSprites;      // ← ekle (18 adet)
+    public Sprite cardBackSprite;     // ← ekle
 
     [Header("Levellar")]
     public LevelConfig[] levels;
