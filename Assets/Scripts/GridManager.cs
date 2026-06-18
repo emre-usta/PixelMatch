@@ -141,11 +141,23 @@ public class GridManager : MonoBehaviour
             return;
         }
 
+        // Tüm mevcut sprite ID'lerini listeye ekle
+        List<int> availableIDs = new List<int>();
+        for (int i = 0; i < cardSprites.Length; i++)
+            availableIDs.Add(i);
+
+        // Rastgele karıştır
+        Shuffle(availableIDs);
+
+        // Sadece ihtiyaç kadar seç (totalPairCount adet)
+        List<int> selectedIDs = availableIDs.GetRange(0, totalPairCount);
+
+        // Çiftleri oluştur
         List<int> cardIDs = new List<int>();
-        for (int i = 0; i < totalPairCount; i++)
+        foreach (int id in selectedIDs)
         {
-            cardIDs.Add(i);
-            cardIDs.Add(i);
+            cardIDs.Add(id);
+            cardIDs.Add(id);
         }
 
         Shuffle(cardIDs);

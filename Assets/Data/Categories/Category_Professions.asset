@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e7e4c026a3573a49b13785d9bad4072, type: 3}
+  m_Name: Category_Professions
+  m_EditorClassIdentifier: 
+  categoryID: 5
+  categoryName: Professions
+  categoryDescription: Match the music instruments!
+  categoryIcon: {fileID: 0}
+  categoryColor: {r: 1, g: 1, b: 1, a: 1}
+  levels:
+  - {fileID: 11400000, guid: 77b4f36f754821846ba940a9195fecb2, type: 2}
+  - {fileID: 11400000, guid: 70a4d2d7e22ada74da16862596b3a0dc, type: 2}
+  - {fileID: 11400000, guid: d7864a0e207c0f64092750b5c0b44fb5, type: 2}
+  - {fileID: 11400000, guid: 97aa6b78e34107346ad2ad3c30850ce0, type: 2}
+  - {fileID: 11400000, guid: dd729ffebf72aab478997dd78d501513, type: 2}
+  - {fileID: 11400000, guid: 0690719157f1a78459ff7b9bb0dd2b69, type: 2}
+  - {fileID: 11400000, guid: ae143e9876420de4ebd7ea34e43b4077, type: 2}
+  - {fileID: 11400000, guid: 549c369712eed464aac38ec67ac5770e, type: 2}
+  - {fileID: 11400000, guid: 273bb406bbf85da4e898668a00fd5553, type: 2}
+  - {fileID: 11400000, guid: 808f0b640fdb9bb4ba114b405e59914c, type: 2}

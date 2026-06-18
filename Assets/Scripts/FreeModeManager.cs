@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class FreeModeManager : MonoBehaviour
 {
@@ -29,8 +30,9 @@ public class FreeModeManager : MonoBehaviour
     [SerializeField] private FreeModeLimitConfig limitConfig;
     [SerializeField] private CategoryConfig[] categories;
 
-    [Header("Kategori Butonları")]
-    [SerializeField] private Button[] categoryButtons;
+    [Header("Kategori Scroll")]
+    [SerializeField] private Transform categoryContent;
+    [SerializeField] private Button categoryButtonPrefab;
 
     [Header("Grid Butonları")]
     [SerializeField] private Button btn4x4;
@@ -61,6 +63,9 @@ public class FreeModeManager : MonoBehaviour
     private readonly Color colorActiveBorder = new Color(0.96f, 0.65f, 0.14f);
     private readonly Color colorInactiveBorder = new Color(0.16f, 0.16f, 0.31f);
 
+    private List<Button> categoryButtons = new List<Button>();
+    private int selectedCategoryIndex = 0;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -83,6 +88,7 @@ public class FreeModeManager : MonoBehaviour
         if (categories != null && categories.Length > 0)
             SelectedCategory = categories[0];
 
+        CreateCategoryButtons();
         SetupButtons();
         UpdateLimitInfo();
         UpdateButtonLabels();
@@ -96,21 +102,40 @@ public class FreeModeManager : MonoBehaviour
         Button[] modeBtns = { btnClassic, btnMove };
         HighlightButton(modeBtns, 0, false);
 
-        HighlightButton(categoryButtons, 0, false);
+        HighlightCategoryButton(0);
+    }
+
+    // ─── KATEGORİ BUTON OLUŞTURMA ────────────────────────────────
+
+    private void CreateCategoryButtons()
+    {
+        if (categoryContent == null || categoryButtonPrefab == null) return;
+
+        // Mevcut butonları temizle
+        foreach (Transform child in categoryContent)
+            Destroy(child.gameObject);
+
+        categoryButtons.Clear();
+
+        for (int i = 0; i < categories.Length; i++)
+        {
+            int index = i;
+            CategoryConfig cat = categories[i];
+
+            Button btn = Instantiate(categoryButtonPrefab, categoryContent);
+            TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+                txt.text = LocalizationManager.Get(cat.categoryName);
+
+            btn.onClick.AddListener(() => SelectCategory(cat, index));
+            categoryButtons.Add(btn);
+        }
     }
 
     // ─── BUTON KURULUM ────────────────────────────────────────────
 
     private void SetupButtons()
     {
-        for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
-        {
-            CategoryConfig cat = categories[i];
-            TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-            if (txt != null) txt.text = LocalizationManager.Get(cat.categoryName);
-            categoryButtons[i].onClick.AddListener(() => SelectCategory(cat));
-        }
-
         btn4x4?.onClick.AddListener(() => SelectGrid(4, 4));
         btn4x5?.onClick.AddListener(() => SelectGrid(4, 5));
         btn5x6?.onClick.AddListener(() => SelectGrid(5, 6));
@@ -148,7 +173,7 @@ public class FreeModeManager : MonoBehaviour
         SetButtonLabel(btnClassic, "mode_classic");
         SetButtonLabel(btnMove, "mode_move");
 
-        for (int i = 0; i < categoryButtons.Length && i < categories.Length; i++)
+        for (int i = 0; i < categoryButtons.Count && i < categories.Length; i++)
         {
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (txt != null)
@@ -167,10 +192,11 @@ public class FreeModeManager : MonoBehaviour
 
     // ─── SEÇİM METOTLARI ──────────────────────────────────────────
 
-    private void SelectCategory(CategoryConfig category)
+    private void SelectCategory(CategoryConfig category, int index)
     {
         SelectedCategory = category;
-        HighlightButton(categoryButtons, System.Array.IndexOf(categories, category), false);
+        selectedCategoryIndex = index;
+        HighlightCategoryButton(index);
     }
 
     private void SelectGrid(int cols, int rows)
@@ -205,6 +231,32 @@ public class FreeModeManager : MonoBehaviour
     }
 
     // ─── BUTON VURGULAMA ──────────────────────────────────────────
+
+    private void HighlightCategoryButton(int selectedIndex)
+    {
+        for (int i = 0; i < categoryButtons.Count; i++)
+        {
+            if (categoryButtons[i] == null) continue;
+
+            bool isActive = (i == selectedIndex);
+
+            Image bg = categoryButtons[i].GetComponent<Image>();
+            if (bg != null)
+                bg.color = isActive ? colorActiveBg : colorInactiveBg;
+
+            TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+                txt.color = isActive ? colorActiveText : colorInactiveText;
+
+            Transform borderBottom = categoryButtons[i].transform.Find("Border_Bottom");
+            if (borderBottom != null)
+            {
+                Image borderImg = borderBottom.GetComponent<Image>();
+                if (borderImg != null)
+                    borderImg.color = isActive ? colorActiveBorder : colorInactiveBorder;
+            }
+        }
+    }
 
     private void HighlightButton(Button[] buttons, int selectedIndex, bool isDifficulty)
     {

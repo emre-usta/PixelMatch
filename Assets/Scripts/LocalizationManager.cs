@@ -233,6 +233,9 @@ public class LocalizationManager : MonoBehaviour
         strings["Natures"] = "DOĞA";
         strings["Space"] = "UZAY";
         strings["Legends"] = "EFSANELER"; // ← düzeltildi
+        strings["Professions"] = "MESLEKLER";
+        strings["MusicInstruments"] = "MÜZİK \nALETLERİ";
+        strings["Vehicles"] = "ARAÇLAR";
 
         // Efektler
         strings["time_thief_title"] = "ZAMAN HIRSIZI";
@@ -405,6 +408,9 @@ public class LocalizationManager : MonoBehaviour
         strings["Natures"] = "NATURES";
         strings["Space"] = "SPACE";
         strings["Legends"] = "LEGENDS"; // ← düzeltildi
+        strings["Professions"] = "PROFESSIONS";
+        strings["MusicInstruments"] = "MUSIC \nINSTRUMENTS";
+        strings["Vehicles"] = "VEHICLES";
 
         // Efektler
         strings["time_thief_title"] = "TIME THIEF";

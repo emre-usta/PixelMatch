@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db900b700fd33a743bb035839a3a1e37, type: 3}
+  m_Name: Level_7_8
+  m_EditorClassIdentifier: 
+  levelID: 7
+  levelName: MusicInstruments 8
+  levelIcon: {fileID: 0}
+  columns: 5
+  rows: 6
+  useTimer: 1
+  timeLimit: 92
+  useMoveLimit: 0
+  moveLimit: 37
+  cardSprites:
+  - {fileID: 21300000, guid: e0cd30b81e2192e4abb697d15168ca41, type: 3}
+  - {fileID: 21300000, guid: da883e9720aee014bbcbdef577cf3053, type: 3}
+  - {fileID: 21300000, guid: 40f030f39e55a8a46ab9b818ca728a7f, type: 3}
+  - {fileID: 21300000, guid: cdda76532ee8d784fa098ea49af51adf, type: 3}
+  - {fileID: 21300000, guid: 4f2b60ee7889ba14c94cf5a9a09c714e, type: 3}
+  - {fileID: 21300000, guid: 80c7dd5fbd317c64283aceca57759da4, type: 3}
+  - {fileID: 21300000, guid: 8e77d1ac15a27d6439d8c07f8a043247, type: 3}
+  - {fileID: 21300000, guid: 9b4c4d38f48405f4fbd44668f9f3a046, type: 3}
+  cardBackSprite: {fileID: 21300000, guid: 8c0357a723bf2d44bb504dfef1daeb2f, type: 3}
+  difficulty: 2
+  timeThiefSprite: {fileID: 21300000, guid: cb48ad0965646114080af8f779edf2eb, type: 3}
+  previewSprite: {fileID: 21300000, guid: cbdae4e6595e745448dff7e71f5b7c82, type: 3}
