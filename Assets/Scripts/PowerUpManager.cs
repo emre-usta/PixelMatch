@@ -203,7 +203,6 @@ public class PowerUpManager : MonoBehaviour
         if (isMoveMode)
         {
             MoveController.Instance?.ActivateFreezeForMoves(3);
-            // Hamle modunda isPowerUpActive MoveController tarafından sıfırlanacak
             isPowerUpActive = false;
             yield break;
         }

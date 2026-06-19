@@ -94,13 +94,13 @@ public class FreeModeManager : MonoBehaviour
         UpdateButtonLabels();
 
         Button[] gridBtns = { btn4x4, btn4x5, btn5x6, btn6x6 };
-        HighlightButton(gridBtns, 0, false);
+        HighlightButton(gridBtns, 0);
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
-        HighlightButton(diffBtns, 0, false);
+        HighlightButton(diffBtns, 0);
 
         Button[] modeBtns = { btnClassic, btnMove };
-        HighlightButton(modeBtns, 0, false);
+        HighlightButton(modeBtns, 0);
 
         HighlightCategoryButton(0);
     }
@@ -209,7 +209,7 @@ public class FreeModeManager : MonoBehaviour
         int index = (cols == 4 && rows == 4) ? 0 :
                     (cols == 4 && rows == 5) ? 1 :
                     (cols == 5 && rows == 6) ? 2 : 3;
-        HighlightButton(gridBtns, index, false);
+        HighlightButton(gridBtns, index);
     }
 
     private void SelectDifficulty(DifficultyLevel difficulty)
@@ -218,7 +218,7 @@ public class FreeModeManager : MonoBehaviour
         UpdateLimitInfo();
 
         Button[] diffBtns = { btnEasy, btnMedium, btnHard };
-        HighlightButton(diffBtns, (int)difficulty, false);
+        HighlightButton(diffBtns, (int)difficulty);
     }
 
     private void SelectMode(LevelSelectManager.GameMode mode)
@@ -227,7 +227,7 @@ public class FreeModeManager : MonoBehaviour
         LevelSelectManager.SelectedMode = mode;
 
         Button[] modeBtns = { btnClassic, btnMove };
-        HighlightButton(modeBtns, mode == LevelSelectManager.GameMode.Classic ? 0 : 1, false);
+        HighlightButton(modeBtns, mode == LevelSelectManager.GameMode.Classic ? 0 : 1);
     }
 
     // ─── BUTON VURGULAMA ──────────────────────────────────────────
@@ -258,7 +258,7 @@ public class FreeModeManager : MonoBehaviour
         }
     }
 
-    private void HighlightButton(Button[] buttons, int selectedIndex, bool isDifficulty)
+    private void HighlightButton(Button[] buttons, int selectedIndex)
     {
         for (int i = 0; i < buttons.Length; i++)
         {

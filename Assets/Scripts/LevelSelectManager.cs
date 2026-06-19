@@ -69,7 +69,6 @@ public class LevelSelectManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Level popup açıksa kapat
             if (LevelPopupManager.Instance != null &&
                 LevelPopupManager.Instance.IsPopupOpen)
             {
@@ -77,7 +76,6 @@ public class LevelSelectManager : MonoBehaviour
                 return;
             }
 
-            // Popup kapalıysa Ana Menü'ye dön
             OnBackClicked();
         }
     }
@@ -253,7 +251,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // Text_LevelName
         Transform levelNameT = card.transform.Find("Panel_CardInfo/Text_LevelName");
         if (levelNameT != null)
         {
@@ -269,7 +266,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // Text_LevelStat
         Transform levelStatT = card.transform.Find("Panel_CardInfo/Text_LevelStat");
         if (levelStatT != null)
         {
@@ -301,12 +297,10 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // Img_LockIcon
         Transform lockIcon = card.transform.Find("Img_LevelArt/Img_LockIcon");
         if (lockIcon != null)
             lockIcon.gameObject.SetActive(!isUnlocked);
 
-        // Img_LevelArt
         Transform levelArt = card.transform.Find("Img_LevelArt");
         if (levelArt != null)
         {
@@ -329,7 +323,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // Tag_New
         Transform tagNew = card.transform.Find("Img_LevelArt/Tag_New");
         if (tagNew != null)
         {
@@ -344,7 +337,6 @@ public class LevelSelectManager : MonoBehaviour
             if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
         }
 
-        // Tag_Ad
         Transform tagAd = card.transform.Find("Img_LevelArt/Tag_Ad");
         if (tagAd != null)
         {
@@ -356,13 +348,11 @@ public class LevelSelectManager : MonoBehaviour
                     adTxt.text = LocalizationManager.Get("ad_unlock_hint");
             }
 
-            // Sadece reklam ile açılabilir levelda göster
             bool canUnlockCheck = IsNextUnlockableLevel(selectedCategory, levelIndex);
             tagAd.gameObject.SetActive(canUnlockCheck);
             if (canUnlockCheck) StartCoroutine(AnimateNewTag(tagAd.gameObject));
         }
 
-        // Panel_Stars
         Transform starsPanel = card.transform.Find("Panel_Stars");
         if (starsPanel != null)
         {
@@ -376,7 +366,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // Text_Difficulty
         Transform diffT = card.transform.Find("Text_Difficulty");
         if (diffT != null)
         {
@@ -408,7 +397,6 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        // Kilitli kart görünümü
         if (!isUnlocked)
         {
             Image cardImage = card.GetComponent<Image>();
@@ -416,7 +404,6 @@ public class LevelSelectManager : MonoBehaviour
                 cardImage.color = new Color(0.05f, 0.04f, 0.03f);
         }
 
-        // Button
         Button btn = card.GetComponent<Button>();
         if (btn != null)
         {
@@ -451,7 +438,6 @@ public class LevelSelectManager : MonoBehaviour
                 }
                 else
                 {
-                    // Tamamlanmamış reklam leveli var mı kontrol et
                     bool hasUnfinishedAdLevel = false;
                     for (int i = 0; i < selectedCategory.levels.Length; i++)
                     {

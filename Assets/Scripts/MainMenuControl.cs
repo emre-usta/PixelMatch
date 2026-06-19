@@ -18,7 +18,6 @@ public class MainMenuControl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // Ayarlar açýksa kapat
             if (SettingsManager.Instance != null &&
                 SettingsManager.Instance.IsSettingsOpen)
             {
@@ -26,14 +25,12 @@ public class MainMenuControl : MonoBehaviour
                 return;
             }
 
-            // Quit popup açýksa kapat
             if (quitPanel != null && quitPanel.activeSelf)
             {
                 OnQuitCancelled();
                 return;
             }
 
-            // Hiçbiri açýk deðilse exit popup aç
             OnExitClicked();
         }
     }

@@ -77,7 +77,6 @@ public class GameStateManager : MonoBehaviour
         SetState(GameState.Playing);
         GameEvents.RaiseGameStarted();
 
-        // Firebase: Level başlangıcı
         if (!DailyChallengeManager.IsDailyChallengeActive && !FreeModeManager.IsFreeModeActive)
             FirebaseManager.Instance?.LogLevelStart(
                 LevelSelectManager.SelectedCategoryID,
@@ -176,7 +175,6 @@ public class GameStateManager : MonoBehaviour
 
     private void GiveDailyChallengeReward(int stars)
     {
-        // Firebase: DC tamamlanma
         FirebaseManager.Instance?.LogDailyChallengeComplete(stars);
 
         if (PowerUpManager.Instance == null) return;
@@ -302,7 +300,6 @@ public class GameStateManager : MonoBehaviour
         int totalLevels = LevelSelectManager.SelectedCategoryLevelCount;
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
-        // Firebase: Level tamamlanma
         FirebaseManager.Instance?.LogLevelComplete(categoryID, currentLevelID, stars);
 
         LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID);
@@ -321,7 +318,7 @@ public class GameStateManager : MonoBehaviour
 
         if (stars == 1)
         {
-            if (Random.value <= 0.20f)  // 0.4f → 0.20f
+            if (Random.value <= 0.20f)
             {
                 PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
                 NotifyWinPanel(PowerUpType.TimeFreeze);
@@ -331,17 +328,16 @@ public class GameStateManager : MonoBehaviour
         if (stars == 2)
         {
             float roll = Random.value;
-            if (roll <= 0.50f)          // 0.7f → 0.50f
+            if (roll <= 0.50f)
             {
                 PowerUpManager.Instance?.AddPowerUp(PowerUpType.TimeFreeze);
                 NotifyWinPanel(PowerUpType.TimeFreeze);
             }
-            else if (roll <= 0.70f)     // 0.50 + 0.20 = 0.70
+            else if (roll <= 0.70f)
             {
                 PowerUpManager.Instance?.AddPowerUp(PowerUpType.XRay);
                 NotifyWinPanel(PowerUpType.XRay);
             }
-            // %30 ihtimalle hiç ödül yok
         }
 
         if (stars == 3)
@@ -349,11 +345,11 @@ public class GameStateManager : MonoBehaviour
             float roll = Random.value;
             PowerUpType reward =
                 roll <= 0.20f ? PowerUpType.TimeFreeze :
-                roll <= 0.55f ? PowerUpType.XRay :      // 0.20 + 0.35
-                roll <= 0.75f ? PowerUpType.MindFreeze : // 0.55 + 0.20
-                PowerUpType.TimeFreeze;                   // bu satıra düşmez
+                roll <= 0.55f ? PowerUpType.XRay :
+                roll <= 0.75f ? PowerUpType.MindFreeze :
+                PowerUpType.TimeFreeze;
 
-            if (roll <= 0.75f)  // %75 ihtimalle ödül, %25 yok
+            if (roll <= 0.75f)
             {
                 PowerUpManager.Instance?.AddPowerUp(reward);
                 NotifyWinPanel(reward);
@@ -370,7 +366,6 @@ public class GameStateManager : MonoBehaviour
         Time.timeScale = 0f;
         GameEvents.RaiseGameLost();
 
-        // Firebase: Level başarısızlık
         if (!DailyChallengeManager.IsDailyChallengeActive && !FreeModeManager.IsFreeModeActive)
             FirebaseManager.Instance?.LogLevelFail(
                 LevelSelectManager.SelectedCategoryID,

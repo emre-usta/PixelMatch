@@ -39,7 +39,7 @@ public class SettingsManager : MonoBehaviour
     [Header("Gizlilik")]
     [SerializeField] private Button btnPrivacy;
     [SerializeField] private Button btnPrivacyPolicy;
-    [SerializeField] private GameObject panelPrivacy; // Layout Group parent
+    [SerializeField] private GameObject panelPrivacy;
 
     private bool bgmMuted = false;
     private bool sfxMuted = false;
@@ -211,8 +211,6 @@ public class SettingsManager : MonoBehaviour
 
         btnPrivacy.gameObject.SetActive(isRequired);
 
-        // Layout Group parent'ı her zaman görünür bırak
-        // İçindeki butonlar kendi görünürlüğünü yönetir
         if (panelPrivacy != null)
             panelPrivacy.SetActive(true);
     }

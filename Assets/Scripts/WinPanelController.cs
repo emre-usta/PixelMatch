@@ -118,14 +118,12 @@ public class WinPanelController : MonoBehaviour
                 foreach (var (type, amount) in displayedRewards)
                     PowerUpManager.Instance?.AddPowerUp(type, amount);
 
-                // Count textleri güncelle
                 for (int i = 0; i < displayedRewards.Count && i < rewardCountTexts.Length; i++)
                 {
                     if (rewardCountTexts[i] != null)
                         rewardCountTexts[i].text = $"x{displayedRewards[i].amount * 2}";
                 }
 
-                // Time.timeScale sıfırla ki coroutine çalışsın
                 Time.timeScale = 0f;
                 StartCoroutine(DeactivateDoubleRewardButton());
             }
@@ -140,7 +138,7 @@ public class WinPanelController : MonoBehaviour
         if (btnImage != null) btnImage.color = btnDoubleActiveColor;
 
         Button btn = btnDoubleReward.GetComponent<Button>();
-        if (btn != null) btn.interactable = false; // ← animasyon süresince kapalı
+        if (btn != null) btn.interactable = false;
 
         CanvasGroup cg = btnDoubleReward.GetComponent<CanvasGroup>();
         if (cg == null) cg = btnDoubleReward.AddComponent<CanvasGroup>();
@@ -163,7 +161,7 @@ public class WinPanelController : MonoBehaviour
         cg.alpha = 1f;
         btnDoubleReward.transform.localScale = Vector3.one;
 
-        if (btn != null) btn.interactable = true; // ← animasyon bitti, aktif et
+        if (btn != null) btn.interactable = true;
 
         StartCoroutine(PulseDoubleRewardButton());
     }
@@ -202,20 +200,16 @@ public class WinPanelController : MonoBehaviour
     {
         if (btnDoubleReward == null) yield break;
 
-        // Tıklanamaz yap
         Button btn = btnDoubleReward.GetComponent<Button>();
         if (btn != null) btn.interactable = false;
 
-        // Renk değiştir
         Image btnImage = btnDoubleReward.GetComponent<Image>();
         if (btnImage != null) btnImage.color = btnDoubleUsedColor;
 
-        // Metni güncelle
         TextMeshProUGUI txt = btnDoubleReward.GetComponentInChildren<TextMeshProUGUI>();
         if (txt != null)
             txt.text = LocalizationManager.Get("btn_double_used");
 
-        // Soluklaştır
         CanvasGroup cg = btnDoubleReward.GetComponent<CanvasGroup>();
         if (cg == null) cg = btnDoubleReward.AddComponent<CanvasGroup>();
 
@@ -269,11 +263,9 @@ public class WinPanelController : MonoBehaviour
             }
         }
 
-        // displayedRewards'a kopyala
         displayedRewards = new List<(PowerUpType, int)>(pendingRewards);
         pendingRewards.Clear();
 
-        // 2x butonu smooth göster
         if (!doubleRewardUsed)
             StartCoroutine(ShowDoubleRewardButton());
     }

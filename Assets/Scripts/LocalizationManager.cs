@@ -232,7 +232,7 @@ public class LocalizationManager : MonoBehaviour
         strings["Foods"] = "YİYECEKLER";
         strings["Natures"] = "DOĞA";
         strings["Space"] = "UZAY";
-        strings["Legends"] = "EFSANELER"; // ← düzeltildi
+        strings["Legends"] = "EFSANELER";
         strings["Professions"] = "MESLEKLER";
         strings["MusicInstruments"] = "MÜZİK \nALETLERİ";
         strings["Vehicles"] = "ARAÇLAR";
@@ -407,7 +407,7 @@ public class LocalizationManager : MonoBehaviour
         strings["Foods"] = "FOODS";
         strings["Natures"] = "NATURES";
         strings["Space"] = "SPACE";
-        strings["Legends"] = "LEGENDS"; // ← düzeltildi
+        strings["Legends"] = "LEGENDS";
         strings["Professions"] = "PROFESSIONS";
         strings["MusicInstruments"] = "MUSIC \nINSTRUMENTS";
         strings["Vehicles"] = "VEHICLES";

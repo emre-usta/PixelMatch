@@ -11,8 +11,8 @@ public class CategoryConfig : ScriptableObject
     public Color categoryColor = Color.white;
 
     [Header("Kart Görselleri")]
-    public Sprite[] cardSprites;      // ← ekle (18 adet)
-    public Sprite cardBackSprite;     // ← ekle
+    public Sprite[] cardSprites;
+    public Sprite cardBackSprite;
 
     [Header("Levellar")]
     public LevelConfig[] levels;

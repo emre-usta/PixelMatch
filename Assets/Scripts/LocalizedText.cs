@@ -23,10 +23,8 @@ public class LocalizedText : MonoBehaviour
 
     public void UpdateText()
     {
-        // tmp null ise tekrar almayý dene
         if (tmp == null) tmp = GetComponent<TextMeshProUGUI>();
 
-        // Hala null ise sessizce çýk — hata verme
         if (tmp == null) return;
 
         if (string.IsNullOrEmpty(localizationKey)) return;

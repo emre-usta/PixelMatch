@@ -2,7 +2,6 @@
 using Firebase.Analytics;
 using Firebase.Crashlytics;
 using Firebase.Extensions;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class FirebaseManager : MonoBehaviour
@@ -33,7 +32,6 @@ public class FirebaseManager : MonoBehaviour
                 FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
                 Crashlytics.ReportUncaughtExceptionsAsFatal = true;
                 isInitialized = true;
-                Debug.Log("Firebase initialized successfully!");
             }
             else
             {

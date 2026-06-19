@@ -72,7 +72,6 @@ public class GridManager : MonoBehaviour
         columns = DailyChallengeManager.DCColumns;
         rows = DailyChallengeManager.DCRows;
 
-        // Sprite'ları CategoryConfig'den al
         CategoryConfig cat = DailyChallengeManager.DCCategory;
         if (cat != null)
         {
@@ -95,7 +94,6 @@ public class GridManager : MonoBehaviour
         columns = FreeModeManager.SelectedColumns;
         rows = FreeModeManager.SelectedRows;
 
-        // Sprite'ları CategoryConfig'den al
         CategoryConfig cat = FreeModeManager.SelectedCategory;
         if (cat != null)
         {
@@ -123,7 +121,6 @@ public class GridManager : MonoBehaviour
             columns = levelConfig.columns;
             rows = levelConfig.rows;
 
-            // Sprite'ları CategoryConfig'den al
             CategoryConfig cat = LevelSelectManager.SelectedCategory;
             if (cat != null)
             {
@@ -145,18 +142,14 @@ public class GridManager : MonoBehaviour
             return;
         }
 
-        // Tüm sprite ID'lerini listeye ekle
         List<int> availableIDs = new List<int>();
         for (int i = 0; i < cardSprites.Length; i++)
             availableIDs.Add(i);
 
-        // Rastgele karıştır
         Shuffle(availableIDs);
 
-        // İhtiyaç kadar seç
         List<int> selectedIDs = availableIDs.GetRange(0, totalPairCount);
 
-        // Çiftleri oluştur
         List<int> cardIDs = new List<int>();
         foreach (int id in selectedIDs)
         {
@@ -306,7 +299,6 @@ public class GridManager : MonoBehaviour
     }
     private IEnumerator WinDelayed()
     {
-        // Kart kaybolma animasyonunun bitmesini bekle
         yield return new WaitForSecondsRealtime(0.8f);
         GameStateManager.Instance.WinGame();
     }
