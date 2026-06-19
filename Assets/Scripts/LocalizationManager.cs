@@ -424,7 +424,7 @@ public class LocalizationManager : MonoBehaviour
         strings["banner_move_thief"] = "MOVE THIEF!";
         strings["combo_moves"] = "MOVES";
         strings["combo_seconds"] = "SEC";
-        strings["freeze_title"] = "❄️ FROZEN!";
+        strings["freeze_title"] = "FROZEN!";
         strings["freeze_time_feedback"] = "Time frozen for 5 seconds!";
         strings["freeze_moves_feedback"] = "Next 3 moves are free!";
 

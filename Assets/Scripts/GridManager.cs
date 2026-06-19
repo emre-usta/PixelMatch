@@ -302,7 +302,13 @@ public class GridManager : MonoBehaviour
         matchedPairCount++;
 
         if (matchedPairCount >= totalPairCount)
-            GameStateManager.Instance.WinGame();
+            StartCoroutine(WinDelayed());
+    }
+    private IEnumerator WinDelayed()
+    {
+        // Kart kaybolma animasyonunun bitmesini bekle
+        yield return new WaitForSecondsRealtime(0.8f);
+        GameStateManager.Instance.WinGame();
     }
 
     private void HandlePairMismatch(CardController a, CardController b)

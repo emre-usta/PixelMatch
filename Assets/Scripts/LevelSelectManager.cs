@@ -28,6 +28,9 @@ public class LevelSelectManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtHintCount;
     [SerializeField] private TextMeshProUGUI txtFreezeCount;
 
+    [Header("Kategori Scroll")]
+    [SerializeField] private ScrollRect categoryScrollRect;
+
     private readonly Color colorCatActive = new Color(0.10f, 0.23f, 0.06f);
     private readonly Color colorCatInactive = new Color(0.05f, 0.07f, 0.09f);
     private readonly Color colorBorderActive = new Color(0.27f, 0.80f, 0.40f);
@@ -126,6 +129,7 @@ public class LevelSelectManager : MonoBehaviour
 
         UpdateCategoryButtons(index);
         UpdateProgress(index);
+        ScrollToCategoryButton(index);
 
         foreach (Transform child in levelContainer)
             Destroy(child.gameObject);
@@ -157,6 +161,15 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     public void OnCategoryClicked(int index) => LoadCategory(index);
+
+    private void ScrollToCategoryButton(int index)
+    {
+        if (categoryScrollRect == null || categoryButtons == null) return;
+        if (categoryButtons.Length <= 1) return;
+
+        float normalizedPos = (float)index / (categoryButtons.Length - 1);
+        categoryScrollRect.horizontalNormalizedPosition = normalizedPos;
+    }
 
     // ─── KATEGORİ BUTON GÜNCELLEMESİ ─────────────────────────────
 
@@ -583,4 +596,20 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     public void OnBackClicked() => SceneManager.LoadScene("MainMenu");
+
+    // ─── KATEGORİ NAVİGASYON ─────────────────────────────────────
+
+    public void OnPreviousCategoryClicked()
+    {
+        int newIndex = selectedCategoryIndex - 1;
+        if (newIndex < 0) newIndex = categories.Length - 1;
+        LoadCategory(newIndex);
+    }
+
+    public void OnNextCategoryClicked()
+    {
+        int newIndex = selectedCategoryIndex + 1;
+        if (newIndex >= categories.Length) newIndex = 0;
+        LoadCategory(newIndex);
+    }
 }

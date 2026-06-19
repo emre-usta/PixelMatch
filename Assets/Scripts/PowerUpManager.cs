@@ -9,6 +9,7 @@ public class PowerUpManager : MonoBehaviour
     private const string KEY_HINT = "powerup_hint";
     private const string KEY_FREEZE = "powerup_freeze";
     private const int MAX_COUNT = 10;
+    private bool isPowerUpActive = false;
 
     private void Awake()
     {
@@ -62,6 +63,7 @@ public class PowerUpManager : MonoBehaviour
 
     public void UseXRay()
     {
+        if (isPowerUpActive) return;
         if (!TryUsePowerUp(PowerUpType.XRay)) return;
         FirebaseManager.Instance?.LogPowerUpUsed("xray");
         StartCoroutine(XRayCoroutine());
@@ -69,6 +71,7 @@ public class PowerUpManager : MonoBehaviour
 
     public void UseHint()
     {
+        if (isPowerUpActive) return;
         if (GridManager.Instance != null)
         {
             int openCount = 0;
@@ -87,6 +90,7 @@ public class PowerUpManager : MonoBehaviour
 
     public void UseTimeFreeze()
     {
+        if (isPowerUpActive) return;
         if (!TryUsePowerUp(PowerUpType.TimeFreeze)) return;
         FirebaseManager.Instance?.LogPowerUpUsed("freeze");
         StartCoroutine(TimeFreezeCoroutine());
@@ -96,7 +100,9 @@ public class PowerUpManager : MonoBehaviour
 
     private IEnumerator XRayCoroutine()
     {
-        if (GridManager.Instance == null) yield break;
+        isPowerUpActive = true;
+
+        if (GridManager.Instance == null) { isPowerUpActive = false; yield break; }
 
         GridManager.Instance.SetAllCardsInteractable(false);
 
@@ -118,13 +124,16 @@ public class PowerUpManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.3f);
 
         GridManager.Instance.SetAllCardsInteractable(true);
+        isPowerUpActive = false;
     }
 
     // ─── HINT ─────────────────────────────────────────────────────
 
     private IEnumerator HintCoroutine()
     {
-        if (GridManager.Instance == null) yield break;
+        isPowerUpActive = true;
+
+        if (GridManager.Instance == null) { isPowerUpActive = false; yield break; }
 
         var cards = GridManager.Instance.AllCards;
         CardController hintA = null;
@@ -162,7 +171,7 @@ public class PowerUpManager : MonoBehaviour
             }
         }
 
-        if (hintA == null || hintB == null) yield break;
+        if (hintA == null || hintB == null) { isPowerUpActive = false; yield break; }
 
         GridManager.Instance.SetAllCardsInteractable(false);
         hintA.RevealSilent();
@@ -174,13 +183,17 @@ public class PowerUpManager : MonoBehaviour
         GameEvents.RaisePairMatched(hintA, hintB);
 
         yield return new WaitForSecondsRealtime(0.3f);
+
         GridManager.Instance.SetAllCardsInteractable(true);
+        isPowerUpActive = false;
     }
 
     // ─── TIME FREEZE ──────────────────────────────────────────────
 
     private IEnumerator TimeFreezeCoroutine()
     {
+        isPowerUpActive = true;
+
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
 
         ComboEffectManager.Instance?.TriggerFreezeFlash();
@@ -190,6 +203,8 @@ public class PowerUpManager : MonoBehaviour
         if (isMoveMode)
         {
             MoveController.Instance?.ActivateFreezeForMoves(3);
+            // Hamle modunda isPowerUpActive MoveController tarafından sıfırlanacak
+            isPowerUpActive = false;
             yield break;
         }
 
@@ -199,5 +214,6 @@ public class PowerUpManager : MonoBehaviour
 
         TimerController.Instance?.ResumeTimer();
         PowerUpUI.Instance?.HideFreezeFeedback();
+        isPowerUpActive = false;
     }
 }
