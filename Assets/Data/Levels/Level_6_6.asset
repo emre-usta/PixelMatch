@@ -15,22 +15,12 @@ MonoBehaviour:
   levelID: 5
   levelName: Professions 6
   levelIcon: {fileID: 0}
-  columns: 4
+  columns: 5
   rows: 4
   useTimer: 1
   timeLimit: 60
   useMoveLimit: 0
   moveLimit: 18
-  cardSprites:
-  - {fileID: 21300000, guid: e0cd30b81e2192e4abb697d15168ca41, type: 3}
-  - {fileID: 21300000, guid: da883e9720aee014bbcbdef577cf3053, type: 3}
-  - {fileID: 21300000, guid: 40f030f39e55a8a46ab9b818ca728a7f, type: 3}
-  - {fileID: 21300000, guid: cdda76532ee8d784fa098ea49af51adf, type: 3}
-  - {fileID: 21300000, guid: 4f2b60ee7889ba14c94cf5a9a09c714e, type: 3}
-  - {fileID: 21300000, guid: 80c7dd5fbd317c64283aceca57759da4, type: 3}
-  - {fileID: 21300000, guid: 8e77d1ac15a27d6439d8c07f8a043247, type: 3}
-  - {fileID: 21300000, guid: 9b4c4d38f48405f4fbd44668f9f3a046, type: 3}
-  cardBackSprite: {fileID: 21300000, guid: f51aa8eb13a485b469e5900e73672b62, type: 3}
   difficulty: 1
   timeThiefSprite: {fileID: 0}
   previewSprite: {fileID: 21300000, guid: 5a5460d187d008c49b6d6d9708c9d946, type: 3}
