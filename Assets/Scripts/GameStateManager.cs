@@ -139,6 +139,7 @@ public class GameStateManager : MonoBehaviour
             yield return new WaitUntil(() => PowerUpManager.Instance != null);
 
             GiveDailyChallengeReward(stars);
+            LogLevelEndEvent(success: true, stars: stars);
 
             if (panelWin != null)
             {
@@ -157,6 +158,7 @@ public class GameStateManager : MonoBehaviour
         SaveStars(starsNormal);
         SaveRecord(starsNormal);
         UnlockNextLevel(starsNormal);
+        LogLevelEndEvent(success: true, stars: starsNormal);
 
         if (panelWin != null)
         {
@@ -371,6 +373,8 @@ public class GameStateManager : MonoBehaviour
                 LevelSelectManager.SelectedCategoryID,
                 LevelSelectManager.SelectedLevel?.levelID ?? 0);
 
+        LogLevelEndEvent(success: false, stars: 0);
+
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
             DailyChallengeManager.Instance?.AddAttempt();
@@ -510,6 +514,41 @@ public class GameStateManager : MonoBehaviour
 
     public bool IsPlaying => CurrentState == GameState.Playing;
 
+    private void LogLevelEndEvent(bool success, int stars)
+    {
+        if (FreeModeManager.IsFreeModeActive) return;
+
+        int categoryID = LevelSelectManager.SelectedCategoryID;
+        int levelID = LevelSelectManager.SelectedLevel?.levelID ?? 0;
+        string category = LevelSelectManager.SelectedCategory?.categoryName ?? "unknown";
+
+        string gameMode = DailyChallengeManager.IsDailyChallengeActive
+                            ? "daily_challenge"
+                            : LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move
+                                ? "move"
+                                : "classic";
+
+        int columns = DailyChallengeManager.IsDailyChallengeActive
+                            ? DailyChallengeManager.DCColumns
+                            : LevelSelectManager.SelectedLevel?.columns ?? 0;
+
+        int rows = DailyChallengeManager.IsDailyChallengeActive
+                            ? DailyChallengeManager.DCRows
+                            : LevelSelectManager.SelectedLevel?.rows ?? 0;
+
+        float timeLeft = TimerController.Instance != null
+                            ? TimerController.Instance.RemainingTime : 0f;
+
+        int movesLeft = MoveController.Instance != null
+                            ? MoveController.Instance.MoveLimit - MoveController.Instance.MoveCount : 0;
+
+        int timeThiefHits = GridManager.Instance != null
+                            ? GridManager.Instance.TimeThiefHitCount : 0;
+
+        FirebaseManager.Instance?.LogLevelEnd(
+            categoryID, category, levelID, success, gameMode,
+            columns, rows, stars, timeLeft, movesLeft, timeThiefHits);
+    }
     private void SetState(GameState newState) => CurrentState = newState;
 
     public void LoadMainMenu()

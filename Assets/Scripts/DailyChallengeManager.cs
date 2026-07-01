@@ -167,6 +167,20 @@ public class DailyChallengeManager : MonoBehaviour
     {
         IsDailyChallengeActive = true;
         LevelSelectManager.SelectedMode = LevelSelectManager.GameMode.Classic;
+
+        string difficulty = DCDifficulty switch
+        {
+            DifficultyLevel.Easy => "easy",
+            DifficultyLevel.Medium => "medium",
+            DifficultyLevel.Hard => "hard",
+            _ => "easy"
+        };
+        FirebaseManager.Instance?.LogDailyChallengeStart(
+            difficulty,
+            DCColumns,
+            DCRows,
+            DCCategory?.categoryName ?? "unknown");
+
         SceneManager.LoadScene("Level1");
     }
 

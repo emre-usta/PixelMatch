@@ -173,7 +173,10 @@ public class AdRewardPopup : MonoBehaviour
         AdManager.Instance.ShowRewarded(
             onSuccess: () =>
             {
-                FirebaseManager.Instance?.LogAdWatched(adType);
+                FirebaseManager.Instance?.LogAdWatched(
+                    "rewarded",
+                    adType,
+                    LevelSelectManager.SelectedLevel?.levelID ?? 0);
                 onWatched?.Invoke();
                 onWatched = null;
             },

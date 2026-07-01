@@ -65,7 +65,11 @@ public class PowerUpManager : MonoBehaviour
     {
         if (isPowerUpActive) return;
         if (!TryUsePowerUp(PowerUpType.XRay)) return;
-        FirebaseManager.Instance?.LogPowerUpUsed("xray");
+        FirebaseManager.Instance?.LogPowerUpUsed(
+            "xray",
+            LevelSelectManager.SelectedLevel?.levelID ?? 0,
+            LevelSelectManager.SelectedCategoryID,
+            "standard_play");
         StartCoroutine(XRayCoroutine());
     }
 
@@ -84,7 +88,11 @@ public class PowerUpManager : MonoBehaviour
         }
 
         if (!TryUsePowerUp(PowerUpType.MindFreeze)) return;
-        FirebaseManager.Instance?.LogPowerUpUsed("hint");
+        FirebaseManager.Instance?.LogPowerUpUsed(
+            "hint",
+            LevelSelectManager.SelectedLevel?.levelID ?? 0,
+            LevelSelectManager.SelectedCategoryID,
+            "standard_play");
         StartCoroutine(HintCoroutine());
     }
 
@@ -92,7 +100,11 @@ public class PowerUpManager : MonoBehaviour
     {
         if (isPowerUpActive) return;
         if (!TryUsePowerUp(PowerUpType.TimeFreeze)) return;
-        FirebaseManager.Instance?.LogPowerUpUsed("freeze");
+        FirebaseManager.Instance?.LogPowerUpUsed(
+            "freeze",
+            LevelSelectManager.SelectedLevel?.levelID ?? 0,
+            LevelSelectManager.SelectedCategoryID,
+            "standard_play");
         StartCoroutine(TimeFreezeCoroutine());
     }
 

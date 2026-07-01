@@ -119,7 +119,7 @@ public class AdManager : MonoBehaviour
         });
     }
 
-    public void ShowRewarded(Action onSuccess, Action onFail = null)
+    public void ShowRewarded(Action onSuccess, Action onFail = null, string adPlacement = "powerup")
     {
         if (!IsRewardedReady)
         {
@@ -152,6 +152,10 @@ public class AdManager : MonoBehaviour
 
         rewardedAd.Show(reward =>
         {
+            FirebaseManager.Instance?.LogAdWatched(
+                "rewarded",
+                adPlacement,
+                LevelSelectManager.SelectedLevel?.levelID ?? 0);
             localSuccess?.Invoke();
             localSuccess = null;
         });
@@ -191,6 +195,10 @@ public class AdManager : MonoBehaviour
         interstitialAd.OnAdFullScreenContentFailed += OnInterstitialFailed;
 
         lastInterstitialTime = Time.realtimeSinceStartup;
+        FirebaseManager.Instance?.LogAdWatched(
+            "interstitial",
+            "level_transition",
+            LevelSelectManager.SelectedLevel?.levelID ?? 0);
         interstitialAd.Show();
     }
 
@@ -225,7 +233,7 @@ public class AdManager : MonoBehaviour
         });
     }
 
-    public void ShowRewardedInterstitialIfReady(Action onSuccess = null, Action onSkipped = null)
+    public void ShowRewardedInterstitialIfReady(Action onSuccess = null, Action onSkipped = null, string adPlacement = "dc_start")
     {
         int count = PlayerPrefs.GetInt(KEY_LEVEL_COUNT, 0);
         float lastTime = PlayerPrefs.GetFloat(KEY_LAST_REWARDED_INT, -999f);
@@ -273,6 +281,10 @@ public class AdManager : MonoBehaviour
         rewardedInterstitialAd.Show(reward =>
         {
             rewardEarned = true;
+            FirebaseManager.Instance?.LogAdWatched(
+                "rewarded_interstitial",
+                adPlacement,
+                LevelSelectManager.SelectedLevel?.levelID ?? 0);
         });
     }
 }

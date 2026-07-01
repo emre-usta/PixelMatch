@@ -32,8 +32,10 @@ public class GridManager : MonoBehaviour
 
     private int matchedPairCount = 0;
     private int totalPairCount = 0;
+    private int timeThiefHitCount = 0;
 
     public CardController FirstSelectedCard => firstSelectedCard;
+    public int TimeThiefHitCount => timeThiefHitCount;
 
     private void Awake()
     {
@@ -272,6 +274,7 @@ public class GridManager : MonoBehaviour
 
             if (hasTimeThief)
             {
+                timeThiefHitCount++;
                 GameEvents.RaiseEffectTriggered(CardEffectType.TimeThief);
                 StartCoroutine(MismatchSequence(firstSelectedCard, secondSelectedCard));
             }
