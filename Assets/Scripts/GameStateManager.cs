@@ -303,6 +303,7 @@ public class GameStateManager : MonoBehaviour
         bool isLastLevel = currentLevelID >= totalLevels - 1;
 
         FirebaseManager.Instance?.LogLevelComplete(categoryID, currentLevelID, stars);
+        InAppReviewManager.Instance?.OnLevelCompleted();
 
         LevelProgressManager.Instance.UnlockLevel(categoryID, currentLevelID);
 
