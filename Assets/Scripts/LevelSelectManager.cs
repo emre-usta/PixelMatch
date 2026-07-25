@@ -31,8 +31,8 @@ public class LevelSelectManager : MonoBehaviour
     [Header("Kategori Scroll")]
     [SerializeField] private ScrollRect categoryScrollRect;
 
-    private readonly Color colorCatActive = new Color(0.10f, 0.23f, 0.06f);
-    private readonly Color colorCatInactive = new Color(0.05f, 0.07f, 0.09f);
+    private readonly Color colorCatActive = new Color(0.043f, 0.196f, 0.714f, 1f);   // #0B32B6 - seçili
+    private readonly Color colorCatInactive = new Color(0.043f, 0.196f, 0.420f, 1f); // #0B326B - default
     private readonly Color colorBorderActive = new Color(0.27f, 0.80f, 0.40f);
     private readonly Color colorBorderInactive = new Color(0.16f, 0.19f, 0.25f);
     private readonly Color colorTextActive = new Color(0.27f, 0.80f, 0.40f);
@@ -197,7 +197,10 @@ public class LevelSelectManager : MonoBehaviour
             }
 
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
-            if (txt != null) txt.color = isActive ? colorTextActive : colorTextInactive;
+            if (txt != null)
+                txt.color = isActive
+                    ? new Color(0.267f, 0.800f, 0.400f, 1f)  // #44CC66 - seçili
+                    : new Color(0.937f, 1.000f, 0.035f, 1f);  // #DFFF09 - default
         }
     }
 
@@ -234,22 +237,46 @@ public class LevelSelectManager : MonoBehaviour
             ? LevelProgressManager.Instance.GetBestStars(selectedCategory.categoryID, levelIndex)
             : 0;
 
-        Color borderColor = !isUnlocked
-            ? new Color(0.12f, 0.16f, 0.19f)
-            : isNew
-                ? new Color(0.27f, 0.67f, 1.00f)
-                : new Color(0.27f, 0.80f, 0.40f);
+        bool isCompleted = bestStars > 0;
+        bool canUnlock = IsNextUnlockableLevel(selectedCategory, levelIndex);
 
-        string[] borderNames = { "Border_Top", "Border_Bottom", "Border_Left", "Border_Right" };
-        foreach (string b in borderNames)
+        // ─── ÇERÇEVE VE ARKA PLAN RENKLERİ ───────────────────────────
+
+        // Ana kart arka planı
+        Image cardBg = card.GetComponent<Image>();
+        if (cardBg != null)
         {
-            Transform border = card.transform.Find(b);
-            if (border != null)
+            if (!isUnlocked)
+                cardBg.color = new Color(0.08f, 0.10f, 0.18f); // Kilitli - çok koyu, neredeyse siyah
+            else if (isCompleted)
+                cardBg.color = new Color(0.05f, 0.17f, 0.10f); // Tamamlandı - koyu yeşil
+            else if (isNew)
+                cardBg.color = new Color(0.05f, 0.10f, 0.22f); // Yeni - koyu mavi
+            else
+                cardBg.color = new Color(0.05f, 0.08f, 0.15f); // Normal - koyu
+        }
+
+        // Çerçeve (en alttaki Image objesi)
+        Transform frameT = card.transform.Find("Image");
+        if (frameT != null)
+        {
+            Image frameImg = frameT.GetComponent<Image>();
+            if (frameImg != null)
             {
-                Image img = border.GetComponent<Image>();
-                if (img != null) img.color = borderColor;
+                if (!isUnlocked && canUnlock)
+                    frameImg.color = new Color(1.00f, 0.84f, 0.25f);  // Altın - reklam ile açılabilir
+                else if (!isUnlocked)
+                    frameImg.color = new Color(0.25f, 0.32f, 0.45f);  // Daha belirgin gri-mavi - kilitli
+                else if (isCompleted)
+                    frameImg.color = new Color(0.00f, 0.90f, 0.46f);  // Yeşil - tamamlandı
+                else if (isNew)
+                    frameImg.color = new Color(0.16f, 0.62f, 1.00f);  // Mavi - yeni
+                else
+                    frameImg.color = new Color(0.27f, 0.80f, 0.40f);  // Açık yeşil - açılmış
             }
         }
+
+        // ─── LEVEL ADI ────────────────────────────────────────────────
 
         Transform levelNameT = card.transform.Find("Panel_CardInfo/Text_LevelName");
         if (levelNameT != null)
@@ -259,12 +286,12 @@ public class LevelSelectManager : MonoBehaviour
             {
                 txt.text = $"LVL {levelIndex + 1:D2}";
                 txt.color = !isUnlocked
-                    ? new Color(0.16f, 0.19f, 0.25f)
-                    : isNew
-                        ? new Color(0.27f, 0.67f, 1.00f)
-                        : new Color(0.27f, 0.80f, 0.40f);
+                    ? new Color(0.30f, 0.35f, 0.45f)
+                    : new Color(1.00f, 1.00f, 1.00f);
             }
         }
+
+        // ─── LEVEL STAT ───────────────────────────────────────────────
 
         Transform levelStatT = card.transform.Find("Panel_CardInfo/Text_LevelStat");
         if (levelStatT != null)
@@ -297,74 +324,7 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        Transform lockIcon = card.transform.Find("Img_LevelArt/Img_LockIcon");
-        if (lockIcon != null)
-            lockIcon.gameObject.SetActive(!isUnlocked);
-
-        Transform levelArt = card.transform.Find("Img_LevelArt");
-        if (levelArt != null)
-        {
-            Transform artImg = levelArt.Find("Img_Art");
-            if (artImg != null)
-            {
-                Image img = artImg.GetComponent<Image>();
-                if (img != null)
-                {
-                    if (isUnlocked && level.previewSprite != null)
-                    {
-                        img.sprite = level.previewSprite;
-                        img.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        img.gameObject.SetActive(false);
-                    }
-                }
-            }
-        }
-
-        Transform tagNew = card.transform.Find("Img_LevelArt/Tag_New");
-        if (tagNew != null)
-        {
-            Transform textNew = tagNew.Find("Text_New");
-            if (textNew != null)
-            {
-                TextMeshProUGUI newTxt = textNew.GetComponent<TextMeshProUGUI>();
-                if (newTxt != null)
-                    newTxt.text = LocalizationManager.Get("new_tag");
-            }
-            tagNew.gameObject.SetActive(isNew);
-            if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
-        }
-
-        Transform tagAd = card.transform.Find("Img_LevelArt/Tag_Ad");
-        if (tagAd != null)
-        {
-            Transform textAd = tagAd.Find("Text_Ad");
-            if (textAd != null)
-            {
-                TextMeshProUGUI adTxt = textAd.GetComponent<TextMeshProUGUI>();
-                if (adTxt != null)
-                    adTxt.text = LocalizationManager.Get("ad_unlock_hint");
-            }
-
-            bool canUnlockCheck = IsNextUnlockableLevel(selectedCategory, levelIndex);
-            tagAd.gameObject.SetActive(canUnlockCheck);
-            if (canUnlockCheck) StartCoroutine(AnimateNewTag(tagAd.gameObject));
-        }
-
-        Transform starsPanel = card.transform.Find("Panel_Stars");
-        if (starsPanel != null)
-        {
-            for (int s = 0; s < starsPanel.childCount; s++)
-            {
-                Image starImg = starsPanel.GetChild(s).GetComponent<Image>();
-                if (starImg != null)
-                    starImg.color = (s < bestStars)
-                        ? new Color(0.98f, 0.78f, 0.46f)
-                        : new Color(0.16f, 0.13f, 0.06f);
-            }
-        }
+        // ─── ZORLUK ETİKETİ ───────────────────────────────────────────
 
         Transform diffT = card.transform.Find("Text_Difficulty");
         if (diffT != null)
@@ -397,12 +357,84 @@ public class LevelSelectManager : MonoBehaviour
             }
         }
 
-        if (!isUnlocked)
+        // ─── LEVEL SANAT GÖRSELİ ─────────────────────────────────────
+
+        Transform lockIcon = card.transform.Find("Img_LevelArt/Img_LockIcon");
+        if (lockIcon != null)
+            lockIcon.gameObject.SetActive(!isUnlocked);
+
+        Transform levelArt = card.transform.Find("Img_LevelArt");
+        if (levelArt != null)
         {
-            Image cardImage = card.GetComponent<Image>();
-            if (cardImage != null)
-                cardImage.color = new Color(0.05f, 0.04f, 0.03f);
+            Transform artImg = levelArt.Find("Img_Art");
+            if (artImg != null)
+            {
+                Image img = artImg.GetComponent<Image>();
+                if (img != null)
+                {
+                    if (isUnlocked && level.previewSprite != null)
+                    {
+                        img.sprite = level.previewSprite;
+                        img.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        img.gameObject.SetActive(false);
+                    }
+                }
+            }
         }
+
+        // ─── TAG NEW ──────────────────────────────────────────────────
+
+        Transform tagNew = card.transform.Find("Img_LevelArt/Tag_New");
+        if (tagNew != null)
+        {
+            Transform textNew = tagNew.Find("Text_New");
+            if (textNew != null)
+            {
+                TextMeshProUGUI newTxt = textNew.GetComponent<TextMeshProUGUI>();
+                if (newTxt != null)
+                    newTxt.text = LocalizationManager.Get("new_tag");
+            }
+            tagNew.gameObject.SetActive(isNew);
+            if (isNew) StartCoroutine(AnimateNewTag(tagNew.gameObject));
+        }
+
+        // ─── TAG AD ───────────────────────────────────────────────────
+
+        Transform tagAd = card.transform.Find("Img_LevelArt/Tag_Ad");
+        if (tagAd != null)
+        {
+            Transform textAd = tagAd.Find("Text_Ad");
+            if (textAd != null)
+            {
+                TextMeshProUGUI adTxt = textAd.GetComponent<TextMeshProUGUI>();
+                if (adTxt != null)
+                    adTxt.text = LocalizationManager.Get("ad_unlock_hint");
+            }
+            tagAd.gameObject.SetActive(canUnlock);
+            if (canUnlock) StartCoroutine(AnimateNewTag(tagAd.gameObject));
+        }
+
+        // ─── YILDIZLAR ────────────────────────────────────────────────
+
+        Transform starsPanel = card.transform.Find("Panel_Stars");
+        if (starsPanel != null)
+        {
+            for (int s = 0; s < starsPanel.childCount; s++)
+            {
+                Image starImg = starsPanel.GetChild(s).GetComponent<Image>();
+                if (starImg != null)
+                    starImg.color = (s < bestStars)
+                        ? new Color(0.98f, 0.78f, 0.46f)
+                        : isUnlocked
+                            ? new Color(0.16f, 0.13f, 0.06f)  // Açık - koyu yıldız
+                            : new Color(0.08f, 0.10f, 0.15f); // Kilitli - neredeyse görünmez
+            }
+        }
+
+        // ─── BUTON ────────────────────────────────────────────────────
 
         Button btn = card.GetComponent<Button>();
         if (btn != null)
@@ -415,56 +447,51 @@ public class LevelSelectManager : MonoBehaviour
                 btn.onClick.AddListener(() =>
                     LevelPopupManager.Instance.ShowPopup(level, capturedIndex));
             }
+            else if (canUnlock)
+            {
+                btn.onClick.AddListener(() =>
+                {
+                    AdRewardPopup.Instance?.ShowForLockedLevel(
+                        selectedCategory.categoryID,
+                        capturedIndex,
+                        onSuccess: () =>
+                        {
+                            LevelProgressManager.Instance?.UnlockLevel(
+                                selectedCategory.categoryID, capturedIndex);
+                            LevelPopupManager.Instance.ShowPopup(level, capturedIndex);
+                            LoadCategory(selectedCategoryIndex);
+                        }
+                    );
+                });
+            }
             else
             {
-                bool canUnlock = IsNextUnlockableLevel(selectedCategory, levelIndex);
+                bool hasUnfinishedAdLevel = false;
+                for (int i = 0; i < selectedCategory.levels.Length; i++)
+                {
+                    bool adUnlocked = PlayerPrefs.GetInt(
+                        $"ad_unlocked_{selectedCategory.categoryID}_{i}", 0) == 1;
+                    int stars = LevelProgressManager.Instance?.GetBestStars(
+                        selectedCategory.categoryID, i) ?? 0;
 
-                if (canUnlock)
+                    if (adUnlocked && stars == 0)
+                    {
+                        hasUnfinishedAdLevel = true;
+                        break;
+                    }
+                }
+
+                if (hasUnfinishedAdLevel)
                 {
                     btn.onClick.AddListener(() =>
-                    {
-                        AdRewardPopup.Instance?.ShowForLockedLevel(
-                            selectedCategory.categoryID,
-                            capturedIndex,
-                            onSuccess: () =>
-                            {
-                                LevelProgressManager.Instance?.UnlockLevel(
-                                    selectedCategory.categoryID, capturedIndex);
-                                LevelPopupManager.Instance.ShowPopup(level, capturedIndex);
-                                LoadCategory(selectedCategoryIndex);
-                            }
-                        );
-                    });
+                        AdRewardPopup.Instance?.ShowInfo(
+                            LocalizationManager.Get("ad_locked_title"),
+                            LocalizationManager.Get("ad_locked_desc")
+                        ));
                 }
                 else
                 {
-                    bool hasUnfinishedAdLevel = false;
-                    for (int i = 0; i < selectedCategory.levels.Length; i++)
-                    {
-                        bool adUnlocked = PlayerPrefs.GetInt(
-                            $"ad_unlocked_{selectedCategory.categoryID}_{i}", 0) == 1;
-                        int stars = LevelProgressManager.Instance?.GetBestStars(
-                            selectedCategory.categoryID, i) ?? 0;
-
-                        if (adUnlocked && stars == 0)
-                        {
-                            hasUnfinishedAdLevel = true;
-                            break;
-                        }
-                    }
-
-                    if (hasUnfinishedAdLevel)
-                    {
-                        btn.onClick.AddListener(() =>
-                            AdRewardPopup.Instance?.ShowInfo(
-                                LocalizationManager.Get("ad_locked_title"),
-                                LocalizationManager.Get("ad_locked_desc")
-                            ));
-                    }
-                    else
-                    {
-                        btn.interactable = false;
-                    }
+                    btn.interactable = false;
                 }
             }
         }

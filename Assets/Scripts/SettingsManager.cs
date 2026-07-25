@@ -46,10 +46,25 @@ public class SettingsManager : MonoBehaviour
 
     private readonly Color colorMuteActive = new Color(0.58f, 0.00f, 0.04f);
     private readonly Color colorMuteInactive = new Color(0.04f, 0.12f, 0.06f);
-    private readonly Color colorLangActive = new Color(0.10f, 0.23f, 0.06f);
-    private readonly Color colorLangInactive = new Color(0.04f, 0.04f, 0.08f);
-    private readonly Color colorTextActive = new Color(0.96f, 0.65f, 0.14f);
-    private readonly Color colorTextInactive = new Color(0.32f, 0.26f, 0.20f);
+
+    // --- TR RENKLERİ ---
+    private readonly Color colorTR_Main = HexToColor("7A1313");
+    private readonly Color colorTR_Image = HexToColor("E1D5AC");
+    private readonly Color colorTR_Image1 = HexToColor("CCA514");
+
+    // --- EN RENKLERİ ---
+    private readonly Color colorEN_Main = HexToColor("1479B4");
+    private readonly Color colorEN_Image = HexToColor("83C3E9");
+    private readonly Color colorEN_Image1 = HexToColor("0D527A");
+
+    // --- PASİF (GRİ) RENKLER ---
+    private readonly Color colorInactive_Main = HexToColor("555555");
+    private readonly Color colorInactive_Image = HexToColor("888888");
+    private readonly Color colorInactive_Image1 = HexToColor("333333");
+
+    // --- YAZI RENKLERİ ---
+    private readonly Color colorTextActive = HexToColor("F5A623");
+    private readonly Color colorTextInactive = HexToColor("524233");
 
     public bool IsSettingsOpen => settingsPanel != null && settingsPanel.activeSelf;
 
@@ -164,17 +179,64 @@ public class SettingsManager : MonoBehaviour
     private void UpdateLanguageButtons()
     {
         bool isTR = LocalizationManager.CurrentLanguage == LocalizationManager.Language.TR;
-        SetLangButton(btnTR, isTR);
-        SetLangButton(btnEN, !isTR);
+
+        SetLangButton(btnTR, isTR, isTRButton: true);
+        SetLangButton(btnEN, !isTR, isTRButton: false);
     }
 
-    private void SetLangButton(Button btn, bool isActive)
+    private void SetLangButton(Button btn, bool isActive, bool isTRButton)
     {
         if (btn == null) return;
-        Image img = btn.GetComponent<Image>();
-        if (img != null) img.color = isActive ? colorLangActive : colorLangInactive;
+
+        // 1. Ana Renk Seçimi
+        Color mainColor, imgColor, img1Color;
+
+        if (isActive)
+        {
+            // Seçili olan butonun kendi özel aktif renkleri
+            mainColor = isTRButton ? colorTR_Main : colorEN_Main;
+            imgColor = isTRButton ? colorTR_Image : colorEN_Image;
+            img1Color = isTRButton ? colorTR_Image1 : colorEN_Image1;
+        }
+        else
+        {
+            // Seçili olmayan buton için gri tonları
+            mainColor = colorInactive_Main;
+            imgColor = colorInactive_Image;
+            img1Color = colorInactive_Image1;
+        }
+
+        // 2. Ana Buton Image Rengi
+        Image mainImg = btn.GetComponent<Image>();
+        if (mainImg != null) mainImg.color = mainColor;
+
+        // 3. Çocuk Image Görsellerinin Renkleri (Image ve Image (1))
+        Transform imgTransform = btn.transform.Find("Image");
+        if (imgTransform != null && imgTransform.TryGetComponent(out Image img))
+        {
+            img.color = imgColor;
+        }
+
+        Transform img1Transform = btn.transform.Find("Image (1)");
+        if (img1Transform != null && img1Transform.TryGetComponent(out Image img1))
+        {
+            img1.color = img1Color;
+        }
+
+        // 4. Metin Rengi
         TextMeshProUGUI txt = btn.GetComponentInChildren<TextMeshProUGUI>();
-        if (txt != null) txt.color = isActive ? colorTextActive : colorTextInactive;
+        if (txt != null)
+        {
+            txt.color = isActive ? colorTextActive : colorTextInactive;
+        }
+    }
+
+    // Hex Kodunu Color Objesine Çeviren Yardımcı Metot
+    private static Color HexToColor(string hex)
+    {
+        if (ColorUtility.TryParseHtmlString("#" + hex, out Color color))
+            return color;
+        return Color.white;
     }
 
     // ─── VALUE TEXTS ──────────────────────────────────────────────

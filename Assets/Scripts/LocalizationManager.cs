@@ -63,6 +63,10 @@ public class LocalizationManager : MonoBehaviour
         {
             FreeModeManager.Instance.UpdateButtonLabels();
         }
+
+        // ← ekle
+        if (MainMenuControl.Instance != null)
+            MainMenuControl.Instance.UpdateModeSelectTexts();
     }
 
     public static string Get(string key)
@@ -260,6 +264,13 @@ public class LocalizationManager : MonoBehaviour
         strings["badge_explorer"] = "KAŞİF";
         strings["badge_master"] = "USTA";
         strings["badge_legend"] = "EFSANE";
+
+        // Mode Select
+        strings["mode_story_title"] = "HİKAYE MODU";
+        strings["mode_story_sub"] = "8 Kategori · 80 Level";
+        strings["mode_story_desc"] = "Yıldız kazan, ilerle!";
+        strings["mode_free_title"] = "SERBEST MOD";
+        strings["mode_free_desc"] = "Kategori, ızgara ve zorluk\nsınırını özgürce belirle!";
     }
 
     // ─── İNGİLİZCE ───────────────────────────────────────────────
@@ -434,5 +445,12 @@ public class LocalizationManager : MonoBehaviour
         strings["badge_explorer"] = "EXPLORER";
         strings["badge_master"] = "MASTER";
         strings["badge_legend"] = "LEGEND";
+
+        // Mode Select
+        strings["mode_story_title"] = "STORY MODE";
+        strings["mode_story_sub"] = "8 Categories · 80 Levels";
+        strings["mode_story_desc"] = "Earn stars, progress!";
+        strings["mode_free_title"] = "FREE MODE";
+        strings["mode_free_desc"] = "Choose category, grid\nand difficulty freely!";
     }
 }
