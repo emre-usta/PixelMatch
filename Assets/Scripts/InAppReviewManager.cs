@@ -1,76 +1,59 @@
-﻿using System.Collections;
+﻿#if UNITY_ANDROID
+using System.Collections;
 using UnityEngine;
 using Google.Play.Review;
-
 public class InAppReviewManager : MonoBehaviour
 {
     public static InAppReviewManager Instance { get; private set; }
-
     private ReviewManager _reviewManager;
     private PlayReviewInfo _playReviewInfo;
     private bool _isReviewFlowReady = false;
-
     private const string KEY_LEVELS_COMPLETED = "review_levels_completed";
     private const string KEY_REVIEW_SHOWN = "review_shown";
     private const int LEVELS_BEFORE_REVIEW = 5;
-
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
     private void Start()
     {
         StartCoroutine(InitReviewFlow());
     }
-
     // ─── BAŞLATMA ─────────────────────────────────────────────────
-
     private IEnumerator InitReviewFlow()
     {
         _reviewManager = new ReviewManager();
-
         var requestFlowOperation = _reviewManager.RequestReviewFlow();
         yield return requestFlowOperation;
-
         if (requestFlowOperation.Error != ReviewErrorCode.NoError)
         {
             Debug.LogWarning($"[InAppReview] Review flow request failed: {requestFlowOperation.Error}");
             yield break;
         }
-
         _playReviewInfo = requestFlowOperation.GetResult();
         _isReviewFlowReady = true;
         Debug.Log("[InAppReview] Review flow ready.");
     }
-
     // ─── LEVEL TAMAMLANDI ─────────────────────────────────────────
-
     public void OnLevelCompleted()
     {
         // Free Mode ve Daily Challenge'da tetikleme
         if (FreeModeManager.IsFreeModeActive) return;
         if (DailyChallengeManager.IsDailyChallengeActive) return;
-
         // Daha önce gösterildiyse tekrar gösterme
         if (PlayerPrefs.GetInt(KEY_REVIEW_SHOWN, 0) == 1) return;
-
         int levelsCompleted = PlayerPrefs.GetInt(KEY_LEVELS_COMPLETED, 0) + 1;
         PlayerPrefs.SetInt(KEY_LEVELS_COMPLETED, levelsCompleted);
         PlayerPrefs.Save();
-
         Debug.Log($"[InAppReview] Levels completed: {levelsCompleted}");
-
         if (levelsCompleted >= LEVELS_BEFORE_REVIEW)
         {
             StartCoroutine(LaunchReviewFlow());
         }
     }
-
     // ─── POPUP GÖSTER ─────────────────────────────────────────────
-
     private IEnumerator LaunchReviewFlow()
     {
         if (!_isReviewFlowReady)
@@ -78,30 +61,24 @@ public class InAppReviewManager : MonoBehaviour
             // Hazır değilse tekrar dene
             yield return StartCoroutine(InitReviewFlow());
         }
-
         if (!_isReviewFlowReady || _playReviewInfo == null)
         {
             Debug.LogWarning("[InAppReview] Review flow not ready, skipping.");
             yield break;
         }
-
         var launchFlowOperation = _reviewManager.LaunchReviewFlow(_playReviewInfo);
         yield return launchFlowOperation;
-
         _playReviewInfo = null;
-
         if (launchFlowOperation.Error != ReviewErrorCode.NoError)
         {
             Debug.LogWarning($"[InAppReview] Launch failed: {launchFlowOperation.Error}");
             yield break;
         }
-
         // Gösterildi olarak işaretle
         PlayerPrefs.SetInt(KEY_REVIEW_SHOWN, 1);
         PlayerPrefs.Save();
         Debug.Log("[InAppReview] Review flow completed.");
     }
-
     // ─── DEBUG ────────────────────────────────────────────────────
     [ContextMenu("Reset Review State")]
     public void ResetReviewState()
@@ -112,3 +89,4 @@ public class InAppReviewManager : MonoBehaviour
         Debug.Log("[InAppReview] Review state reset.");
     }
 }
+#endif

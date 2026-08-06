@@ -7,20 +7,22 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:348567356853:android:bcee79892347e4fcf645fc",
+        "mobilesdk_app_id": "1:348567356853:ios:23fca08872984c76f645fc",
         "android_client_info": {
           "package_name": "com.ReforgedGames.PixelMatch"
         }
       },
-      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAX8vBef2Lg4KUawrnFBJ7sqhpD7xaWY_c"
+          "current_key": "AIzaSyDekQIQivHtIVbrJnfzgiJt6iIDQhOsXrU"
         }
       ],
       "services": {
+        "analytics_service": {
+          "status": 0
+        },
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "status": 1
         }
       }
     }
