@@ -12,6 +12,10 @@ public class AdManager : MonoBehaviour
     private const string REWARDED_ID = "ca-app-pub-6613024242187744/7789293047";
     private const string INTERSTITIAL_ID = "ca-app-pub-6613024242187744/2545089668";
     private const string REWARDED_INTERSTITIAL_ID = "ca-app-pub-6613024242187744/8771707777";
+#elif UNITY_IOS
+    private const string REWARDED_ID = "ca-app-pub-6613024242187744/1565059185";
+    private const string INTERSTITIAL_ID = "ca-app-pub-6613024242187744/8922860368";
+    private const string REWARDED_INTERSTITIAL_ID = "ca-app-pub-6613024242187744/9015907864";
 #else
     private const string REWARDED_ID              = "unused";
     private const string INTERSTITIAL_ID          = "unused";

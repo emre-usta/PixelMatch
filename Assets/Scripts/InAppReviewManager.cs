@@ -10,8 +10,8 @@ public class InAppReviewManager : MonoBehaviour
 #if UNITY_ANDROID
     private ReviewManager _reviewManager;
     private PlayReviewInfo _playReviewInfo;
-#endif
     private bool _isReviewFlowReady = false;
+#endif
     private const string KEY_LEVELS_COMPLETED = "review_levels_completed";
     private const string KEY_REVIEW_SHOWN = "review_shown";
     private const int LEVELS_BEFORE_REVIEW = 5;
