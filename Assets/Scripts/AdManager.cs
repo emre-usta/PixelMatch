@@ -130,34 +130,44 @@ public class AdManager : MonoBehaviour
 
         Action localSuccess = onSuccess;
         Action localFail = onFail;
+        RewardedAd ad = rewardedAd;
 
         void OnClosed()
         {
-            rewardedAd.OnAdFullScreenContentClosed -= OnClosed;
-            rewardedAd.OnAdFullScreenContentFailed -= OnFailed;
-            LoadRewarded();
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                ad.OnAdFullScreenContentClosed -= OnClosed;
+                ad.OnAdFullScreenContentFailed -= OnFailed;
+                LoadRewarded();
+            });
         }
 
         void OnFailed(AdError error)
         {
-            rewardedAd.OnAdFullScreenContentClosed -= OnClosed;
-            rewardedAd.OnAdFullScreenContentFailed -= OnFailed;
-            localFail?.Invoke();
-            localFail = null;
-            LoadRewarded();
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                ad.OnAdFullScreenContentClosed -= OnClosed;
+                ad.OnAdFullScreenContentFailed -= OnFailed;
+                localFail?.Invoke();
+                localFail = null;
+                LoadRewarded();
+            });
         }
 
-        rewardedAd.OnAdFullScreenContentClosed += OnClosed;
-        rewardedAd.OnAdFullScreenContentFailed += OnFailed;
+        ad.OnAdFullScreenContentClosed += OnClosed;
+        ad.OnAdFullScreenContentFailed += OnFailed;
 
-        rewardedAd.Show(reward =>
+        ad.Show(reward =>
         {
-            FirebaseManager.Instance?.LogAdWatched(
-                "rewarded",
-                adPlacement,
-                LevelSelectManager.SelectedLevel?.levelID ?? 0);
-            localSuccess?.Invoke();
-            localSuccess = null;
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                FirebaseManager.Instance?.LogAdWatched(
+                    "rewarded",
+                    adPlacement,
+                    LevelSelectManager.SelectedLevel?.levelID ?? 0);
+                localSuccess?.Invoke();
+                localSuccess = null;
+            });
         });
     }
 
@@ -204,20 +214,26 @@ public class AdManager : MonoBehaviour
 
     private void OnInterstitialClosed()
     {
-        interstitialAd.OnAdFullScreenContentClosed -= OnInterstitialClosed;
-        interstitialAd.OnAdFullScreenContentFailed -= OnInterstitialFailed;
-        onInterstitialClosed?.Invoke();
-        onInterstitialClosed = null;
-        LoadInterstitial();
+        MobileAdsEventExecutor.ExecuteInUpdate(() =>
+        {
+            interstitialAd.OnAdFullScreenContentClosed -= OnInterstitialClosed;
+            interstitialAd.OnAdFullScreenContentFailed -= OnInterstitialFailed;
+            onInterstitialClosed?.Invoke();
+            onInterstitialClosed = null;
+            LoadInterstitial();
+        });
     }
 
     private void OnInterstitialFailed(AdError error)
     {
-        interstitialAd.OnAdFullScreenContentClosed -= OnInterstitialClosed;
-        interstitialAd.OnAdFullScreenContentFailed -= OnInterstitialFailed;
-        onInterstitialClosed?.Invoke();
-        onInterstitialClosed = null;
-        LoadInterstitial();
+        MobileAdsEventExecutor.ExecuteInUpdate(() =>
+        {
+            interstitialAd.OnAdFullScreenContentClosed -= OnInterstitialClosed;
+            interstitialAd.OnAdFullScreenContentFailed -= OnInterstitialFailed;
+            onInterstitialClosed?.Invoke();
+            onInterstitialClosed = null;
+            LoadInterstitial();
+        });
     }
 
     // ─── REWARDED INTERSTITIAL ────────────────────────────────────
@@ -253,38 +269,48 @@ public class AdManager : MonoBehaviour
         Action localSuccess = onSuccess;
         Action localSkipped = onSkipped;
         bool rewardEarned = false;
+        RewardedInterstitialAd ad = rewardedInterstitialAd;
 
         void OnClosed()
         {
-            rewardedInterstitialAd.OnAdFullScreenContentClosed -= OnClosed;
-            rewardedInterstitialAd.OnAdFullScreenContentFailed -= OnFailed;
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                ad.OnAdFullScreenContentClosed -= OnClosed;
+                ad.OnAdFullScreenContentFailed -= OnFailed;
 
-            if (rewardEarned)
-                localSuccess?.Invoke();
-            else
-                localSkipped?.Invoke();
+                if (rewardEarned)
+                    localSuccess?.Invoke();
+                else
+                    localSkipped?.Invoke();
 
-            LoadRewardedInterstitial();
+                LoadRewardedInterstitial();
+            });
         }
 
         void OnFailed(AdError error)
         {
-            rewardedInterstitialAd.OnAdFullScreenContentClosed -= OnClosed;
-            rewardedInterstitialAd.OnAdFullScreenContentFailed -= OnFailed;
-            localSkipped?.Invoke();
-            LoadRewardedInterstitial();
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                ad.OnAdFullScreenContentClosed -= OnClosed;
+                ad.OnAdFullScreenContentFailed -= OnFailed;
+                localSkipped?.Invoke();
+                LoadRewardedInterstitial();
+            });
         }
 
-        rewardedInterstitialAd.OnAdFullScreenContentClosed += OnClosed;
-        rewardedInterstitialAd.OnAdFullScreenContentFailed += OnFailed;
+        ad.OnAdFullScreenContentClosed += OnClosed;
+        ad.OnAdFullScreenContentFailed += OnFailed;
 
-        rewardedInterstitialAd.Show(reward =>
+        ad.Show(reward =>
         {
-            rewardEarned = true;
-            FirebaseManager.Instance?.LogAdWatched(
-                "rewarded_interstitial",
-                adPlacement,
-                LevelSelectManager.SelectedLevel?.levelID ?? 0);
+            MobileAdsEventExecutor.ExecuteInUpdate(() =>
+            {
+                rewardEarned = true;
+                FirebaseManager.Instance?.LogAdWatched(
+                    "rewarded_interstitial",
+                    adPlacement,
+                    LevelSelectManager.SelectedLevel?.levelID ?? 0);
+            });
         });
     }
 }
