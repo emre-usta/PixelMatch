@@ -35,6 +35,17 @@ public class InAppUpdateManager : MonoBehaviour
 #if UNITY_ANDROID
     private IEnumerator CheckForUpdate()
     {
+
+        try
+        {
+            using (var launcher = new AndroidJavaClass("androidx.activity.result.ActivityResultLauncher")) { }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("[InAppUpdate] androidx.activity bulunamadı, güncelleme kontrolü atlandı: " + e.Message);
+            yield break;
+        }
+
         _appUpdateManager = new AppUpdateManager();
 
         PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation =

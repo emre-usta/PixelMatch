@@ -1,5 +1,6 @@
 <dependencies>
   <packages>
+    <package>androidx.activity:activity:1.8.2</package>
     <package>androidx.constraintlayout:constraintlayout:2.1.4</package>
     <package>androidx.lifecycle:lifecycle-process:2.6.2</package>
     <package>com.google.android.gms:play-services-ads:25.3.0</package>
