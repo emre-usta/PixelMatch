@@ -44,27 +44,27 @@ public class SettingsManager : MonoBehaviour
     private bool bgmMuted = false;
     private bool sfxMuted = false;
 
-    private readonly Color colorMuteActive = new Color(0.58f, 0.00f, 0.04f);
-    private readonly Color colorMuteInactive = new Color(0.04f, 0.12f, 0.06f);
+    private readonly Color colorMuteActive = new Color(1.00f, 0.42f, 0.52f);   // yakut - sessiz
+    private readonly Color colorMuteInactive = new Color(0.31f, 0.90f, 0.78f); // zümrüt - açık
 
     // --- TR RENKLERİ ---
-    private readonly Color colorTR_Main = HexToColor("7A1313");
+    private readonly Color colorTR_Main = HexToColor("FFFFFF");
     private readonly Color colorTR_Image = HexToColor("E1D5AC");
     private readonly Color colorTR_Image1 = HexToColor("CCA514");
 
     // --- EN RENKLERİ ---
-    private readonly Color colorEN_Main = HexToColor("1479B4");
+    private readonly Color colorEN_Main = HexToColor("FFFFFF");
     private readonly Color colorEN_Image = HexToColor("83C3E9");
     private readonly Color colorEN_Image1 = HexToColor("0D527A");
 
     // --- PASİF (GRİ) RENKLER ---
-    private readonly Color colorInactive_Main = HexToColor("555555");
+    private readonly Color colorInactive_Main = HexToColor("8C859E");
     private readonly Color colorInactive_Image = HexToColor("888888");
     private readonly Color colorInactive_Image1 = HexToColor("333333");
 
     // --- YAZI RENKLERİ ---
-    private readonly Color colorTextActive = HexToColor("F5A623");
-    private readonly Color colorTextInactive = HexToColor("524233");
+    private readonly Color colorTextActive = HexToColor("FFD25A");
+    private readonly Color colorTextInactive = HexToColor("C9B892");
 
     public bool IsSettingsOpen => settingsPanel != null && settingsPanel.activeSelf;
 

@@ -27,7 +27,7 @@ public class EffectManager : MonoBehaviour
         if (effectType != CardEffectType.TimeThief) return;
 
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
-        Color red = new Color(0.89f, 0.29f, 0.29f);
+        Color red = new Color(1.00f, 0.44f, 0.53f);
 
         ComboEffectManager.Instance?.TriggerTimeThiefFlash();
 

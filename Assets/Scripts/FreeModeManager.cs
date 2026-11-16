@@ -56,10 +56,10 @@ public class FreeModeManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI txtTimeValue;
     [SerializeField] private TextMeshProUGUI txtMoveValue;
 
-    private readonly Color colorActiveBg = new Color(0.10f, 0.07f, 0.00f);
-    private readonly Color colorInactiveBg = new Color(0.04f, 0.04f, 0.08f);
-    private readonly Color colorActiveText = new Color(0.96f, 0.65f, 0.14f);
-    private readonly Color colorInactiveText = new Color(0.32f, 0.26f, 0.20f);
+    private readonly Color colorActiveBg = new Color(1.00f, 1.00f, 1.00f);
+    private readonly Color colorInactiveBg = new Color(0.55f, 0.52f, 0.62f);
+    private readonly Color colorActiveText = new Color(1.00f, 0.82f, 0.35f);
+    private readonly Color colorInactiveText = new Color(0.79f, 0.72f, 0.57f);
     private readonly Color colorActiveBorder = new Color(0.96f, 0.65f, 0.14f);
     private readonly Color colorInactiveBorder = new Color(0.16f, 0.16f, 0.31f);
 

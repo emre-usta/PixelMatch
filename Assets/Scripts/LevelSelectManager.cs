@@ -31,8 +31,8 @@ public class LevelSelectManager : MonoBehaviour
     [Header("Kategori Scroll")]
     [SerializeField] private ScrollRect categoryScrollRect;
 
-    private readonly Color colorCatActive = new Color(0.043f, 0.196f, 0.714f, 1f);   // #0B32B6 - seçili
-    private readonly Color colorCatInactive = new Color(0.043f, 0.196f, 0.420f, 1f); // #0B326B - default
+    private readonly Color colorCatActive = new Color(1f, 1f, 1f, 1f);               // tema: pirinç sekme (seçili)
+    private readonly Color colorCatInactive = new Color(0.55f, 0.52f, 0.62f, 1f);    // tema: soluk sekme
     private readonly Color colorBorderActive = new Color(0.27f, 0.80f, 0.40f);
     private readonly Color colorBorderInactive = new Color(0.16f, 0.19f, 0.25f);
     private readonly Color colorTextActive = new Color(0.27f, 0.80f, 0.40f);
@@ -102,7 +102,7 @@ public class LevelSelectManager : MonoBehaviour
             {
                 elapsed += Time.deltaTime;
                 float alpha = Mathf.Lerp(0.3f, 1f, elapsed / 0.6f);
-                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha);
+                txtScrollArrow.color = new Color(1.00f, 0.82f, 0.35f, alpha);
                 yield return null;
             }
             elapsed = 0f;
@@ -110,7 +110,7 @@ public class LevelSelectManager : MonoBehaviour
             {
                 elapsed += Time.deltaTime;
                 float alpha = Mathf.Lerp(1f, 0.3f, elapsed / 0.6f);
-                txtScrollArrow.color = new Color(0.27f, 0.80f, 0.40f, alpha);
+                txtScrollArrow.color = new Color(1.00f, 0.82f, 0.35f, alpha);
                 yield return null;
             }
         }
@@ -199,8 +199,8 @@ public class LevelSelectManager : MonoBehaviour
             TextMeshProUGUI txt = categoryButtons[i].GetComponentInChildren<TextMeshProUGUI>();
             if (txt != null)
                 txt.color = isActive
-                    ? new Color(0.267f, 0.800f, 0.400f, 1f)  // #44CC66 - seçili
-                    : new Color(0.937f, 1.000f, 0.035f, 1f);  // #DFFF09 - default
+                    ? new Color(1.000f, 0.820f, 0.350f, 1f)  // #FFD25A - seçili (altın)
+                    : new Color(0.790f, 0.720f, 0.570f, 1f);  // #C9B892 - default
         }
     }
 
@@ -247,13 +247,13 @@ public class LevelSelectManager : MonoBehaviour
         if (cardBg != null)
         {
             if (!isUnlocked)
-                cardBg.color = new Color(0.08f, 0.10f, 0.18f); // Kilitli - çok koyu, neredeyse siyah
+                cardBg.color = new Color(0.45f, 0.42f, 0.50f); // Kilitli - soluk
             else if (isCompleted)
-                cardBg.color = new Color(0.05f, 0.17f, 0.10f); // Tamamlandı - koyu yeşil
+                cardBg.color = new Color(1.00f, 1.00f, 1.00f); // Tamamlandı
             else if (isNew)
-                cardBg.color = new Color(0.05f, 0.10f, 0.22f); // Yeni - koyu mavi
+                cardBg.color = new Color(1.00f, 1.00f, 1.00f); // Yeni
             else
-                cardBg.color = new Color(0.05f, 0.08f, 0.15f); // Normal - koyu
+                cardBg.color = new Color(0.85f, 0.85f, 0.90f); // Normal
         }
 
         // Çerçeve (en alttaki Image objesi)
@@ -264,15 +264,15 @@ public class LevelSelectManager : MonoBehaviour
             if (frameImg != null)
             {
                 if (!isUnlocked && canUnlock)
-                    frameImg.color = new Color(1.00f, 0.84f, 0.25f);  // Altın - reklam ile açılabilir
+                    frameImg.color = new Color(0.31f, 0.90f, 0.78f);  // Zümrüt - reklam ile açılabilir
                 else if (!isUnlocked)
-                    frameImg.color = new Color(0.25f, 0.32f, 0.45f);  // Daha belirgin gri-mavi - kilitli
+                    frameImg.color = new Color(0.29f, 0.25f, 0.36f);  // Mürdüm - kilitli
                 else if (isCompleted)
-                    frameImg.color = new Color(0.00f, 0.90f, 0.46f);  // Yeşil - tamamlandı
+                    frameImg.color = new Color(0.79f, 0.63f, 0.34f);  // Pirinç - tamamlandı
                 else if (isNew)
-                    frameImg.color = new Color(0.16f, 0.62f, 1.00f);  // Mavi - yeni
+                    frameImg.color = new Color(1.00f, 0.84f, 0.40f);  // Parlak altın - yeni
                 else
-                    frameImg.color = new Color(0.27f, 0.80f, 0.40f);  // Açık yeşil - açılmış
+                    frameImg.color = new Color(0.91f, 0.78f, 0.48f);  // Açık pirinç - açılmış
             }
         }
 
@@ -286,8 +286,8 @@ public class LevelSelectManager : MonoBehaviour
             {
                 txt.text = $"LVL {levelIndex + 1:D2}";
                 txt.color = !isUnlocked
-                    ? new Color(0.30f, 0.35f, 0.45f)
-                    : new Color(1.00f, 1.00f, 1.00f);
+                    ? new Color(0.43f, 0.40f, 0.50f)
+                    : new Color(0.95f, 0.91f, 0.82f);
             }
         }
 
@@ -320,7 +320,7 @@ public class LevelSelectManager : MonoBehaviour
                     else
                         stat.text = "";
                 }
-                stat.color = new Color(0.67f, 0.67f, 0.67f);
+                stat.color = new Color(0.79f, 0.72f, 0.57f);
             }
         }
 
@@ -344,9 +344,9 @@ public class LevelSelectManager : MonoBehaviour
                     diff.text = LocalizationManager.Get(diffKey);
                     diff.color = level.difficulty switch
                     {
-                        DifficultyLevel.Easy => new Color(0.59f, 0.77f, 0.35f),
-                        DifficultyLevel.Medium => new Color(0.98f, 0.78f, 0.46f),
-                        DifficultyLevel.Hard => new Color(0.89f, 0.29f, 0.29f),
+                        DifficultyLevel.Easy => new Color(0.49f, 0.95f, 0.61f),
+                        DifficultyLevel.Medium => new Color(1.00f, 0.71f, 0.35f),
+                        DifficultyLevel.Hard => new Color(1.00f, 0.44f, 0.53f),
                         _ => Color.gray
                     };
                 }
@@ -427,10 +427,10 @@ public class LevelSelectManager : MonoBehaviour
                 Image starImg = starsPanel.GetChild(s).GetComponent<Image>();
                 if (starImg != null)
                     starImg.color = (s < bestStars)
-                        ? new Color(0.98f, 0.78f, 0.46f)
+                        ? new Color(1.00f, 0.79f, 0.24f)
                         : isUnlocked
-                            ? new Color(0.16f, 0.13f, 0.06f)  // Açık - koyu yıldız
-                            : new Color(0.08f, 0.10f, 0.15f); // Kilitli - neredeyse görünmez
+                            ? new Color(0.20f, 0.16f, 0.25f)  // Açık - koyu yıldız
+                            : new Color(0.12f, 0.10f, 0.16f); // Kilitli - neredeyse görünmez
             }
         }
 

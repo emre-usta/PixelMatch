@@ -10,8 +10,8 @@ public class WinPanelController : MonoBehaviour
     [SerializeField] private Image star1;
     [SerializeField] private Image star2;
     [SerializeField] private Image star3;
-    [SerializeField] private Color starActiveColor = new Color(0.96f, 0.65f, 0.14f);
-    [SerializeField] private Color starInactiveColor = new Color(0.16f, 0.13f, 0.06f);
+    [SerializeField] private Color starActiveColor = new Color(1.00f, 0.79f, 0.24f);
+    [SerializeField] private Color starInactiveColor = new Color(0.20f, 0.16f, 0.25f);
 
     [Header("Stat Card")]
     [SerializeField] private TextMeshProUGUI txtScoreValue;
@@ -35,8 +35,8 @@ public class WinPanelController : MonoBehaviour
 
     [Header("2x Ödül")]
     [SerializeField] private GameObject btnDoubleReward;
-    [SerializeField] private Color btnDoubleActiveColor = new Color(0.96f, 0.65f, 0.14f);
-    [SerializeField] private Color btnDoubleUsedColor = new Color(0.3f, 0.3f, 0.3f);
+    [SerializeField] private Color btnDoubleActiveColor = new Color(1.00f, 1.00f, 1.00f);
+    [SerializeField] private Color btnDoubleUsedColor = new Color(0.45f, 0.45f, 0.50f);
 
     [Header("Animasyon")]
     [SerializeField] private RectTransform txtYouWin;
