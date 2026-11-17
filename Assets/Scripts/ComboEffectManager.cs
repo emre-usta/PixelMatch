@@ -176,7 +176,7 @@ public class ComboEffectManager : MonoBehaviour
 
         txtComboReward.text = text;
         txtComboReward.gameObject.SetActive(true);
-        txtComboReward.color = new Color(0.37f, 0.94f, 0.82f, 1f);
+        txtComboReward.color = new Color(0.32f, 0.93f, 0.51f, 1f);
 
         Vector3 startPos = txtComboReward.transform.localPosition;
         float elapsed = 0f;
@@ -187,7 +187,7 @@ public class ComboEffectManager : MonoBehaviour
             elapsed += Time.unscaledDeltaTime;
             float t = elapsed / duration;
             txtComboReward.transform.localPosition = startPos + Vector3.up * (40f * t);
-            txtComboReward.color = new Color(0.37f, 0.94f, 0.82f, 1f - t);
+            txtComboReward.color = new Color(0.32f, 0.93f, 0.51f, 1f - t);
             yield return null;
         }
 

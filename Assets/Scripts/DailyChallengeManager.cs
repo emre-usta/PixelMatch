@@ -218,18 +218,18 @@ public class DailyChallengeManager : MonoBehaviour
                 if (stars > 0)
                 {
                     txtStatus.text = LocalizationManager.Get("dc_completed");
-                    txtStatus.color = new Color(0.49f, 0.95f, 0.61f);
+                    txtStatus.color = new Color(0.59f, 0.77f, 0.35f);
                 }
                 else
                 {
                     txtStatus.text = LocalizationManager.Get("dc_failed");
-                    txtStatus.color = new Color(1.00f, 0.70f, 0.75f);
+                    txtStatus.color = new Color(0.89f, 0.29f, 0.29f);
                 }
             }
             else
             {
                 txtStatus.text = LocalizationManager.Get("dc_play_hint");
-                txtStatus.color = new Color(1.00f, 0.82f, 0.35f);
+                txtStatus.color = new Color(0.96f, 0.65f, 0.14f);
 
                 if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
                 pulseCoroutine = StartCoroutine(PulseText(txtStatus));
@@ -253,8 +253,8 @@ public class DailyChallengeManager : MonoBehaviour
 
     private IEnumerator PulseText(TextMeshProUGUI txt)
     {
-        Color baseColor = new Color(1.00f, 0.82f, 0.35f);
-        Color dimColor = new Color(1.00f, 0.82f, 0.35f, 0.3f);
+        Color baseColor = new Color(0.96f, 0.65f, 0.14f);
+        Color dimColor = new Color(0.96f, 0.65f, 0.14f, 0.3f);
         float duration = 1f;
 
         while (true)

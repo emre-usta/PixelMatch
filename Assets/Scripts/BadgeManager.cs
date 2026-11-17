@@ -44,10 +44,10 @@ public class BadgeManager : MonoBehaviour
 
     private Color GetTitleColor(int stars)
     {
-        if (stars >= 120) return new Color(0.37f, 0.94f, 0.82f);
-        if (stars >= 80) return new Color(1.00f, 0.82f, 0.35f);
-        if (stars >= 45) return new Color(0.62f, 0.90f, 1.00f);
-        if (stars >= 15) return new Color(0.95f, 0.91f, 0.82f);
-        return new Color(0.79f, 0.72f, 0.57f);
+        if (stars >= 120) return new Color(0.32f, 0.93f, 0.51f);
+        if (stars >= 80) return new Color(0.96f, 0.65f, 0.14f);
+        if (stars >= 45) return new Color(0.27f, 0.67f, 1.00f);
+        if (stars >= 15) return new Color(0.98f, 0.78f, 0.46f);
+        return new Color(0.67f, 0.67f, 0.67f);
     }
 }
