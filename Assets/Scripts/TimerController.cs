@@ -94,6 +94,14 @@ public class TimerController : MonoBehaviour
         UpdateTimerUI();
         GameEvents.RaiseTimeChanged(remainingTime);
 
+        // Süre dışarıdan (ör. Zaman Hırsızı) sıfırlandıysa, timer'ın durumundan bağımsız olarak hemen kaybettir.
+        if (remainingTime <= 0 && useTimer &&
+            GameStateManager.Instance != null && GameStateManager.Instance.IsPlaying)
+        {
+            HandleTimeUp();
+            return;
+        }
+
         if (isRunning && timerCoroutine == null && remainingTime > 0)
             timerCoroutine = StartCoroutine(TimerCoroutine());
     }
@@ -114,11 +122,25 @@ public class TimerController : MonoBehaviour
             if (remainingTime <= 0)
             {
                 timerCoroutine = null;
-                GameEvents.RaiseTimeUp();
-                GameStateManager.Instance.LoseGame();
+                HandleTimeUp();
                 yield break;
             }
         }
+
+        timerCoroutine = null;
+    }
+
+    private void HandleTimeUp()
+    {
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+            timerCoroutine = null;
+        }
+
+        isRunning = false;
+        GameEvents.RaiseTimeUp();
+        GameStateManager.Instance.LoseGame();
     }
 
     private void UpdateTimerUI()

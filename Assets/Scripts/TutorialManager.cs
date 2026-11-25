@@ -133,6 +133,6 @@ public class TutorialManager : MonoBehaviour
 
         if (tutorialPanel != null) tutorialPanel.SetActive(false);
         Time.timeScale = 1f;
-        GameStateManager.Instance?.OnGridReady();
+        GameStateManager.Instance?.OnTutorialCompleted();
     }
 }

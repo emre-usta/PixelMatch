@@ -128,9 +128,12 @@ public class AudioManager : MonoBehaviour
         comboCount++;
 
         if (GameStateManager.Instance != null &&
-            GameStateManager.Instance.CurrentState == GameState.Win)
+            GameStateManager.Instance.CurrentState != GameState.Playing)
         {
+            // Oyun kuralı etkisi olan combo ödülü verilmez; eşleşme sesi yine çalar.
             comboCount = 0;
+            if (sfxMatchVariants != null && sfxMatchVariants.Length > 0)
+                PlaySFX(sfxMatchVariants[Random.Range(0, sfxMatchVariants.Length)]);
             return;
         }
 

@@ -15,6 +15,13 @@ public class GameStateManager : MonoBehaviour
     [SerializeField] private GameObject panelWin;
     [SerializeField] private GameObject panelGameOver;
 
+    // Son eşleşme ile kazanma sonucunun gösterilmesi arasındaki bekleme (eski GridManager.WinDelayed süresi).
+    private const float WIN_PRESENTATION_DELAY = 0.8f;
+
+    private bool gridReady = false;
+    private bool losePending = false;
+    private bool winResultShown = false;
+
     private void Awake()
     {
 #if !UNITY_EDITOR && !DEVELOPMENT_BUILD
@@ -57,6 +64,20 @@ public class GameStateManager : MonoBehaviour
 
     public void OnGridReady()
     {
+        gridReady = true;
+        TryStartGame();
+    }
+
+    public void OnTutorialCompleted()
+    {
+        TryStartGame();
+    }
+
+    // Oyunu oyun başına yalnızca bir kez başlatır: grid hazır olmalı, state Initializing olmalı.
+    private void TryStartGame()
+    {
+        if (CurrentState != GameState.Initializing || !gridReady) return;
+
         bool isAdUnlockedLevel = LevelSelectManager.SelectedLevel != null &&
             PlayerPrefs.GetInt(
                 $"ad_unlocked_{LevelSelectManager.SelectedCategoryID}_{LevelSelectManager.SelectedLevel.levelID}", 0) == 1;
@@ -85,7 +106,7 @@ public class GameStateManager : MonoBehaviour
 
     public void PauseGame()
     {
-        if (CurrentState != GameState.Playing) return;
+        if (CurrentState != GameState.Playing || losePending) return;
         SetState(GameState.Paused);
         Time.timeScale = 0f;
         GameEvents.RaiseGamePaused();
@@ -102,20 +123,83 @@ public class GameStateManager : MonoBehaviour
         if (panelPause != null) panelPause.SetActive(false);
     }
 
-    public void WinGame()
+    // ─── OYUN SONU (TEK OTORİTE) ──────────────────────────────────
+    // Kazanma hemen kesinleşir. Kaybetme isteği bir kare bekletilir; böylece aynı karede
+    // gerçekleşen son eşleşme (abonelik sırasından bağımsız olarak) her zaman önceliklidir.
+
+    public void WinGame() => EndGame(GameResult.Win);
+
+    public void LoseGame()
+    {
+        if (CurrentState != GameState.Playing || losePending) return;
+        losePending = true;
+        StartCoroutine(ResolveLoseNextFrame());
+    }
+
+    private IEnumerator ResolveLoseNextFrame()
+    {
+        yield return null;
+        losePending = false;
+
+        bool boardCleared = GridManager.Instance != null && GridManager.Instance.RemainingPairs == 0;
+        if (boardCleared)
+        {
+            EndGame(GameResult.Win);
+            yield break;
+        }
+
+        // Aynı karede gelen bir ödül (ör. combo) kaybetme koşulunu ortadan kaldırdıysa kaybetmeyi iptal et.
+        if (CurrentState == GameState.Playing && !IsLoseConditionMet())
+        {
+            bool isMoveLimited = MoveController.Instance != null && MoveController.Instance.UseMoveLimit;
+            if (!isMoveLimited)
+                TimerController.Instance?.ResumeTimer();
+            yield break;
+        }
+
+        EndGame(GameResult.Lose);
+    }
+
+    private bool IsLoseConditionMet()
+    {
+        if (MoveController.Instance != null && MoveController.Instance.UseMoveLimit)
+            return MoveController.Instance.RemainingMoves <= 0;
+
+        return TimerController.Instance == null || TimerController.Instance.RemainingTime <= 0;
+    }
+
+    private void EndGame(GameResult result)
     {
         if (CurrentState != GameState.Playing) return;
+
+        if (result == GameResult.Win)
+            BeginWin();
+        else
+            BeginLose();
+    }
+
+    private void BeginWin()
+    {
         SetState(GameState.Win);
+        TimerController.Instance?.StopTimer();
+        StartCoroutine(WinSequence());
+    }
+
+    private IEnumerator WinSequence()
+    {
+        yield return new WaitForSecondsRealtime(WIN_PRESENTATION_DELAY);
+
         Time.timeScale = 0f;
         GameEvents.RaiseGameWon();
 
         float delay = ComboEffectManager.Instance != null ? 1.2f : 0f;
-        StartCoroutine(ShowWinPanelDelayed(delay));
+        yield return StartCoroutine(ShowWinPanelDelayed(delay));
     }
 
     private IEnumerator ShowWinPanelDelayed(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
+        winResultShown = true;
 
         if (FreeModeManager.IsFreeModeActive)
         {
@@ -362,9 +446,8 @@ public class GameStateManager : MonoBehaviour
 
     // ─── LOSE ─────────────────────────────────────────────────────
 
-    public void LoseGame()
+    private void BeginLose()
     {
-        if (CurrentState != GameState.Playing) return;
         SetState(GameState.Lose);
         Time.timeScale = 0f;
         GameEvents.RaiseGameLost();
@@ -409,6 +492,13 @@ public class GameStateManager : MonoBehaviour
 
         SetState(GameState.Playing);
         Time.timeScale = 1f;
+
+        // Tahtada eşleşecek çift kalmadıysa süre/hamle eklemeden doğrudan kazan.
+        if (GridManager.Instance != null && GridManager.Instance.RemainingPairs == 0)
+        {
+            EndGame(GameResult.Win);
+            yield break;
+        }
 
         bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
         if (isMoveMode)
@@ -564,6 +654,9 @@ public class GameStateManager : MonoBehaviour
 
     public void RestartGame()
     {
+        // Kazanma kesinleşti ama sonuç paneli henüz açılmadı: yeniden başlatma yok sayılır.
+        if (CurrentState == GameState.Win && !winResultShown) return;
+
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
             if (!DailyChallengeManager.Instance.HasAttemptsLeft())
@@ -603,6 +696,12 @@ public enum GameState
     Initializing,
     Playing,
     Paused,
+    Win,
+    Lose
+}
+
+public enum GameResult
+{
     Win,
     Lose
 }
