@@ -79,16 +79,8 @@ public class GameStateManager : MonoBehaviour
     {
         if (CurrentState != GameState.Initializing || !gridReady) return;
 
-        bool isAdUnlockedLevel = LevelSelectManager.SelectedLevel != null &&
-            PlayerPrefs.GetInt(
-                $"ad_unlocked_{LevelSelectManager.SelectedCategoryID}_{LevelSelectManager.SelectedLevel.levelID}", 0) == 1;
-
-        if (TutorialManager.Instance != null &&
-            TutorialManager.Instance.gameObject.activeInHierarchy &&
-            PlayerPrefs.GetInt("tutorial_done", 0) == 0 &&
-            !GameSession.IsSource(SessionSource.DailyChallenge) &&
-            !GameSession.IsSource(SessionSource.FreeMode) &&
-            !isAdUnlockedLevel)
+        // Oyun yalnızca tutorial gerçekten ekrandayken bekler (AUDIT 1.5); tutorial bitince OnTutorialCompleted başlatır.
+        if (TutorialManager.Instance != null && TutorialManager.Instance.IsShowing)
             return;
 
         OriginalMoveLimit = LevelSelectManager.SelectedLevel?.moveLimit ??
