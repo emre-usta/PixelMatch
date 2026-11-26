@@ -21,6 +21,7 @@ public class GameStateManager : MonoBehaviour
     private bool gridReady = false;
     private bool losePending = false;
     private bool winResultShown = false;
+    private bool isLeavingScene = false;
 
     private void Awake()
     {
@@ -644,6 +645,9 @@ public class GameStateManager : MonoBehaviour
 
     public void LoadMainMenu()
     {
+        if (isLeavingScene) return;
+        isLeavingScene = true;
+
         if (DailyChallengeManager.IsDailyChallengeActive)
             DailyChallengeManager.SetInactive();
 
@@ -656,6 +660,9 @@ public class GameStateManager : MonoBehaviour
     {
         // Kazanma kesinleşti ama sonuç paneli henüz açılmadı: yeniden başlatma yok sayılır.
         if (CurrentState == GameState.Win && !winResultShown) return;
+
+        if (isLeavingScene) return;
+        isLeavingScene = true;
 
         if (DailyChallengeManager.IsDailyChallengeActive)
         {
@@ -673,6 +680,9 @@ public class GameStateManager : MonoBehaviour
 
     public void NextOrRetryWin()
     {
+        if (isLeavingScene) return;
+        isLeavingScene = true;
+
         Time.timeScale = 1f;
 
         AdManager.Instance?.ShowRewardedInterstitialIfReady(

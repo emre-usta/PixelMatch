@@ -158,13 +158,20 @@ public class AdRewardPopup : MonoBehaviour
     {
         Hide();
 
-        if (onWatched == null) return;
+        // Callback'ler bu gösterime ait yerel kopyalara alınır; böylece her biri en fazla bir kez çalışır
+        // ve sonraki bir popup'ın callback'leriyle karışmaz.
+        System.Action watched = onWatched;
+        System.Action declined = onDeclined;
+        onWatched = null;
+        onDeclined = null;
+
+        if (watched == null) return;
 
         if (AdManager.Instance == null || !AdManager.Instance.IsRewardedReady)
         {
+            AdManager.Instance?.RequestLoad(AdManager.AdFormat.Rewarded);
             // Reklam hazır değil, ödül verme!
-            onDeclined?.Invoke();
-            onDeclined = null;
+            declined?.Invoke();
             return;
         }
 
@@ -177,13 +184,11 @@ public class AdRewardPopup : MonoBehaviour
                     "rewarded",
                     adType,
                     LevelSelectManager.SelectedLevel?.levelID ?? 0);
-                onWatched?.Invoke();
-                onWatched = null;
+                watched.Invoke();
             },
             onFail: () =>
             {
-                onDeclined?.Invoke();
-                onDeclined = null;
+                declined?.Invoke();
             }
         );
     }
