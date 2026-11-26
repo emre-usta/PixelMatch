@@ -4,19 +4,41 @@ using GoogleMobileAds.Common;
 using GoogleMobileAds.Ump.Api;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class AdManager : MonoBehaviour
 {
     public static AdManager Instance { get; private set; }
 
 #if UNITY_ANDROID
+  #if UNITY_EDITOR || DEVELOPMENT_BUILD
+    // Google'ın herkese açık Android test reklam birimleri (yalnızca editör / development build).
+    private const string REWARDED_ID = "ca-app-pub-3940256099942544/5224354917";
+    private const string INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
+    private const string REWARDED_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/5354046379";
+  #else
     private const string REWARDED_ID = "ca-app-pub-6613024242187744/7789293047";
     private const string INTERSTITIAL_ID = "ca-app-pub-6613024242187744/2545089668";
     private const string REWARDED_INTERSTITIAL_ID = "ca-app-pub-6613024242187744/8771707777";
+  #endif
 #else
     private const string REWARDED_ID              = "unused";
     private const string INTERSTITIAL_ID          = "unused";
     private const string REWARDED_INTERSTITIAL_ID = "unused";
+#endif
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    // Test cihazı ID'leri (AdMob TestDeviceIds ve UMP TestDeviceHashedIds için ortak liste).
+    // Cihaz ID'si, logcat'te UMP'nin yazdığı "addTestDeviceHashedId(...)" satırından alınır.
+    private static readonly List<string> TEST_DEVICE_IDS = new List<string>
+    {
+        // "CIHAZ_ID_BURAYA",
+    };
+#endif
+
+#if DEVELOPMENT_BUILD
+    // true: UMP rıza akışı cihaz AB'deymiş (EEA) gibi test edilir. Yalnızca development build'de derlenir.
+    private static readonly bool DEBUG_FORCE_EEA = false;
 #endif
 
     private RewardedAd rewardedAd;
@@ -67,6 +89,17 @@ public class AdManager : MonoBehaviour
     {
         ConsentRequestParameters requestParameters = new ConsentRequestParameters();
 
+#if DEVELOPMENT_BUILD
+        if (DEBUG_FORCE_EEA)
+        {
+            requestParameters.ConsentDebugSettings = new ConsentDebugSettings
+            {
+                DebugGeography = DebugGeography.EEA,
+                TestDeviceHashedIds = TEST_DEVICE_IDS
+            };
+        }
+#endif
+
         ConsentInformation.Update(requestParameters, (FormError updateError) =>
         {
             if (updateError != null)
@@ -103,6 +136,18 @@ public class AdManager : MonoBehaviour
     {
         if (isInitialized) return;
         isInitialized = true;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+  #if DEVELOPMENT_BUILD
+        Debug.Log(DEBUG_FORCE_EEA ? "[AdManager] TEST ADS ACTIVE (UMP debug: EEA)" : "[AdManager] TEST ADS ACTIVE");
+  #else
+        Debug.Log("[AdManager] TEST ADS ACTIVE");
+  #endif
+        MobileAds.SetRequestConfiguration(new RequestConfiguration
+        {
+            TestDeviceIds = TEST_DEVICE_IDS
+        });
+#endif
 
         MobileAds.Initialize(initStatus =>
         {
