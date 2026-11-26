@@ -60,6 +60,11 @@ public class TimerController : MonoBehaviour
 
     public void PauseTimer() => isRunning = false;
 
+    // TimeFreeze power-up'ı: Pause/Resume'dan bağımsız sayım durdurma (AUDIT 1.8).
+    private bool isFrozen = false;
+    public void Freeze() => isFrozen = true;
+    public void Unfreeze() => isFrozen = false;
+
     public void ResumeTimer()
     {
         isRunning = true;
@@ -115,7 +120,7 @@ public class TimerController : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(1f);
 
-            if (!isRunning) continue;
+            if (!isRunning || isFrozen) continue;
             if (Time.timeScale == 0f) continue;
 
             remainingTime = Mathf.Max(0, remainingTime - 1f);

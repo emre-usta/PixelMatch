@@ -202,6 +202,7 @@ public class GameStateManager : MonoBehaviour
     {
         SetState(GameState.Win);
         TimerController.Instance?.StopTimer();
+        PowerUpManager.Instance?.CancelActiveTimeFreeze();
         StartCoroutine(WinSequence());
     }
 
@@ -471,6 +472,7 @@ public class GameStateManager : MonoBehaviour
     {
         SetState(GameState.Lose);
         Time.timeScale = 0f;
+        PowerUpManager.Instance?.CancelActiveTimeFreeze();
         GameEvents.RaiseGameLost();
 
         if (!DailyChallengeManager.IsDailyChallengeActive && !FreeModeManager.IsFreeModeActive)
