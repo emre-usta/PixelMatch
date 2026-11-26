@@ -89,6 +89,8 @@ public class LevelPopupManager : MonoBehaviour
         if (pendingLevel == null) return;
         isStarting = true;
         LevelSelectManager.SetSelectedLevel(pendingLevel, pendingLevelIndex);
+        GameSession.Begin(SessionContext.ForStory(
+            LevelSelectManager.SelectedCategory, pendingLevel, pendingLevelIndex, LevelSelectManager.SelectedMode));
         if (popupPanel != null) popupPanel.SetActive(false);
         SceneManager.LoadScene("Level1");
     }

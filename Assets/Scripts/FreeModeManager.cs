@@ -313,6 +313,8 @@ public class FreeModeManager : MonoBehaviour
 
         IsFreeModeActive = true;
         LevelSelectManager.SelectedMode = SelectedMode;
+        GameSession.Begin(SessionContext.ForFreeMode(
+            SelectedCategory, SelectedColumns, SelectedRows, SelectedDifficulty, SelectedMode, limitConfig));
         SceneManager.LoadScene("Level1");
     }
 

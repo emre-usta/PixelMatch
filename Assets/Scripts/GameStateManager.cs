@@ -652,6 +652,7 @@ public class GameStateManager : MonoBehaviour
             DailyChallengeManager.SetInactive();
 
         FreeModeManager.ResetFreeModeState();
+        GameSession.End();
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }

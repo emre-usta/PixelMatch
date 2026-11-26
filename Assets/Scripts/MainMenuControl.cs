@@ -19,6 +19,9 @@ public class MainMenuControl : MonoBehaviour
 
     private void Start()
     {
+        // Ana Menüye her girişte aktif oyun oturumu kapanır.
+        GameSession.End();
+
         if (panelModeSelect != null) panelModeSelect.SetActive(false);
         GiveStarterPowerUps();
         UpdateModeSelectTexts();
