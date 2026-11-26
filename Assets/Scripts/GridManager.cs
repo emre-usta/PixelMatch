@@ -35,6 +35,10 @@ public class GridManager : MonoBehaviour
     private int timeThiefHitCount = 0;
 
     public CardController FirstSelectedCard => firstSelectedCard;
+    // Açık bir çift sonuçlanıyor: CheckMatch (2. kart açıldı → sonuç) ya da yanlış eşleşmenin
+    // kapanma sekansı (MismatchSequence başı → iki kartın Hide'ı). X-Ray ve İpucu bu sırada kullanılamaz (AUDIT 1.6).
+    public bool IsResolvingPair => isChecking || pendingMismatchCount > 0;
+    private int pendingMismatchCount = 0;
     public int TimeThiefHitCount => timeThiefHitCount;
 
     private void Awake()
@@ -149,7 +153,8 @@ public class GridManager : MonoBehaviour
 
         if (timeThiefEnabled && levelConfig != null)
         {
-            int timeThiefPairID = Random.Range(2, totalPairCount);
+            // Grid'de gerçekten bulunan çiftlerden seçilir; her Hard oyunda hırsız çıkar (AUDIT 1.17).
+            int timeThiefPairID = selectedIDs[Random.Range(0, selectedIDs.Count)];
             List<int> pairIndices = new List<int>();
 
             for (int i = 0; i < cardIDs.Count; i++)
@@ -291,6 +296,9 @@ public class GridManager : MonoBehaviour
 
     private IEnumerator MismatchSequence(CardController a, CardController b)
     {
+        // CheckMatch'in içinde (isChecking hâlâ true iken) başlar; böylece IsResolvingPair kesintisiz kalır.
+        pendingMismatchCount++;
+
         StartCoroutine(a.ShakeAnimation());
         StartCoroutine(b.ShakeAnimation());
 
@@ -298,6 +306,8 @@ public class GridManager : MonoBehaviour
 
         a.Hide();
         b.Hide();
+
+        pendingMismatchCount--;
     }
 
     // ─── YARDIMCI METOTLAR ────────────────────────────────────────

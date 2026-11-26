@@ -144,14 +144,14 @@ public class AdRewardPopup : MonoBehaviour
         if (txtDeclineButton != null) txtDeclineButton.text = declineBtn;
 
         if (popupPanel != null) popupPanel.SetActive(true);
-        Time.timeScale = 0f;
+        TimeScaleController.Request(TimeScaleReason.Popup);
     }
 
     public void Hide()
     {
         if (popupPanel != null) popupPanel.SetActive(false);
         if (btnDecline != null) btnDecline.gameObject.SetActive(true);
-        Time.timeScale = 1f;
+        TimeScaleController.Release(TimeScaleReason.Popup);
     }
 
     private void OnWatchClicked()

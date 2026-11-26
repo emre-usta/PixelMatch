@@ -60,6 +60,12 @@ public class MoveController : MonoBehaviour
         frozenMoves = freeMovesCount;
     }
 
+    // Oyun bitince kalan bedava hamleler iptal edilir (second chance sonrası geri gelmez).
+    public void CancelFreeze()
+    {
+        frozenMoves = 0;
+    }
+
     private void HandlePairResult(CardController a, CardController b)
     {
         if (frozenMoves > 0)

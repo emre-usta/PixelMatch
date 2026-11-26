@@ -61,9 +61,21 @@ public class PowerUpManager : MonoBehaviour
 
     // ─── KULLANIM ─────────────────────────────────────────────────
 
+    // Power-up'lar yalnızca oyun Playing iken kullanılabilir (AUDIT 1.7).
+    private static bool IsGamePlaying =>
+        GameStateManager.Instance != null && GameStateManager.Instance.IsPlaying;
+
+    private static bool IsMatchBeingChecked =>
+        GridManager.Instance != null && GridManager.Instance.IsResolvingPair;
+
+    private const float TIME_FREEZE_DURATION = 5f;
+    private Coroutine timeFreezeRoutine;
+
     public void UseXRay()
     {
         if (isPowerUpActive) return;
+        if (!IsGamePlaying) return;
+        if (IsMatchBeingChecked) return;
         if (!TryUsePowerUp(PowerUpType.XRay)) return;
         FirebaseManager.Instance?.LogPowerUpUsed(
             "xray",
@@ -76,16 +88,20 @@ public class PowerUpManager : MonoBehaviour
     public void UseHint()
     {
         if (isPowerUpActive) return;
-        if (GridManager.Instance != null)
-        {
-            int openCount = 0;
-            foreach (var card in GridManager.Instance.AllCards)
-                if (card.State == CardState.Open)
-                    openCount++;
+        if (!IsGamePlaying) return;
+        if (IsMatchBeingChecked) return;
+        if (GridManager.Instance == null) return;
 
-            if (openCount > 2)
-                return;
-        }
+        int openCount = 0;
+        foreach (var card in GridManager.Instance.AllCards)
+            if (card.State == CardState.Open)
+                openCount++;
+
+        if (openCount > 2)
+            return;
+
+        // Çift envanter düşmeden önce aranır; bulunamazsa hak harcanmaz.
+        if (!FindHintPair(out CardController hintA, out CardController hintB)) return;
 
         if (!TryUsePowerUp(PowerUpType.MindFreeze)) return;
         FirebaseManager.Instance?.LogPowerUpUsed(
@@ -93,19 +109,22 @@ public class PowerUpManager : MonoBehaviour
             LevelSelectManager.SelectedLevel?.levelID ?? 0,
             LevelSelectManager.SelectedCategoryID,
             "standard_play");
-        StartCoroutine(HintCoroutine());
+        StartCoroutine(HintCoroutine(hintA, hintB));
     }
 
     public void UseTimeFreeze()
     {
         if (isPowerUpActive) return;
+        if (!IsGamePlaying) return;
         if (!TryUsePowerUp(PowerUpType.TimeFreeze)) return;
         FirebaseManager.Instance?.LogPowerUpUsed(
             "freeze",
             LevelSelectManager.SelectedLevel?.levelID ?? 0,
             LevelSelectManager.SelectedCategoryID,
             "standard_play");
-        StartCoroutine(TimeFreezeCoroutine());
+        timeFreezeRoutine = StartCoroutine(TimeFreezeCoroutine());
+        // Move modunda korutin aynı karede biter (bedava hamleler MoveController'da); referans tutulmaz.
+        if (!isPowerUpActive) timeFreezeRoutine = null;
     }
 
     // ─── X-RAY ────────────────────────────────────────────────────
@@ -141,16 +160,13 @@ public class PowerUpManager : MonoBehaviour
 
     // ─── HINT ─────────────────────────────────────────────────────
 
-    private IEnumerator HintCoroutine()
+    // Önce açık kartın eşi, yoksa kapalı ilk çift. Kart durumunu değiştirmez.
+    private bool FindHintPair(out CardController hintA, out CardController hintB)
     {
-        isPowerUpActive = true;
-
-        if (GridManager.Instance == null) { isPowerUpActive = false; yield break; }
+        hintA = null;
+        hintB = null;
 
         var cards = GridManager.Instance.AllCards;
-        CardController hintA = null;
-        CardController hintB = null;
-
         CardController selectedCard = GridManager.Instance.FirstSelectedCard;
 
         if (selectedCard != null)
@@ -183,13 +199,35 @@ public class PowerUpManager : MonoBehaviour
             }
         }
 
-        if (hintA == null || hintB == null) { isPowerUpActive = false; yield break; }
+        return hintA != null && hintB != null;
+    }
+
+    private IEnumerator HintCoroutine(CardController hintA, CardController hintB)
+    {
+        isPowerUpActive = true;
+
+        if (GridManager.Instance == null) { isPowerUpActive = false; yield break; }
 
         GridManager.Instance.SetAllCardsInteractable(false);
         hintA.RevealSilent();
         hintB.RevealSilent();
 
         yield return new WaitForSecondsRealtime(0.6f);
+
+        // Pause sırasında beklenir; oyun bu arada bittiyse (Win/Lose) eşleştirme yapılmaz.
+        while (GameStateManager.Instance != null &&
+               GameStateManager.Instance.CurrentState == GameState.Paused)
+            yield return null;
+
+        if (!IsGamePlaying)
+        {
+            GridManager.Instance.ClearSelectedCard();
+            hintA.Hide();
+            hintB.Hide();
+            GridManager.Instance.SetAllCardsInteractable(true);
+            isPowerUpActive = false;
+            yield break;
+        }
 
         GridManager.Instance.ClearSelectedCard();
         GameEvents.RaisePairMatched(hintA, hintB);
@@ -219,12 +257,43 @@ public class PowerUpManager : MonoBehaviour
             yield break;
         }
 
-        TimerController.Instance?.PauseTimer();
+        // Dondurma, Pause/Resume'dan bağımsız (AUDIT 1.8): ResumeTimer artık dondurmayı bozmaz.
+        TimerController.Instance?.Freeze();
 
-        yield return new WaitForSecondsRealtime(5f);
+        // Süre yalnızca oyun Playing iken azalır; ölçekli zaman kullanıldığı için Pause ve
+        // timeScale=0 olan popup'lar sırasında da durur, Resume'da kaldığı yerden devam eder.
+        float remaining = TIME_FREEZE_DURATION;
+        while (remaining > 0f)
+        {
+            yield return null;
+            if (IsGamePlaying)
+                remaining -= Time.deltaTime;
+        }
 
-        TimerController.Instance?.ResumeTimer();
+        TimerController.Instance?.Unfreeze();
         PowerUpUI.Instance?.HideFreezeFeedback();
         isPowerUpActive = false;
+        timeFreezeRoutine = null;
+    }
+
+    // Oyun bittiği anda (kazanma ya da kayıp) aktif dondurma sonlanır; second chance sonrası geri gelmez.
+    public void CancelActiveTimeFreeze()
+    {
+        if (timeFreezeRoutine != null)
+        {
+            StopCoroutine(timeFreezeRoutine);
+            timeFreezeRoutine = null;
+            isPowerUpActive = false;
+        }
+
+        TimerController.Instance?.Unfreeze();
+        MoveController.Instance?.CancelFreeze();
+
+        if (PowerUpUI.Instance != null)
+        {
+            // ShowFreezeFeedback'in bekleyen gizleme çağrısı, sonraki bir dondurmanın göstergesini erken kapatmasın.
+            PowerUpUI.Instance.CancelInvoke(nameof(PowerUpUI.HideFreezeFeedback));
+            PowerUpUI.Instance.HideFreezeFeedback();
+        }
     }
 }

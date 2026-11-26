@@ -124,7 +124,7 @@ public class WinPanelController : MonoBehaviour
                         rewardCountTexts[i].text = $"x{displayedRewards[i].amount * 2}";
                 }
 
-                Time.timeScale = 0f;
+                TimeScaleController.Request(TimeScaleReason.GameEnd);
                 StartCoroutine(DeactivateDoubleRewardButton());
             }
         );
