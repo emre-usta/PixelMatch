@@ -91,7 +91,8 @@ public class DailyChallengeManager : MonoBehaviour
 
     // ─── DURUM KONTROL ────────────────────────────────────────────
 
-    public bool IsPlayedToday()
+    // DC'nin PlayerPrefs metotları static: Level1'de MainMenu'deki örnek yok edilmiş olur.
+    public static bool IsPlayedToday()
     {
         string lastPlayed = PlayerPrefs.GetString(KEY_LAST_PLAYED, "");
         string today = DateTime.Now.ToString("yyyy-MM-dd");
@@ -104,7 +105,7 @@ public class DailyChallengeManager : MonoBehaviour
         return PlayerPrefs.GetInt(KEY_LAST_STARS, 0);
     }
 
-    public void MarkPlayedToday(int stars)
+    public static void MarkPlayedToday(int stars)
     {
         string today = DateTime.Now.ToString("yyyy-MM-dd");
         PlayerPrefs.SetString(KEY_LAST_PLAYED, today);
@@ -114,13 +115,13 @@ public class DailyChallengeManager : MonoBehaviour
 
     public bool CanRetry() => !IsPlayedToday();
 
-    public int GetTodayAttempts()
+    public static int GetTodayAttempts()
     {
         string today = DateTime.Now.ToString("yyyy-MM-dd");
         return PlayerPrefs.GetInt(KEY_ATTEMPTS + "_" + today, 0);
     }
 
-    public void AddAttempt()
+    public static void AddAttempt()
     {
         string today = DateTime.Now.ToString("yyyy-MM-dd");
         int current = GetTodayAttempts();
@@ -128,12 +129,18 @@ public class DailyChallengeManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public bool HasAttemptsLeft() => GetTodayAttempts() < 2;
+    public static bool HasAttemptsLeft() => GetTodayAttempts() < 2;
 
     public static void SetInactive()
     {
         IsDailyChallengeActive = false;
+        MarkStartedToday();
+    }
 
+    // Gün henüz işaretlenmediyse 0 yıldızla "oynandı" yazar (AUDIT 1.13: DC oyunu başladığı an).
+    // Galibiyetteki MarkPlayedToday yıldızı sonradan üzerine yazar.
+    public static void MarkStartedToday()
+    {
         string today = DateTime.Now.ToString("yyyy-MM-dd");
         string lastPlayed = PlayerPrefs.GetString("dc_last_played", "");
 

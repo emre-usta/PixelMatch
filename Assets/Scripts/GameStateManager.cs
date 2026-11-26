@@ -89,12 +89,39 @@ public class GameStateManager : MonoBehaviour
                             (TimerController.Instance?.TotalTime ?? 0f);
 
         SetState(GameState.Playing);
+
+        // AUDIT 1.13 (tek deneme): DC oyunu gerçekten başladığında gün işaretlenir, Restart gizlenir.
+        if (GameSession.IsSource(SessionSource.DailyChallenge))
+        {
+            DailyChallengeManager.MarkStartedToday();
+            HidePauseRestartButton();
+        }
+
         GameEvents.RaiseGameStarted();
 
         if (!DailyChallengeManager.IsDailyChallengeActive && !FreeModeManager.IsFreeModeActive)
             FirebaseManager.Instance?.LogLevelStart(
                 LevelSelectManager.SelectedCategoryID,
                 LevelSelectManager.SelectedLevel?.levelID ?? 0);
+    }
+
+    // Sahnedeki adı sonda boşluklu ("Btn_Restart "), bu yüzden Trim ile karşılaştırılır.
+    private void HidePauseRestartButton()
+    {
+        if (panelPause != null)
+        {
+            var buttons = panelPause.GetComponentsInChildren<UnityEngine.UI.Button>(true);
+            foreach (var btn in buttons)
+            {
+                if (btn.gameObject.name.Trim() == "Btn_Restart")
+                {
+                    btn.gameObject.SetActive(false);
+                    return;
+                }
+            }
+        }
+
+        Debug.LogWarning("[DC] Btn_Restart not found under panelPause");
     }
 
     public void PauseGame()
@@ -203,14 +230,13 @@ public class GameStateManager : MonoBehaviour
                 WinPanelController winPanel = panelWin.GetComponentInChildren<WinPanelController>();
                 winPanel?.ShowFreeModeResult(stars);
             }
-            FreeModeManager.ResetFreeModeState();
             yield break;
         }
 
         if (GameSession.IsSource(SessionSource.DailyChallenge))
         {
             int stars = CalculateStars();
-            DailyChallengeManager.Instance.MarkPlayedToday(stars);
+            DailyChallengeManager.MarkPlayedToday(stars);
             DailyChallengeManager.SetInactive();
 
             yield return new WaitUntil(() => PowerUpManager.Instance != null);
@@ -328,6 +354,7 @@ public class GameStateManager : MonoBehaviour
 
     private void SaveStars(int stars)
     {
+        if (LevelSelectManager.SelectedLevel == null) return;
         if (LevelProgressManager.Instance == null) return;
 
         int categoryID = LevelSelectManager.SelectedCategoryID;
@@ -455,14 +482,14 @@ public class GameStateManager : MonoBehaviour
 
         if (GameSession.IsSource(SessionSource.DailyChallenge))
         {
-            DailyChallengeManager.Instance?.AddAttempt();
-            bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
+            DailyChallengeManager.AddAttempt();
 
+            // Tek deneme (AUDIT 1.13): second chance reddedilirse gün biter.
             AdRewardPopup.Instance?.ShowForSecondChance(
                 onSuccess: () => ApplySecondChance(),
                 onDecline: () =>
                 {
-                    if (!hasAttempts) DailyChallengeManager.SetInactive();
+                    DailyChallengeManager.SetInactive();
                     ShowDCGameOverPanel();
                 }
             );
@@ -655,19 +682,12 @@ public class GameStateManager : MonoBehaviour
         // Kazanma kesinleşti ama sonuç paneli henüz açılmadı: yeniden başlatma yok sayılır.
         if (CurrentState == GameState.Win && !winResultShown) return;
 
+        // Tek deneme (AUDIT 1.13): DC'de yeniden başlatma yok.
+        if (GameSession.IsSource(SessionSource.DailyChallenge)) return;
+
         if (isLeavingScene) return;
         isLeavingScene = true;
 
-        if (DailyChallengeManager.IsDailyChallengeActive)
-        {
-            if (!DailyChallengeManager.Instance.HasAttemptsLeft())
-            {
-                DailyChallengeManager.SetInactive();
-                Time.timeScale = 1f;
-                SceneManager.LoadScene("MainMenu");
-                return;
-            }
-        }
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

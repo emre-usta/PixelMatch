@@ -320,6 +320,10 @@ public class FreeModeManager : MonoBehaviour
 
     public void OnBackClicked()
     {
+        // StartFreeMode ile aynı tek seferlik sahne geçiş bayrağı (AUDIT 1.23 tipi koruma).
+        if (isStarting) return;
+        isStarting = true;
+
         IsFreeModeActive = false;
         SceneManager.LoadScene("MainMenu");
     }
