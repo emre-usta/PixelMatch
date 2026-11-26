@@ -44,6 +44,9 @@ public class MoveController : MonoBehaviour
     {
         this.useMoveLimit = useMoveLimit;
         this.moveLimit = moveLimit;
+
+        // Önizleme/tutorial sırasında göstergede seviyenin başlangıç değeri görünsün.
+        UpdateUI();
     }
 
     private void HandleGameStarted()

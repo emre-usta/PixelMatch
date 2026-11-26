@@ -86,6 +86,9 @@ public class TimerController : MonoBehaviour
             return;
         }
         totalTime = timeLimit;
+
+        // Önizleme/tutorial sırasında göstergede seviyenin başlangıç süresi görünsün (timer henüz akmaz).
+        UpdateTimerUI(totalTime);
     }
 
     public void AddTime(float delta)
@@ -143,11 +146,13 @@ public class TimerController : MonoBehaviour
         GameStateManager.Instance.LoseGame();
     }
 
-    private void UpdateTimerUI()
+    private void UpdateTimerUI() => UpdateTimerUI(remainingTime);
+
+    private void UpdateTimerUI(float time)
     {
         if (timerText == null) return;
-        int minutes = Mathf.FloorToInt(remainingTime / 60f);
-        int seconds = Mathf.FloorToInt(remainingTime % 60f);
+        int minutes = Mathf.FloorToInt(time / 60f);
+        int seconds = Mathf.FloorToInt(time % 60f);
         timerText.text = $"{minutes:00}:{seconds:00}";
     }
 }
