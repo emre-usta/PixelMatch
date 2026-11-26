@@ -86,8 +86,8 @@ public class GameStateManager : MonoBehaviour
         if (TutorialManager.Instance != null &&
             TutorialManager.Instance.gameObject.activeInHierarchy &&
             PlayerPrefs.GetInt("tutorial_done", 0) == 0 &&
-            !DailyChallengeManager.IsDailyChallengeActive &&
-            !FreeModeManager.IsFreeModeActive &&
+            !GameSession.IsSource(SessionSource.DailyChallenge) &&
+            !GameSession.IsSource(SessionSource.FreeMode) &&
             !isAdUnlockedLevel)
             return;
 
@@ -202,7 +202,7 @@ public class GameStateManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(delay);
         winResultShown = true;
 
-        if (FreeModeManager.IsFreeModeActive)
+        if (GameSession.IsSource(SessionSource.FreeMode))
         {
             if (panelWin != null)
             {
@@ -215,7 +215,7 @@ public class GameStateManager : MonoBehaviour
             yield break;
         }
 
-        if (DailyChallengeManager.IsDailyChallengeActive)
+        if (GameSession.IsSource(SessionSource.DailyChallenge))
         {
             int stars = CalculateStars();
             DailyChallengeManager.Instance.MarkPlayedToday(stars);
@@ -289,13 +289,14 @@ public class GameStateManager : MonoBehaviour
 
     private int CalculateStars()
     {
-        bool isFree = FreeModeManager.IsFreeModeActive;
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        // Kaynak ve mod oturumdan; limit değerleri bilerek eski kaynaklardan (AUDIT D2 Aşama B kapsamı).
+        bool isFree = GameSession.IsSource(SessionSource.FreeMode);
+        bool isMoveMode = GameSession.IsMoveMode;
 
         float timeLimit = 0f;
         int moveLimit = 0;
 
-        if (DailyChallengeManager.IsDailyChallengeActive)
+        if (GameSession.IsSource(SessionSource.DailyChallenge))
         {
             timeLimit = TimerController.Instance != null ? TimerController.Instance.TotalTime : 120f;
             moveLimit = MoveController.Instance != null ? MoveController.Instance.MoveLimit : 30;
@@ -460,7 +461,7 @@ public class GameStateManager : MonoBehaviour
 
         LogLevelEndEvent(success: false, stars: 0);
 
-        if (DailyChallengeManager.IsDailyChallengeActive)
+        if (GameSession.IsSource(SessionSource.DailyChallenge))
         {
             DailyChallengeManager.Instance?.AddAttempt();
             bool hasAttempts = DailyChallengeManager.Instance.HasAttemptsLeft();
@@ -501,7 +502,7 @@ public class GameStateManager : MonoBehaviour
             yield break;
         }
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
         if (isMoveMode)
             MoveController.Instance?.AddMoves(10);
         else
@@ -598,7 +599,7 @@ public class GameStateManager : MonoBehaviour
         TMPro.TextMeshProUGUI reason = reasonT.GetComponent<TMPro.TextMeshProUGUI>();
         if (reason == null) return;
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
         reason.text = isMoveMode
             ? LocalizationManager.Get("out_of_moves")
             : LocalizationManager.Get("out_of_time");

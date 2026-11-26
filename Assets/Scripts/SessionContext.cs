@@ -216,4 +216,10 @@ public static class GameSession
 
         return SessionContext.FromLegacyStatics(limits);
     }
+
+    // Context hiç yoksa (editörde Level1 doğrudan açıldı) bugünkü varsayılanla aynı sonucu verir: Story gibi davranılır.
+    public static bool IsSource(SessionSource source) => CurrentOrLegacy()?.Source == source;
+
+    public static bool IsMoveMode =>
+        CurrentOrLegacy()?.IsMoveMode ?? (LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move);
 }

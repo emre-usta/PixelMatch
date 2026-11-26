@@ -206,7 +206,7 @@ public class PowerUpManager : MonoBehaviour
     {
         isPowerUpActive = true;
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
 
         ComboEffectManager.Instance?.TriggerFreezeFlash();
         AudioManager.Instance?.PlayFreezeSFX();

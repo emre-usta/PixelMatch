@@ -71,7 +71,7 @@ public class AdRewardPopup : MonoBehaviour
             return;
         }
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
 
         currentAdType = "second_chance";
         onWatched = () =>

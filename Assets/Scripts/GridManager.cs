@@ -57,68 +57,47 @@ public class GridManager : MonoBehaviour
         GameEvents.OnPairMismatch -= HandlePairMismatch;
     }
 
+    // Aktif oturum (AUDIT D2). Null ise editörde Level1 doğrudan açılmıştır: inspector ayarları kullanılır.
+    private SessionContext session;
+
     private void Start()
     {
-        if (DailyChallengeManager.IsDailyChallengeActive)
-            SetupDailyChallengeConfig();
-        else if (FreeModeManager.IsFreeModeActive)
-            SetupFreeModeConfig();
-        else if (LevelSelectManager.SelectedLevel != null)
-            levelConfig = LevelSelectManager.SelectedLevel;
+        session = GameSession.CurrentOrLegacy(freeModeLimitConfig);
+
+        if (session != null)
+            ApplySession(session);
 
         GenerateGrid();
     }
 
-    private void SetupDailyChallengeConfig()
+    // Grid, kart görselleri ve başlangıç limitleri oturumdan (Story / DC / Free için aynı yol).
+    private void ApplySession(SessionContext s)
     {
-        columns = DailyChallengeManager.DCColumns;
-        rows = DailyChallengeManager.DCRows;
+        columns = s.Columns;
+        rows = s.Rows;
 
-        CategoryConfig cat = DailyChallengeManager.DCCategory;
-        if (cat != null)
+        if (s.Category != null)
         {
-            cardSprites = cat.cardSprites;
-            cardBackSprite = cat.cardBackSprite;
+            cardSprites = s.Category.cardSprites;
+            cardBackSprite = s.Category.cardBackSprite;
         }
 
-        if (freeModeLimitConfig != null)
+        if (s.HasLimits)
         {
-            var limit = freeModeLimitConfig.GetLimit(columns, rows, DailyChallengeManager.DCDifficulty);
-            TimerController.Instance?.SetConfig(true, limit.timeLimit);
-            MoveController.Instance?.SetConfig(false, limit.moveLimit);
+            TimerController.Instance?.SetConfig(s.UsesTimer, s.TimeLimit);
+            MoveController.Instance?.SetConfig(s.UsesMoveLimit, s.MoveLimit);
         }
 
-        levelConfig = null;
-    }
-
-    private void SetupFreeModeConfig()
-    {
-        columns = FreeModeManager.SelectedColumns;
-        rows = FreeModeManager.SelectedRows;
-
-        CategoryConfig cat = FreeModeManager.SelectedCategory;
-        if (cat != null)
-        {
-            cardSprites = cat.cardSprites;
-            cardBackSprite = cat.cardBackSprite;
-        }
-
-        bool isMoveMode = FreeModeManager.SelectedMode == LevelSelectManager.GameMode.Move;
-        if (freeModeLimitConfig != null)
-        {
-            var limit = freeModeLimitConfig.GetLimit(columns, rows, FreeModeManager.SelectedDifficulty);
-            TimerController.Instance?.SetConfig(!isMoveMode, limit.timeLimit);
-            MoveController.Instance?.SetConfig(isMoveMode, limit.moveLimit);
-        }
-
-        levelConfig = null;
+        // Zaman Hırsızı sprite'ı için story seviyesinin config'i tutulur.
+        levelConfig = s.Source == SessionSource.Story ? s.Level : null;
     }
 
     // ─── GRİD ÜRETİMİ ─────────────────────────────────────────────
 
     private void GenerateGrid()
     {
-        if (levelConfig != null)
+        // Yalnızca oturum yokken: inspector'daki levelConfig ile eski story yolu.
+        if (session == null && levelConfig != null)
         {
             columns = levelConfig.columns;
             rows = levelConfig.rows;
@@ -164,7 +143,11 @@ public class GridManager : MonoBehaviour
         int timeThiefIndex1 = -1;
         int timeThiefIndex2 = -1;
 
-        if (levelConfig != null && levelConfig.difficulty == DifficultyLevel.Hard)
+        bool timeThiefEnabled = session != null
+            ? session.TimeThiefEnabled
+            : levelConfig != null && levelConfig.difficulty == DifficultyLevel.Hard;
+
+        if (timeThiefEnabled && levelConfig != null)
         {
             int timeThiefPairID = Random.Range(2, totalPairCount);
             List<int> pairIndices = new List<int>();

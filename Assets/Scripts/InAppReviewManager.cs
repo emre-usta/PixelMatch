@@ -51,8 +51,8 @@ public class InAppReviewManager : MonoBehaviour
     public void OnLevelCompleted()
     {
         // Free Mode ve Daily Challenge'da tetikleme
-        if (FreeModeManager.IsFreeModeActive) return;
-        if (DailyChallengeManager.IsDailyChallengeActive) return;
+        if (GameSession.IsSource(SessionSource.FreeMode)) return;
+        if (GameSession.IsSource(SessionSource.DailyChallenge)) return;
 
         // Daha önce gösterildiyse tekrar gösterme
         if (PlayerPrefs.GetInt(KEY_REVIEW_SHOWN, 0) == 1) return;

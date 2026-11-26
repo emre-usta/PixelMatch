@@ -58,7 +58,7 @@ public class PowerUpUI : MonoBehaviour
     {
         if (freezeFeedbackPanel != null) freezeFeedbackPanel.SetActive(true);
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
 
         if (txtFreezeTitle != null)
             txtFreezeTitle.text = LocalizationManager.Get("freeze_title");
