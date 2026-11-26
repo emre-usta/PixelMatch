@@ -128,7 +128,7 @@ public class GameStateManager : MonoBehaviour
     {
         if (CurrentState != GameState.Playing || losePending) return;
         SetState(GameState.Paused);
-        Time.timeScale = 0f;
+        TimeScaleController.Request(TimeScaleReason.Pause);
         GameEvents.RaiseGamePaused();
         if (panelPause != null) panelPause.SetActive(true);
     }
@@ -137,7 +137,7 @@ public class GameStateManager : MonoBehaviour
     {
         if (CurrentState != GameState.Paused) return;
         SetState(GameState.Playing);
-        Time.timeScale = 1f;
+        TimeScaleController.Release(TimeScaleReason.Pause);
         GameEvents.RaiseGameResumed();
         TimerController.Instance?.ResumeTimer();
         if (panelPause != null) panelPause.SetActive(false);
@@ -210,7 +210,7 @@ public class GameStateManager : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(WIN_PRESENTATION_DELAY);
 
-        Time.timeScale = 0f;
+        TimeScaleController.Request(TimeScaleReason.GameEnd);
         GameEvents.RaiseGameWon();
 
         float delay = ComboEffectManager.Instance != null ? 1.2f : 0f;
@@ -471,7 +471,7 @@ public class GameStateManager : MonoBehaviour
     private void BeginLose()
     {
         SetState(GameState.Lose);
-        Time.timeScale = 0f;
+        TimeScaleController.Request(TimeScaleReason.GameEnd);
         PowerUpManager.Instance?.CancelActiveTimeFreeze();
         GameEvents.RaiseGameLost();
 
@@ -514,7 +514,7 @@ public class GameStateManager : MonoBehaviour
         yield return new WaitForSecondsRealtime(0.1f);
 
         SetState(GameState.Playing);
-        Time.timeScale = 1f;
+        TimeScaleController.Release(TimeScaleReason.GameEnd);
 
         // Tahtada eşleşecek çift kalmadıysa süre/hamle eklemeden doğrudan kazan.
         if (GridManager.Instance != null && GridManager.Instance.RemainingPairs == 0)
@@ -675,7 +675,7 @@ public class GameStateManager : MonoBehaviour
 
         FreeModeManager.ResetFreeModeState();
         GameSession.End();
-        Time.timeScale = 1f;
+        TimeScaleController.ResetAll();
         SceneManager.LoadScene("MainMenu");
     }
 
@@ -690,7 +690,7 @@ public class GameStateManager : MonoBehaviour
         if (isLeavingScene) return;
         isLeavingScene = true;
 
-        Time.timeScale = 1f;
+        TimeScaleController.ResetAll();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -699,7 +699,7 @@ public class GameStateManager : MonoBehaviour
         if (isLeavingScene) return;
         isLeavingScene = true;
 
-        Time.timeScale = 1f;
+        TimeScaleController.ResetAll();
 
         AdManager.Instance?.ShowRewardedInterstitialIfReady(
             onSuccess: () =>

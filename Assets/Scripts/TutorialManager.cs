@@ -77,7 +77,7 @@ public class TutorialManager : MonoBehaviour
     {
         isActive = true;
         currentStep = 0;
-        Time.timeScale = 0f;
+        TimeScaleController.Request(TimeScaleReason.Tutorial);
 
         if (tutorialPanel != null) tutorialPanel.SetActive(true);
         UpdateUI();
@@ -137,7 +137,7 @@ public class TutorialManager : MonoBehaviour
         FirebaseManager.Instance?.LogTutorialComplete();
 
         if (tutorialPanel != null) tutorialPanel.SetActive(false);
-        Time.timeScale = 1f;
+        TimeScaleController.Release(TimeScaleReason.Tutorial);
         GameStateManager.Instance?.OnTutorialCompleted();
     }
 }

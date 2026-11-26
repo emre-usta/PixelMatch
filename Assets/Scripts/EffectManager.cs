@@ -138,7 +138,7 @@ public class EffectManager : MonoBehaviour
                     : LocalizationManager.Get("time_thief_desc");
         }
 
-        Time.timeScale = 0f;
+        TimeScaleController.Request(TimeScaleReason.TimeThiefInfo);
         timeThiefTutorialPopup.SetActive(true);
     }
 
@@ -146,6 +146,6 @@ public class EffectManager : MonoBehaviour
     {
         if (timeThiefTutorialPopup != null)
             timeThiefTutorialPopup.SetActive(false);
-        Time.timeScale = 1f;
+        TimeScaleController.Release(TimeScaleReason.TimeThiefInfo);
     }
 }
