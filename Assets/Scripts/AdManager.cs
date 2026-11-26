@@ -5,6 +5,7 @@ using GoogleMobileAds.Ump.Api;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 public class AdManager : MonoBehaviour
 {
@@ -76,6 +77,28 @@ public class AdManager : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // UMP callback'leri Android UI thread'inden gelir; işleri Unity ana thread'ine aktarmak için.
+        mainThreadContext = SynchronizationContext.Current;
+        mainThreadId = Thread.CurrentThread.ManagedThreadId;
+    }
+
+    // ─── ANA THREAD ───────────────────────────────────────────────
+    // MobileAdsEventExecutor.ExecuteInUpdate burada kullanılamaz: kuyruğu işleyen obje ancak
+    // MobileAds.Instance oluşturulunca yaratılıyor. Unity'nin SynchronizationContext'i her zaman hazır.
+
+    private SynchronizationContext mainThreadContext;
+    private int mainThreadId;
+
+    private void RunOnMainThread(Action action)
+    {
+        if (mainThreadContext == null || Thread.CurrentThread.ManagedThreadId == mainThreadId)
+        {
+            action();
+            return;
+        }
+
+        mainThreadContext.Post(_ => action(), null);
     }
 
     private void Start()
@@ -100,7 +123,7 @@ public class AdManager : MonoBehaviour
         }
 #endif
 
-        ConsentInformation.Update(requestParameters, (FormError updateError) =>
+        ConsentInformation.Update(requestParameters, (FormError updateError) => RunOnMainThread(() =>
         {
             if (updateError != null)
             {
@@ -111,14 +134,14 @@ public class AdManager : MonoBehaviour
 
             Initialize();
 
-            ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) =>
+            ConsentForm.LoadAndShowConsentFormIfRequired((FormError showError) => RunOnMainThread(() =>
             {
                 if (showError != null)
                     Debug.LogError("Consent form error: " + showError.Message);
 
                 Initialize();
-            });
-        });
+            }));
+        }));
     }
 
     public void ShowPrivacyOptionsForm()
@@ -132,7 +155,10 @@ public class AdManager : MonoBehaviour
 
     // ─── BAŞLATMA ─────────────────────────────────────────────────
 
-    private void Initialize()
+    // Gövde her durumda Unity ana thread'inde çalışır (ana thread'den çağrılırsa gecikmesiz).
+    private void Initialize() => RunOnMainThread(InitializeOnMainThread);
+
+    private void InitializeOnMainThread()
     {
         if (isInitialized) return;
         isInitialized = true;
