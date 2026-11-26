@@ -282,8 +282,9 @@ public class WinPanelController : MonoBehaviour
 
     private void UpdateScore()
     {
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
-        bool isFree = FreeModeManager.IsFreeModeActive;
+        // Kaynak ve mod oturumdan; gösterilen limit değerleri bilerek eski kaynaklardan (AUDIT D2 Aşama B kapsamı).
+        bool isMoveMode = GameSession.IsMoveMode;
+        bool isFree = GameSession.IsSource(SessionSource.FreeMode);
 
         if (txtTimeBonusLabel != null)
             txtTimeBonusLabel.text = LocalizationManager.Get(

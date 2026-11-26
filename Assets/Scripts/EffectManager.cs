@@ -26,7 +26,7 @@ public class EffectManager : MonoBehaviour
     {
         if (effectType != CardEffectType.TimeThief) return;
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
         Color red = new Color(0.89f, 0.29f, 0.29f);
 
         ComboEffectManager.Instance?.TriggerTimeThiefFlash();
@@ -114,7 +114,7 @@ public class EffectManager : MonoBehaviour
 
         if (timeThiefTutorialPopup == null) yield break;
 
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
 
         Transform titleT = timeThiefTutorialPopup.transform
             .Find("Panel_Content/Panel_Title/Text_PauseTitle");

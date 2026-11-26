@@ -156,7 +156,7 @@ public class AudioManager : MonoBehaviour
 
     private void GiveComboReward(int combo)
     {
-        bool isMoveMode = LevelSelectManager.SelectedMode == LevelSelectManager.GameMode.Move;
+        bool isMoveMode = GameSession.IsMoveMode;
         string label = isMoveMode
             ? LocalizationManager.Get("combo_moves")
             : LocalizationManager.Get("combo_seconds");

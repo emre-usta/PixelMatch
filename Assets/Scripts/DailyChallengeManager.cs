@@ -170,6 +170,8 @@ public class DailyChallengeManager : MonoBehaviour
     {
         IsDailyChallengeActive = true;
         LevelSelectManager.SelectedMode = LevelSelectManager.GameMode.Classic;
+        GameSession.Begin(SessionContext.ForDailyChallenge(
+            SessionContext.TodayDcDate(), DCCategory, DCColumns, DCRows, DCDifficulty, limitConfig));
 
         string difficulty = DCDifficulty switch
         {

@@ -44,8 +44,8 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        if (DailyChallengeManager.IsDailyChallengeActive ||
-            FreeModeManager.IsFreeModeActive)
+        if (GameSession.IsSource(SessionSource.DailyChallenge) ||
+            GameSession.IsSource(SessionSource.FreeMode))
         {
             if (tutorialPanel != null) tutorialPanel.SetActive(false);
             gameObject.SetActive(false);
@@ -53,8 +53,10 @@ public class TutorialManager : MonoBehaviour
         }
 
         bool isDone = PlayerPrefs.GetInt(KEY_TUTORIAL_DONE, 0) == 1;
-        bool isFirstLevel = LevelSelectManager.SelectedLevel != null &&
-                            LevelSelectManager.SelectedLevel.levelID == 0;
+        SessionContext session = GameSession.CurrentOrLegacy();
+        bool isFirstLevel = session != null &&
+                            session.Source == SessionSource.Story &&
+                            session.LevelID == 0;
 
         if (isDone || !isFirstLevel)
         {
