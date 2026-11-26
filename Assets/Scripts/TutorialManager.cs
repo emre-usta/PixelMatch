@@ -24,6 +24,9 @@ public class TutorialManager : MonoBehaviour
     private readonly int totalSteps = 8;
     private bool isActive = false;
 
+    // Tutorial şu an ekranda mı (ShowTutorial → true, CompleteTutorial → false). Oyun başlatma guard'ı bunu kullanır.
+    public bool IsShowing => isActive;
+
     private readonly string[] stepKeys =
     {
         "tutorial_step1",
