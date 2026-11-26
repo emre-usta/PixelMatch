@@ -169,6 +169,7 @@ public class AdRewardPopup : MonoBehaviour
 
         if (AdManager.Instance == null || !AdManager.Instance.IsRewardedReady)
         {
+            AdManager.Instance?.RequestLoad(AdManager.AdFormat.Rewarded);
             // Reklam hazır değil, ödül verme!
             declined?.Invoke();
             return;

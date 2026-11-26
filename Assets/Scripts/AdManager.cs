@@ -72,6 +72,33 @@ public class AdManager : MonoBehaviour
     public bool IsInterstitialReady => interstitialAd != null && interstitialAd.CanShowAd();
     public bool IsRewardedInterstitialReady => rewardedInterstitialAd != null && rewardedInterstitialAd.CanShowAd();
 
+    // ─── YÜKLEME DURUMU ───────────────────────────────────────────
+
+    public enum AdFormat { Rewarded, Interstitial, RewardedInterstitial }
+
+    private class AdLoadState
+    {
+        public bool isLoading;
+        public int failedAttempts;
+        public Coroutine retryRoutine;
+    }
+
+    // Başarısız yüklemeden sonra bekleme süreleri (sn); son değer üst sınırdır.
+    private static readonly float[] LOAD_RETRY_DELAYS = { 5f, 15f, 30f, 60f, 120f };
+    private const float INIT_CALLBACK_WARN_AFTER = 30f;
+
+    private readonly AdLoadState rewardedLoad = new AdLoadState();
+    private readonly AdLoadState interstitialLoad = new AdLoadState();
+    private readonly AdLoadState rewardedInterstitialLoad = new AdLoadState();
+
+    private bool adsInitialized = false;          // MobileAds.Initialize callback'i geldi
+    private float initializeCalledAt = -1f;       // MobileAds.Initialize çağrıldığı an (realtime)
+
+#if UNITY_EDITOR
+    // Editör test menüsü: bir sonraki ShowRewarded "ödülsüz kapandı" yolunu simüle eder (tek seferlik).
+    public const string DebugRewardedNoRewardKey = "PixelMatch.DebugAds.NextRewardedNoReward";
+#endif
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -104,6 +131,16 @@ public class AdManager : MonoBehaviour
     private void Start()
     {
         RequestConsentInfoUpdate();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused) return;
+
+        // Arka plandan dönüş: yüklenmemiş reklamlar için yükleme (hazır / yükleniyor / gösteriliyor ise atlanır).
+        StartLoad(AdFormat.Rewarded);
+        StartLoad(AdFormat.Interstitial);
+        StartLoad(AdFormat.RewardedInterstitial);
     }
 
     // ─── UMP / GDPR ───────────────────────────────────────────────
@@ -175,10 +212,15 @@ public class AdManager : MonoBehaviour
         });
 #endif
 
+        initializeCalledAt = Time.realtimeSinceStartup;
+
         MobileAds.Initialize(initStatus =>
         {
             MobileAdsEventExecutor.ExecuteInUpdate(() =>
             {
+                adsInitialized = true;
+                Debug.Log("[AdManager] MobileAds initialized");
+
                 LoadRewarded();
                 LoadInterstitial();
                 LoadRewardedInterstitial();
@@ -186,18 +228,138 @@ public class AdManager : MonoBehaviour
         });
     }
 
-    // ─── REWARDED ─────────────────────────────────────────────────
+    // ─── YÜKLEME ──────────────────────────────────────────────────
 
-    private void LoadRewarded()
+    // Reklam hazır değilse ve o an yükleme yoksa yüklemeyi hemen başlatır
+    // (bekleyen yeniden deneme varsa iptal edilip öne alınır).
+    public void RequestLoad(AdFormat format)
     {
-        if (rewardedAd != null) { rewardedAd.Destroy(); rewardedAd = null; }
-
-        RewardedAd.Load(REWARDED_ID, new AdRequest(), (ad, error) =>
+        if (!adsInitialized)
         {
-            if (error != null || ad == null) return;
-            rewardedAd = ad;
-        });
+            LogInitDiagnostics(format);
+            return;
+        }
+
+        StartLoad(format);
     }
+
+    private void LogInitDiagnostics(AdFormat format)
+    {
+        if (!isInitialized)
+        {
+            Debug.LogWarning($"[AdManager] RequestLoad({format}): MobileAds.Initialize henüz çağrılmadı (UMP bekleniyor).");
+            return;
+        }
+
+        float elapsed = Time.realtimeSinceStartup - initializeCalledAt;
+        if (elapsed > INIT_CALLBACK_WARN_AFTER)
+            Debug.LogWarning($"[AdManager] RequestLoad({format}): MobileAds.Initialize {elapsed:0} sn önce çağrıldı, callback hâlâ gelmedi.");
+    }
+
+    private void LoadRewarded() => StartLoad(AdFormat.Rewarded);
+    private void LoadInterstitial() => StartLoad(AdFormat.Interstitial);
+    private void LoadRewardedInterstitial() => StartLoad(AdFormat.RewardedInterstitial);
+
+    private AdLoadState GetLoadState(AdFormat format) => format switch
+    {
+        AdFormat.Rewarded => rewardedLoad,
+        AdFormat.Interstitial => interstitialLoad,
+        _ => rewardedInterstitialLoad
+    };
+
+    private bool IsReady(AdFormat format) => format switch
+    {
+        AdFormat.Rewarded => IsRewardedReady,
+        AdFormat.Interstitial => IsInterstitialReady,
+        _ => IsRewardedInterstitialReady
+    };
+
+    private bool IsShowing(AdFormat format) => format switch
+    {
+        AdFormat.Rewarded => isShowingRewarded,
+        AdFormat.Interstitial => isShowingInterstitial,
+        _ => isShowingRewardedInterstitial
+    };
+
+    // Tek giriş noktası: başlatma tamamlanmadıysa, reklam gösteriliyorsa, hazırsa ya da yükleniyorsa hiçbir şey yapmaz.
+    private void StartLoad(AdFormat format)
+    {
+        if (!adsInitialized) return;
+        if (IsShowing(format)) return;
+        if (IsReady(format)) return;
+
+        AdLoadState state = GetLoadState(format);
+        if (state.isLoading) return;
+
+        if (state.retryRoutine != null)
+        {
+            StopCoroutine(state.retryRoutine);
+            state.retryRoutine = null;
+        }
+
+        state.isLoading = true;
+
+        switch (format)
+        {
+            case AdFormat.Rewarded:
+                if (rewardedAd != null) { rewardedAd.Destroy(); rewardedAd = null; }
+                RewardedAd.Load(REWARDED_ID, new AdRequest(), (ad, error) => RunOnMainThread(() =>
+                {
+                    if (HandleLoadResult(format, ad != null, error)) rewardedAd = ad;
+                    else ad?.Destroy();
+                }));
+                break;
+
+            case AdFormat.Interstitial:
+                if (interstitialAd != null) { interstitialAd.Destroy(); interstitialAd = null; }
+                InterstitialAd.Load(INTERSTITIAL_ID, new AdRequest(), (ad, error) => RunOnMainThread(() =>
+                {
+                    if (HandleLoadResult(format, ad != null, error)) interstitialAd = ad;
+                    else ad?.Destroy();
+                }));
+                break;
+
+            default:
+                if (rewardedInterstitialAd != null) { rewardedInterstitialAd.Destroy(); rewardedInterstitialAd = null; }
+                RewardedInterstitialAd.Load(REWARDED_INTERSTITIAL_ID, new AdRequest(), (ad, error) => RunOnMainThread(() =>
+                {
+                    if (HandleLoadResult(format, ad != null, error)) rewardedInterstitialAd = ad;
+                    else ad?.Destroy();
+                }));
+                break;
+        }
+    }
+
+    // Ana thread'de çalışır. true: reklam kullanılabilir. false: yeniden deneme planlandı.
+    private bool HandleLoadResult(AdFormat format, bool hasAd, LoadAdError error)
+    {
+        AdLoadState state = GetLoadState(format);
+        state.isLoading = false;
+
+        if (error != null || !hasAd)
+        {
+            int index = Mathf.Min(state.failedAttempts, LOAD_RETRY_DELAYS.Length - 1);
+            float delay = LOAD_RETRY_DELAYS[index];
+            state.failedAttempts++;
+
+            Debug.LogWarning($"[AdManager] {format} load failed ({error?.GetMessage() ?? "no ad"}), retry #{state.failedAttempts} in {delay:0} s");
+            state.retryRoutine = StartCoroutine(RetryLoadAfter(format, delay));
+            return false;
+        }
+
+        state.failedAttempts = 0;
+        Debug.Log($"[AdManager] {format} loaded");
+        return true;
+    }
+
+    private IEnumerator RetryLoadAfter(AdFormat format, float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        GetLoadState(format).retryRoutine = null;
+        StartLoad(format);
+    }
+
+    // ─── REWARDED ─────────────────────────────────────────────────
 
     // Her gösterimde onSuccess ya da onFail'den tam olarak biri, bir kez çağrılır.
     public void ShowRewarded(Action onSuccess, Action onFail = null, string adPlacement = "powerup")
@@ -212,7 +374,7 @@ public class AdManager : MonoBehaviour
         if (!IsRewardedReady)
         {
             onFail?.Invoke();
-            LoadRewarded();
+            RequestLoad(AdFormat.Rewarded);
             return;
         }
 
@@ -307,6 +469,15 @@ public class AdManager : MonoBehaviour
 
         try
         {
+#if UNITY_EDITOR
+            if (UnityEditor.SessionState.GetBool(DebugRewardedNoRewardKey, false))
+            {
+                UnityEditor.SessionState.EraseBool(DebugRewardedNoRewardKey);
+                Debug.Log("[AdManager] DEBUG: rewarded reklam gösterilmedi, 'ödülsüz kapandı' yolu simüle ediliyor (tek seferlik).");
+                OnClosed();
+                return;
+            }
+#endif
             ad.Show(reward => MobileAdsEventExecutor.ExecuteInUpdate(OnReward));
         }
         catch (Exception e)
@@ -318,17 +489,6 @@ public class AdManager : MonoBehaviour
     }
 
     // ─── INTERSTITIAL ─────────────────────────────────────────────
-
-    private void LoadInterstitial()
-    {
-        if (interstitialAd != null) { interstitialAd.Destroy(); interstitialAd = null; }
-
-        InterstitialAd.Load(INTERSTITIAL_ID, new AdRequest(), (ad, error) =>
-        {
-            if (error != null || ad == null) return;
-            interstitialAd = ad;
-        });
-    }
 
     public void ShowInterstitialIfReady(Action onClosed = null)
     {
@@ -344,6 +504,10 @@ public class AdManager : MonoBehaviour
 
         if (!countReady || !timeReady || !IsInterstitialReady)
         {
+            // Gösterim koşulları sağlandı ama reklam hazır değil: yüklemeyi tetikle.
+            if (countReady && timeReady)
+                RequestLoad(AdFormat.Interstitial);
+
             onClosed?.Invoke();
             return;
         }
@@ -401,17 +565,6 @@ public class AdManager : MonoBehaviour
 
     // ─── REWARDED INTERSTITIAL ────────────────────────────────────
 
-    private void LoadRewardedInterstitial()
-    {
-        if (rewardedInterstitialAd != null) { rewardedInterstitialAd.Destroy(); rewardedInterstitialAd = null; }
-
-        RewardedInterstitialAd.Load(REWARDED_INTERSTITIAL_ID, new AdRequest(), (ad, error) =>
-        {
-            if (error != null || ad == null) return;
-            rewardedInterstitialAd = ad;
-        });
-    }
-
     public void ShowRewardedInterstitialIfReady(Action onSuccess = null, Action onSkipped = null, string adPlacement = "dc_start")
     {
         // Gösterim sürerken gelen istek yok sayılır; ilk isteğin callback'i korunur.
@@ -425,6 +578,10 @@ public class AdManager : MonoBehaviour
 
         if (!countReady || !timeReady || !IsRewardedInterstitialReady)
         {
+            // Gösterim koşulları sağlandı ama reklam hazır değil: yüklemeyi tetikle.
+            if (countReady && timeReady)
+                RequestLoad(AdFormat.RewardedInterstitial);
+
             onSkipped?.Invoke();
             return;
         }
