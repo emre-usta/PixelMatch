@@ -40,6 +40,7 @@ public class LevelSelectManager : MonoBehaviour
 
     private CategoryConfig selectedCategory;
     private int selectedCategoryIndex = 0;
+    private bool isLeavingScene = false;
 
     public static LevelConfig SelectedLevel { get; private set; }
     public static int SelectedCategoryID { get; private set; }
@@ -608,7 +609,12 @@ public class LevelSelectManager : MonoBehaviour
         return levelID >= category.levels.Length - 1;
     }
 
-    public void OnBackClicked() => SceneManager.LoadScene("MainMenu");
+    public void OnBackClicked()
+    {
+        if (isLeavingScene) return;
+        isLeavingScene = true;
+        SceneManager.LoadScene("MainMenu");
+    }
 
     // ─── KATEGORİ NAVİGASYON ─────────────────────────────────────
 

@@ -21,6 +21,7 @@ public class DailyChallengeManager : MonoBehaviour
     }
 
     private Coroutine pulseCoroutine;
+    private bool isLaunching = false;
 
     private const string KEY_LAST_PLAYED = "dc_last_played";
     private const string KEY_LAST_STARS = "dc_last_stars";
@@ -149,6 +150,8 @@ public class DailyChallengeManager : MonoBehaviour
     public void StartDailyChallenge()
     {
         if (IsPlayedToday()) return;
+        if (isLaunching) return;
+        isLaunching = true;
 
         AdManager.Instance?.ShowRewardedInterstitialIfReady(
             onSuccess: () =>

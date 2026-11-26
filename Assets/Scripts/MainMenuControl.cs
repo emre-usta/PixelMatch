@@ -8,6 +8,7 @@ public class MainMenuControl : MonoBehaviour
     [SerializeField] private UIPopupController modeSelectPopup;
 
     private const string KEY_STARTER = "starter_powerups_given";
+    private bool isLeavingScene = false;
     public static MainMenuControl Instance { get; private set; }
 
     private void Awake()
@@ -88,11 +89,15 @@ public class MainMenuControl : MonoBehaviour
     // ─── MOD SEÇİMİ ───────────────────────────────────────────────
     public void OnStoryModeClicked()
     {
+        if (isLeavingScene) return;
+        isLeavingScene = true;
         SceneManager.LoadScene("LevelSelect");
     }
 
     public void OnFreeModeClicked()
     {
+        if (isLeavingScene) return;
+        isLeavingScene = true;
         SceneManager.LoadScene("FreeMode");
     }
 

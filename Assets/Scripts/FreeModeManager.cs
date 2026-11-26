@@ -65,6 +65,7 @@ public class FreeModeManager : MonoBehaviour
 
     private List<Button> categoryButtons = new List<Button>();
     private int selectedCategoryIndex = 0;
+    private bool isStarting = false;
 
     private void Awake()
     {
@@ -307,6 +308,8 @@ public class FreeModeManager : MonoBehaviour
     private void StartFreeMode()
     {
         if (SelectedCategory == null) return;
+        if (isStarting) return;
+        isStarting = true;
 
         IsFreeModeActive = true;
         LevelSelectManager.SelectedMode = SelectedMode;

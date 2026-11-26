@@ -20,6 +20,7 @@ public class LevelPopupManager : MonoBehaviour
 
     private LevelConfig pendingLevel;
     private int pendingLevelIndex;
+    private bool isStarting = false;
 
     public bool IsPopupOpen => popupPanel != null && popupPanel.activeSelf;
 
@@ -84,7 +85,9 @@ public class LevelPopupManager : MonoBehaviour
 
     private void StartLevel()
     {
+        if (isStarting) return;
         if (pendingLevel == null) return;
+        isStarting = true;
         LevelSelectManager.SetSelectedLevel(pendingLevel, pendingLevelIndex);
         if (popupPanel != null) popupPanel.SetActive(false);
         SceneManager.LoadScene("Level1");
